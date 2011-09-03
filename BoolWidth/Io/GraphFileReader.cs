@@ -8,13 +8,13 @@ namespace BoolWidth.Io
     {
         public GraphFileReader (String fileName)
         {
-            ReadFile(fileName);
+            ParseFile(File.ReadAllLines(fileName));
         }
 
-        public void ReadFile(String fileName)
+        public void ParseFile(String[] lines)
         {
             bool headerFound = false;
-            foreach (var line in File.ReadLines(fileName))
+            foreach (var line in lines)
             {
                 var tokens = line.Split(' ');
                 var type = tokens[0];
