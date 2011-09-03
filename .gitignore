@@ -50,3 +50,10 @@ _ReSharper*/
 
 # Temp files
 *.swp
+
+# Clojure
+pom.xml
+*jar
+/lib/
+/classes/
+.lein-deps-sum
