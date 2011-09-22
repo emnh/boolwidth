@@ -38,8 +38,8 @@ module Test =
         let count = 
             Seq.length 
                 (ListNeighborHoods.listNeighborHoods testNeighborHoods)
-        assert (count = (1 <<< power) + 1)
-        ((count = (1 <<< power) + 1),
+        assert (count = (1 <<< power))
+        ((count = (1 <<< power)),
             (Map.ofList 
                 ["function", "testCount";
                 ])
