@@ -1,5 +1,7 @@
 ﻿// cd E:\privdata\dev\BoolWidth\FSharpTest\CutBoolExperiments\CutBoolExperiments\bin\Debug
 
+namespace Experiments
+
 module ListNeighborHoods =
     let private internalListNeighborHoods hoods newHood = 
         (Set.union
@@ -14,10 +16,18 @@ module ListNeighborHoods =
 //let results = testNeighborHoodsA
 //let results2 = internalListNeighborHoods testNeighborHoodsA testNeighborHoodsA.[0]
 
+    let countNeighborHoods neighborHoods = 
+        let allVertices = (Set.unionMany neighborHoods)
+        let branch inSet outSet rest restNeighborHoods = 
+            let restNeighborhoods = Seq.map (fun x -> Set.intersect x rest) restNeighborHoods
+            2
+        branch Set.empty Set.empty allVertices neighborHoods
+
+
 module Test =
     let testNeighborHoodsA = 
         Seq.map 
-            Set.ofSeq 
+            Set.ofSeq
             [
                 [ 1; 2; 5 ]
                 [ 1; 2; 3; ]
@@ -39,11 +49,12 @@ module Test =
             Seq.length 
                 (ListNeighborHoods.listNeighborHoods testNeighborHoods)
         assert (count = (1 <<< power))
-        ((count = (1 <<< power)),
-            (Map.ofList 
-                ["function", "testCount";
-                ])
-            )
+        count
+//        ((count = (1 <<< power)),
+//            (Map.ofList 
+//                ["function", "testCount";
+//                ])
+//            )
 
     let printResults results =     
         Seq.iter (
@@ -71,25 +82,29 @@ module Performance =
     let timeit f = 
         let watch = new System.Diagnostics.Stopwatch()
         watch.Start()
-        let res = f
+        let res = f()
         watch.Stop()
         watch.Elapsed.TotalMilliseconds
     
     let showTiming f msg =
         printfn "%s: Needed %f ms" msg (timeit f)
         
-    showTiming (fun() -> 2) "Test"
+    showTiming (fun() -> (Test.testCount 16)) "TestCount"
+
+    //printfn "%d" (Test.testCount 8)
 
 open ListNeighborHoods
 
-open NUnit.Framework
+open Performance
 
-[<TestFixture>]
-type myFixture() = class
-
-    [<Test>]
-    member self.myTest() =
-        Assert.AreEqual(1,1)
-        //test code
-
-end
+//open NUnit.Framework
+//
+//[<TestFixture>]
+//type myFixture() = class
+//
+//    [<Test>]
+//    member self.myTest() =
+//        Assert.AreEqual(1,1)
+//        //test code
+//
+//end
