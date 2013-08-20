@@ -1,0 +1,229 @@
+<html>
+<style>
+
+body {
+  font: 13px sans-serif;
+  position: relative;
+}
+
+#graphtext textarea,
+#treetext textarea
+{
+    width: 100%;
+    height: 100%;
+}
+
+#split
+{
+    border: 0px;
+}
+#menu
+{
+    float: left;
+}
+.chart
+{
+    width: 800;
+    height: 800;
+    border: 1px solid gray;
+    float: left;
+    margin-right: 2px;
+}
+#todo
+{
+    border: 1px solid gray;
+    float: left;
+    margin-right: 2px;
+    padding-right: 2em;
+}
+
+#grapvhis text
+{
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+#graphvis text.id
+{
+  text-anchor: middle;
+  font-weight: bold;
+}
+
+#graphvis .node
+{
+  cursor: crosshair;
+}
+
+#treevis .treenode circle:hover,
+#treevis .treenode.leaf circle:hover,
+#graphvis .node.node_marked circle {
+    fill: pink;
+}
+
+#graphvis .node_selected {
+  fill: #ff7f0e;
+}
+
+#graphvis .node_target {
+  fill: #007f0e;
+  stroke: #007f0e;
+}
+
+#graphvis .drag_line {
+  stroke: #999;
+  stroke-width: 5;
+  pointer-events: none;
+}
+
+#graphvis .drag_line_hidden {
+  stroke: #999;
+  stroke-width: 0;
+  pointer-events: none;
+}
+
+#graphvis .link {
+  stroke: #999;
+  stroke-width: 1;
+  cursor: crosshair;
+}
+
+#graphvis .link_selected {
+  stroke: #ff7f0e;
+}
+
+#treevis .treenode circle {
+    fill: white;
+    stroke: gray;
+}
+
+#graphvis .node circle,
+#treevis .treenode.leaf circle {
+    fill: lightblue;
+    stroke: gray;
+}
+
+#treevis text {
+    font: sans-serif;
+}
+
+#treevis .treenode circle.dragtarget
+{
+    fill: red;
+}
+
+#treevis .treenode.entered circle,
+#treevis .treenode.leaf.entered circle
+{
+    fill: pink;
+}
+
+#clustervis .node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+#clustervis .node {
+  font: 10px sans-serif;
+}
+#clustervis .link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+</style>
+<head>
+    <title>Boolean-width explorer</title>
+	<script src="jquery-1.9.1.js"></script>
+	<script src="jquery.total-storage.js"></script>
+	<script src="cycle.js"></script>
+	<script src="d3.v3.min.js"></script>
+	<script src="bitset.js"></script>
+	<script src="set.js"></script>
+    <script src="graph.js"></script>
+</head>
+<body>
+	
+<div>
+<div id="menu">
+    <select id="interaction_mode">
+      <option value="edit">Edit</option>
+      <option value="move">Move</option>
+    </select>
+    <ul class="tabs">
+        <li><a href="#graphvis">Graph</a></li>
+        <li><a href="#clustervis">Decomposition</a></li>
+        <li><a href="#graphtext">Graph Text</a></li>
+        <li><a href="#treetext">Decomposition Text</a></li>
+    </ul>
+</div>
+<div id="split">
+    <div class="pane">
+        <div class="chart" id="graphvis"></div>
+        <div class="chart" id="clustervis"></div>
+        <div class="chart" id="debug"></div>
+        <div class="chart" id="graphtext"><textarea disabled></textarea></div>
+        <div class="chart" id="treetext"><textarea disabled></textarea></div>
+    </div>
+    <div class="chart" id="treevis"></div>
+</div>
+<div id="todo">
+    <ul>
+        <li>TODO</li>
+        <ul>
+        <li>clean separation of graph/tree data objects with change notifications</li>
+        <li>visualize cutbool algorithm</li>
+        <li>tag or display max cutbool for tree</li>
+        <li>drag to rearrange tree</li>
+            <ul>
+                <li>fix bugs (not possible to exchange child with parent)</li>
+            </ul>
+        <li>graph changes preserve tree as much as possible</li>
+        <li>graph and tree simple print literals</li>
+        <li>click to fix cutbool view and enable node swaps</li>
+        <li>add help text for keys and mouse actions</li>
+        <li>switch between circle pack and regular tree</li>
+        <li>editable graph text</li>
+        <li>all selectors in css and code target parent svg in case of multiple graphs</li>
+        </ul>
+    </ul>
+</div>
+</div>
+<script src="force_view.js"></script>
+<script src="pack_view.js"></script>
+<script src="cluster_view.js"></script>
+<script>
+    $ = jQuery;
+    $(document).ready(function() {
+        // tabs
+        $("ul.tabs a").click(function() {
+            $(".pane div").hide();
+            $($(this).attr("href")).show();
+        });
+        $("ul.tabs a")[3].click();
+
+        function updateGraphText(graph)
+        { 
+            var fg = formatGraph(graph); 
+            $("#graphtext textarea").val(fg);
+        };
+        function updateTreeText(graph)
+        { 
+            var fg = formatTree(graph); 
+            $("#treetext textarea").val(fg);
+        }
+
+        var graphvis = new force_view("#graphvis");
+        updateGraphText(graphvis.graph);
+        var packvis = new pack_view("#treevis", graphvis);
+        updateTreeText(packvis.state.root);
+        graphvis.redraw_callbacks.push(function() { packvis.redraw_pack(); });
+        graphvis.redraw_callbacks.push(function() { updateGraphText(graphvis.graph); });
+        packvis.markNodes = graphvis.markNodes;
+        var clusterobj = new cluster_view("#clustervis", packvis);
+    });
+</script>
+
+</body>
+
+</html>
