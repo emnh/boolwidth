@@ -1,3 +1,6 @@
 [submodule "explorer"]
 	path = explorer
 	url = https://github.com/emnh/boolwidth-explorer
+[submodule "java/data"]
+	path = java/data
+	url = https://github.com/emnh/boolwidth-data
