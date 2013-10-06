@@ -1,4 +1,4 @@
-(defproject cltest "1.0"
+(defproject boolwidth "1.0"
   :description "FIXME: write"
   :plugins [
             ;[lein-localrepo "0.5.2"]
