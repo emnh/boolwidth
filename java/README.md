@@ -19,6 +19,14 @@ Or download and extract manually to lib folder:
 
 Open the IntelliJ IDEA project in java folder.
 
+I haven't used the Eclipse project in a while, but you can try.
+
 ## Console
 
-TODO: Insert maven instructions.
+bash scripts/build-java.sh
+
+# Run
+
+This will run the heuristic on a graph to create a decomposition.
+
+bash ./scripts/run.sh data/graphLib_ours/hsugrid/hsu-4x4.dimacs
