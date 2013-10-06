@@ -20,8 +20,8 @@ import util.Util;
 public class ControlUtil {
 
 	public static final String OUTPUT_DIR = "output/";
-	public static final String GRAPHLIB = "graphLib/";
-	public static final String GRAPHLIB_OURS = "graphLib_ours/";
+	public static final String GRAPHLIB = "data/graphLib/";
+	public static final String GRAPHLIB_OURS = "data/graphLib_ours/";
 
 	public static String getOutputDir(String inputFile) {
 		String outputDir = OUTPUT_DIR + inputFile + "/";

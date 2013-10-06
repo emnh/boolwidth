@@ -57,3 +57,7 @@ pom.xml
 /lib/
 /classes/
 .lein-deps-sum
+
+# Project
+/java/output
+/java/.idea/workspace.xml
