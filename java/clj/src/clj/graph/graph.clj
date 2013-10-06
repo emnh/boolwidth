@@ -29,7 +29,7 @@
     clj.graph.hood.NeighborhoodSet
     )
   )
-    
+
 (util/enable-reflection-warnings)
 
 ; Conventions
@@ -60,7 +60,7 @@
     is a neighborhood of a vertex v in vertices. N implements PSubsets")
   )
 
-(defprotocol 
+(defprotocol
   PCut
   (cut-graph [x] "Return the graph for which this is a cut")
   (left-vertices [x] "Return subset S of nodes to the left, where S implements PSet, PSubset")
@@ -68,9 +68,9 @@
   (left-hoods
     [x]
     "Return set of neighborhoods N of the nodes to the left, where N implements
-    PSubsets, PSet") 
+    PSubsets, PSet")
   (right-hoods
-    [x] 
+    [x]
     "Return set of neighborhoods N of the nodes to the right, where N
     implements PSubsets, PSet")
   )
@@ -80,7 +80,7 @@
   PGraph
   clj.graph.graph.PCut
   (vertices [x] (vertices (cut-graph x)))
-  (neighbors [x vertex] 
+  (neighbors [x vertex]
              (let
                [isleft (sets/contains? (left-vertices x) vertex)
                 ]
@@ -155,7 +155,7 @@
   common/PIndexed
   Vertex
   (index
-    [x collection] 
+    [x collection]
     (let
       [idx (.id x)]
       (assert (number? idx))
@@ -198,11 +198,11 @@
   PGraphHoods
   Object ; Graph
   (neighborhood
-    [x vertex] 
+    [x vertex]
     (graph-new-neighborhood x vertex)
     )
   (neighborhoods
-    [x vertices] 
+    [x vertices]
     (graph-new-neighborhoods x vertices)
     )
   )
@@ -239,7 +239,7 @@
 ;(type MatrixGraph)
 ;(type clj.graph.graph.MatrixGraph)
 
-(deftest 
+(deftest
   new-matrix-graph-test
   (is
     (=

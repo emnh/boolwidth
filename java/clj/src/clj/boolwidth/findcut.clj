@@ -1,9 +1,10 @@
 (ns clj.boolwidth.findcut
-
   (:use
     [clojure.pprint]
     [clj.graph.graph]
+    [clj.graph.graphxp]
     [clj.boolwidth.cutbool]
+    [clj.boolwidth.cutboolexp]
     [clj.sets.bitset]
     [clojure.contrib.trace]
     )
@@ -18,7 +19,6 @@
     )
   )
 
-(util/enable-reflection-warnings)
 (util/enable-reflection-warnings)
 
 ; Compatible with clojure.contrib.graph
@@ -66,7 +66,7 @@
     (time 
       (let [
             avgcutbool
-            (apply avg (map #(double (boolwidth.CutBool/countNeighborhoods %)) bigraphs))]
+            (apply util/avg (map #(double (boolwidth.CutBool/countNeighborhoods %)) bigraphs))]
         (trace "JAVA AVG" avgcutbool)
         )
       )
@@ -75,13 +75,13 @@
       (trace "JAVA BIGRAPH" (apply min (map #(boolwidth.CutBool/countNeighborhoods %) bigraphs)))
       )
 
-    (time 
-      (trace "CLJ BIGRAPH" (apply min (map #(count (neighborhoods %)) bigraphs)))
-      )
+    ; java.lang.IllegalArgumentException: No single method: neighborhoods of interface: clj.graph.graph.PGraphHoods found for function: neighborhoods of protocol: PGraphHoods
+;    (time 
+;      (trace "CLJ BIGRAPH" (apply min (map #(count (neighborhoods %)) bigraphs))))
 
-    (time 
-      (trace "CLJ CUT" (apply min (map #(count (neighborhoods %)) cuts)))
-      )
+    ; java.lang.IllegalArgumentException: No single method: neighborhoods of interface: clj.graph.graph.PGraphHoods found for function: neighborhoods of protocol: PGraphHoods
+;    (time 
+;      (trace "CLJ CUT" (apply min (map #(count (neighborhoods %)) cuts))))
 
     (time
       (trace "JAVA LAZY"

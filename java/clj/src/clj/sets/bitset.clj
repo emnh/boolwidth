@@ -1,5 +1,5 @@
 (ns clj.sets.bitset
-  (:use 
+  (:use
     [clj.util.util]
     [clojure.pprint]
     [clojure.test]
@@ -7,7 +7,7 @@
   (:require
     [clj.sets.set :as set]
     )
-  (:import 
+  (:import
     java.util.Random
     clojure.lang.Seqable)
   )
@@ -27,7 +27,7 @@
 ;             (toString [this])
 ;             )
 
-(defn bitseq 
+(defn bitseq
   "Returns sequence of bits for a number"
   [number]
 ;  (let [number (int number)]
@@ -66,7 +66,7 @@
 ; ----- BITSET -----
 
 (deftype
-  Bitset 
+  Bitset
   [
    #^clojure.lang.IPersistentCollection ground-set
    #^Number subset]
@@ -75,7 +75,7 @@
   (get-subset [x] subset)
   (get-ground-set [x] ground-set)
   (validate
-    [a b] 
+    [a b]
     { :pre
      [
        (= (get-ground-set a) (get-ground-set b))
@@ -89,21 +89,21 @@
   set/PSet
 
   (union
-    [a b] 
+    [a b]
     { :pre [(validate a b)] }
       (Bitset. (.ground-set a) (bit-or subset (get-subset b)))
     )
-  
+
   (intersection
-    [a b] 
+    [a b]
     { :pre [(validate a b)] }
       (Bitset. (.ground-set a) (bit-and subset (get-subset b)))
     )
 
   (difference
-    [a b] 
+    [a b]
     { :pre [(validate a b)] }
-      (Bitset. (.ground-set a) 
+      (Bitset. (.ground-set a)
                (bit-xor
                  (.subset a)
                  (bit-and (.subset a) (get-subset b)))
@@ -133,7 +133,7 @@
      (fn [[bit element]] (if (= bit 1) element nil))
      (map #(vector %1 %2) (bitseq subset) (reverse ground-set))
      ))
-;            (reduce 
+;            (reduce
 ;              (fn
 ;                [acc element]
 ;                (conj (bit-shift-left acc 1) (if (contains? subset element) 1 0)))
@@ -174,14 +174,14 @@
 
   java.lang.Object
   ;PObject
-  
+
   (hashCode
     [this]
     (hash-combine
       (.hashCode (.ground-set this))
       (.hashCode (.subset this)))
     )
-  
+
   (equals
     [b1 b2]
     ((fn [#^Bitset b1 #^Bitset b2]
@@ -217,7 +217,7 @@
     [subset (if (set? subset) subset (set subset))]
     (let
       [subset
-       (reduce 
+       (reduce
         (fn
           [acc element]
           (bit-or (bit-shift-left #^Number acc 1) (if (contains? subset element) 1 0)))
@@ -240,7 +240,6 @@
 ;  [r, writer]
 ;  (.write writer (.repr r)))
 
-
 (with-test
   (defn implies [a b] (or (not a) b))
   (is (= (implies false false) true))
@@ -251,7 +250,7 @@
 
 (deftest
   set-complement-test
-  (is 
+  (is
     (=
       (set (set/complement (new-bitset #{1 2 3 4 5} #{1 2 4})))
       #{3 5}
@@ -268,7 +267,7 @@
     (if
       (instance? Bitset ground-set)
       (.ground-set #^Bitset ground-set)
-      ground-set) 
+      ground-set)
     0)
   )
 
@@ -290,7 +289,7 @@
 
 (deftest
   subsets-test
-  (let 
+  (let
     [
      a (set (map #(set (seq %)) (all-subsets #{1 2 3})))
      b #{#{} #{3} #{2} #{2 3} #{1} #{1 3} #{1 2} #{1 2 3}}
@@ -303,7 +302,7 @@
 ;  (memoize (fn [] (Random.)))
 ;  )
 
-(def #^Random rnd-single 
+(def #^Random rnd-single
   (Random.)
   )
 
@@ -330,11 +329,11 @@
   ; start from empty set and set random bits if k < n/2
   ; start from full set and clear random bits if k > n/2
   [ground-set #^Integer k]
-  { 
-   :pre ( 
+  {
+   :pre (
          (instance? Integer k)
          (<= k (count ground-set))
-         ) 
+         )
    :runtime '(* 2 k)
    }
   (let
@@ -344,7 +343,7 @@
      init-bitcount (bit-count init-curval)
      compute-next (if (< init-bitcount k) bit-set bit-clear)
      subset (loop [curval init-curval]
-              (if 
+              (if
               (= (bit-count curval) k)
               curval
               (recur (compute-next curval (rand-int n)))
@@ -362,7 +361,7 @@
 (defn random-combinations
   "
   Get infinite seq of random subset of size k in ground-set.
-  
+
   Get infinite seq of random subset of size between l and u in ground-set.
   "
   ([ground-set k]

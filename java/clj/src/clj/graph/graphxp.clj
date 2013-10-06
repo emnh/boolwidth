@@ -1,3 +1,32 @@
+(ns
+  clj.graph.graphxp
+  (:use
+    [clojure.test :only [deftest is]]
+    )
+  (:require
+    [clj.util.util :as util]
+    [clj.graph.hood :as hood]
+    [clj.graph.hoods :as hoods]
+    [clj.common.core :as common]
+    [clojure.contrib.string]
+    [clj.sets.set :as sets]
+    [clj.sets.bitset :as bitset]
+    [clojure.set :as cset]
+    )
+  (:import
+    clojure.lang.Seqable
+    interfaces.IGraph
+    graph.Vertex
+    graph.BiGraph
+    io.DiskGraph
+    clojure.lang.IPersistentVector
+    clj.graph.graph.MatrixCut
+    clj.graph.graph.MatrixGraph
+    clj.graph.hood.NeighborhoodSet
+    ))
+
+(util/enable-reflection-warnings)
+
 (defn disp
   ([first & rest]
    (class first)
@@ -28,26 +57,32 @@
   disp
   )
 
-(extend-type
-  BiGraph
-  Cut
+; TODO: hack, add protocol to make it compile
+;(defprotocol
+;  Cut
+;  (get-hoods [#^BiGraph bigraph] ))
+
+;(extend-type
+;  BiGraph
+;  Cut
 
 ; Returns [left right] each a seq of bitsets
-  (get-hoods
-  (
-    [#^BiGraph bigraph] 
-    (let
-      [
-       left (.leftVertices bigraph)
-       right (.rightVertices bigraph)
-       ]
-      [
-      (set (get-hoods-3 bigraph left right))
-      (set (get-hoods-3 bigraph right left))
-       ]
-      )
-    )
-  )
+;  (get-hoods
+;  (
+;    [#^BiGraph bigraph] 
+;    (let
+;      [
+;       left (.leftVertices bigraph)
+;       right (.rightVertices bigraph)
+;       ]
+;      [
+;      (set (get-hoods-3 bigraph left right))
+;      (set (get-hoods-3 bigraph right left))
+;       ]
+;      )
+;    )
+;  )
+;  )
 
 ; Returns seq of bitsets
 (defmethod
@@ -63,7 +98,7 @@
           (.incidentEdges graph vertex)
           )
         ]
-        (new-bitset ground-set neighbors)
+        (bitset/new-bitset ground-set neighbors)
         )
       )
    )
@@ -97,7 +132,7 @@
    [#^IGraph graph vertices ground-set]
    (let 
      [allvertices (.vertices graph)
-      remove-bitset (set-complement (new-bitset allvertices ground-set))
+        remove-bitset (sets/complement (bitset/new-bitset allvertices ground-set))
      ]
      (for [vertex vertices]
        (let
@@ -107,7 +142,7 @@
            (.incidentEdges graph vertex)
            )
          ]
-         (set-difference (new-bitset allvertices neighbors) remove-bitset)
+         (sets/difference (bitset/new-bitset allvertices neighbors) remove-bitset)
          )
        )
      )
@@ -134,11 +169,11 @@
   [#^MatrixCut mview]
   (let 
     [
-     #^MatrixGraph mgraph (.MatrixGraph mview)
+     ;#^MatrixGraph mgraph (MatrixGraph. (mview)
      left (.left-vertices mview)
      right (.right-vertices mview)
-     leftseq (get-hoods-3 mgraph left right)
-     rightseq (get-hoods-3 mgraph right left)
+     leftseq (get-hoods-3 mview left right)
+     rightseq (get-hoods-3 mview right left)
      ]
     [leftseq rightseq]
     )
@@ -155,11 +190,13 @@
         [neighbors
          (nth (.edge-matrix graph) (.id vertex))
         ]
-        (set-difference neighbors vertices)
+        (sets/difference neighbors vertices)
         )
     )
     (seq vertices)
 ;    (.edge-matrix graph)
     )
   )
+
+
 

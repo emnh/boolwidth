@@ -1,10 +1,10 @@
 (ns clj.util.json
   (:use
     [clj.util.introspect]
-    [clojure.contrib.string :only (as-str)]
+    [clojure.contrib.java-utils :only (as-str)]
     [clojure.contrib.pprint :only (write formatter-out)]
     )
-  (:import 
+  (:import
     graph.BiGraph
     interfaces.IGraph
     (java.io PrintWriter StringWriter)
@@ -45,7 +45,7 @@
     (.append sb \")
     (.print out (str sb))))
 
-(defn- write-json-object [m #^PrintWriter out] 
+(defn- write-json-object [m #^PrintWriter out]
   (.print out \{)
   (loop [x m]
     (when (seq m)
@@ -91,7 +91,7 @@
   (if (.isArray (class x))
     (write-json (seq x) out)
     (throw (Exception. (str "Don't know how to write JSON of " (class x))))))
-  
+
 (extend nil Write-JSON
         {:write-json write-json-null})
 (extend clojure.lang.Named Write-JSON
@@ -133,18 +133,18 @@
 
 ;; Based on code by Tom Faulhaber
 
-(defn- pprint-json-array [s] 
+(defn- pprint-json-array [s]
   ((formatter-out "~<[~;~@{~w~^, ~:_~}~;]~:>") s))
 
 (defn- pprint-json-object [m]
-  ((formatter-out "~<{~;~@{~<~w:~_~w~:>~^, ~_~}~;}~:>") 
+  ((formatter-out "~<{~;~@{~<~w:~_~w~:>~^, ~_~}~;}~:>")
    (for [[k v] m] [(as-str k) v])))
 
 (defn- pprint-json-generic [x]
   (if (.isArray (class x))
     (pprint-json-array (seq x))
     (print (json-str x))))
-  
+
 (defn- pprint-json-dispatch [x]
   (cond (nil? x) (print "null")
         (instance? java.util.Map x) (pprint-json-object x)
@@ -178,22 +178,22 @@
 ;  (.print out \)))
 
 
-;(extend 
-;  graph.Vertex 
+;(extend
+;  graph.Vertex
 ;  Write-JSON {
 ;              :write-json (fn [obj out] (write-java-object obj out))
 ;              }
 ;  )
 
-(extend 
+(extend
   BiGraph
   Write-JSON {
               :write-json (fn [obj out] (write-java-object obj out))
               }
   )
 
-(extend 
-  java.lang.Object 
+(extend
+  java.lang.Object
   Write-JSON {
               :write-json (fn [obj out] (write-java-object obj out))
               }

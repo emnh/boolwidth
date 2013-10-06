@@ -1,11 +1,11 @@
 (ns clj.util.util
-  (:use 
+  (:use
     [clojure.test]
     [clojure.pprint]
     [clojure.contrib.str-utils]
     )
   (:require
-    [clojure.contrib.string :as cstr]
+   [clojure.string :as cstr]
     )
   (:import
 ;    (java.security MessageDigest)
@@ -87,14 +87,14 @@
     [& numbers]
     (/ (apply + numbers) (count numbers)))
 
-(deftest 
+(deftest
   avg-test
   (is (= 2 (avg 1 2 3)))
   )
 
 ;(defmacro defexample
 ;  [name value]
-;  `(def 
+;  `(def
 ;     ~(with-meta name {:b 3})
 ;     ~value)
 ;  )

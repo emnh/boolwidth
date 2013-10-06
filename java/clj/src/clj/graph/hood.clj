@@ -5,6 +5,7 @@
     [clojure.test :only (deftest is)]
     )
   (:require
+    [clojure.set :as cljset]
     [clj.sets.set :as sets]
     )
   (:import
@@ -38,11 +39,11 @@
   (seq [x] (seq hood))
 
   sets/PSet
-  (union [x y] (set-bin-op x clojure.set/union y))
-  (intersection [x y] (set-bin-op x clojure.set/intersection y))
-  (difference [x y] (set-bin-op x clojure.set/difference y))
-  (subset? [x y] (set-bin-op x clojure.set/subset? y))
-  (superset? [x y] (set-bin-op x clojure.set/superset? y))
+  (union [x y] (set-bin-op x cljset/union y))
+  (intersection [x y] (set-bin-op x cljset/intersection y))
+  (difference [x y] (set-bin-op x cljset/difference y))
+  (subset? [x y] (set-bin-op x cljset/subset? y))
+  (superset? [x y] (set-bin-op x cljset/superset? y))
   (contains? [x y] (clojure.core/contains? hood y))
   (count [x] (clojure.core/count hood))
   (empty? [x] (clojure.core/empty? hood))
@@ -52,7 +53,7 @@
 
   sets/PSubset
   (universe [x] _universe)
-  (complement [x] (NeighborhoodSet. _universe (clojure.set/difference _universe hood)))
+  (complement [x] (NeighborhoodSet. _universe (cljset/difference _universe hood)))
 
   java.lang.Object
   (toString [x] (str "N:" "uhash:" (apply str (map #(.id %) _universe)) " hood:" hood))
