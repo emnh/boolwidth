@@ -34,3 +34,7 @@ Run:
 This will run the heuristic on a graph to create a decomposition:
 
     bash ./scripts/run.sh data/graphLib_ours/hsugrid/hsu-4x4.dimacs
+
+# Scala
+
+The scala files were an experiment and are not supported at this time but you are welcome to play with them.
