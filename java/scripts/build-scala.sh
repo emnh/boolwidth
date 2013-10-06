@@ -1,6 +1,6 @@
 #!/bin/zsh
 #CP=$PWD/lib/prefuse.jar:$PWD/lib/glazed*.jar
-CP=$(grep -o "[^\"]*\.jar" .classpath | tr '\n' :):~/devel/master/staticproxy/bin
+CP=$(grep -o "[^\"]*\.jar" .classpath | tr '\n' :)
 scalac=fsc
 javac=javac
 classes=sbuild/classes
