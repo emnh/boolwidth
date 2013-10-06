@@ -1,5 +1,6 @@
 (ns clj.sets.bitset.tests
   (:use
+    [clj.sets.set :as sets]
     [clj.sets.bitset]
     [clojure.test]
     [clojure.pprint]
@@ -25,9 +26,9 @@
      ground-set #{1 2 3 4}
     ]
     (binding [
-       a-bit (to-bitset ground-set a)
-       a2-bit (to-bitset ground-set a)
-       b-bit (to-bitset ground-set b)
+       a-bit (new-bitset ground-set a)
+       a2-bit (new-bitset ground-set a)
+       b-bit (new-bitset ground-set b)
        ]
       (f)
       )
@@ -41,7 +42,7 @@
   (let
     [
      u (clojure.set/difference a b)
-     u_bit (set (difference a-bit b-bit))
+     u_bit (set (sets/difference a-bit b-bit))
     ]
     (is (= u u_bit))
     (report ["diff" u u_bit])
@@ -73,7 +74,7 @@
     [ground-set #{1 2 3 4}
      subset #{1 3}
     ]
-    (is (= (set (to-bitset ground-set subset)) subset))
+    (is (= (set (new-bitset ground-set subset)) subset))
     )
   )
 
