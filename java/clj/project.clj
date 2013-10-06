@@ -13,7 +13,7 @@
           [
            [methods-a-la-carte "0.1.1"]
            [org.clojure/clojure "1.5.1"]
-           [org.clojure/clojure-contrib "1.2.0"]
+;           [org.clojure/clojure-contrib "1.2.0"]
            ;[clojure.contrib.java-utils ""]
            [net.java.dev.glazedlists/glazedlists_java15 "1.8.0"]
            [org.prefuse/prefuse "beta-20071021"]

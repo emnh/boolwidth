@@ -2,7 +2,6 @@
   (:use
     [clojure.test]
     [clojure.pprint]
-    [clojure.contrib.str-utils]
     )
   (:require
    [clojure.string :as cstr]
@@ -111,16 +110,16 @@
   ;   maps (filter (fn [[x y]] (instance? clojure.lang.PersistentArrayMap (var-get y))) pub)
      maps (filter (fn [[x y]] (map? (var-get y))) pub)
      protocols (filter (fn [[x y]] (:on-interface (var-get y))) maps)
-     lines (map (fn [[x y]] (str-join "\t" [x (type (var-get y)) y])) protocols)
+     lines (map (fn [[x y]] (cstr/join "\t" [x (type (var-get y)) y])) protocols)
      ]
-    (println (str-join "\n" lines))
+    (println (cstr/join "\n" lines))
     )
   (println "=====================")
   )
 
 (defn path-join
   [& args]
-  (str-join "/" args)
+  (cstr/join "/" args)
   )
 
 (defn strip-ext

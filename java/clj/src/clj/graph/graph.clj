@@ -14,7 +14,6 @@
     [clj.graph.hood :as hood]
     [clj.graph.hoods :as hoods]
     [clj.common.core :as common]
-    [clojure.contrib.string]
     [clj.sets.set :as sets]
     [clj.sets.bitset :as bitset]
     [clojure.set :as cset]

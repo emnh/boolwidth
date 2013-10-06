@@ -4,11 +4,11 @@
     [clojure.test :only [deftest is]]
     )
   (:require
+    [clj.graph.graph :as ngraph]
     [clj.util.util :as util]
     [clj.graph.hood :as hood]
     [clj.graph.hoods :as hoods]
     [clj.common.core :as common]
-    [clojure.contrib.string]
     [clj.sets.set :as sets]
     [clj.sets.bitset :as bitset]
     [clojure.set :as cset]
@@ -33,25 +33,25 @@
     )
   )
 
-(defmulti 
+(defmulti
   get-hoods
   "[#^BiGraph bigraph]: Get [left right] neighbor sets of bigraph as bitsets."
   disp
   )
 
-(defmulti 
+(defmulti
   get-hoods-3
    "[#^IGraph graph vertices ground-set]: Get sequence of bitsets representing neighbor sets of vertices in ground-set."
   disp
   )
 
-(defmulti 
+(defmulti
   get-hoods-full
   "[#^BiGraph bigraph]: Get [left right] neighbor sets of bigraph as bitsets, with all vertices in graph as ground-set."
   disp
   )
 
-(defmulti 
+(defmulti
   get-hoods-full-3
    "[#^IGraph graph vertices ground-set]: Get sequence of bitsets representing neighbor sets of vertices in ground-set, with all vertices in graph as ground-set."
   disp
@@ -69,7 +69,7 @@
 ; Returns [left right] each a seq of bitsets
 ;  (get-hoods
 ;  (
-;    [#^BiGraph bigraph] 
+;    [#^BiGraph bigraph]
 ;    (let
 ;      [
 ;       left (.leftVertices bigraph)
@@ -105,11 +105,11 @@
   )
 
 ; Returns [left right] each a seq of bitsets
-(defmethod 
+(defmethod
   get-hoods-full
   BiGraph
   (
-    [#^BiGraph bigraph] 
+    [#^BiGraph bigraph]
     (let
       [
        v (.vertices bigraph)
@@ -130,7 +130,7 @@
   IGraph
   (
    [#^IGraph graph vertices ground-set]
-   (let 
+   (let
      [allvertices (.vertices graph)
         remove-bitset (sets/complement (bitset/new-bitset allvertices ground-set))
      ]
@@ -155,7 +155,7 @@
   "
  (
   [#^IGraph graph left]
-  (let 
+  (let
     [left #^java.util.Collection (seq left)]
     (BiGraph. left graph)
      )
@@ -167,7 +167,7 @@
   get-hoods
   MatrixCut
   [#^MatrixCut mview]
-  (let 
+  (let
     [
      ;#^MatrixGraph mgraph (MatrixGraph. (mview)
      left (.left-vertices mview)

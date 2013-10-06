@@ -2,8 +2,7 @@
   (:use
     [clj.util.util]
     [clojure.pprint]
-    [clojure.test]
-    [clojure.contrib.trace])
+    [clojure.test])
   (:require
     [clj.sets.set :as set]
     )

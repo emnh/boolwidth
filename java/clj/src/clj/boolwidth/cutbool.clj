@@ -4,8 +4,6 @@
     [clojure.pprint]
     [clojure.test :only (deftest is)]
 ;    [clojure.contrib.trace]
-    [clojure.contrib.seq :only [rec-cat]]
-;    [clojure.contrib.json]
     )
   (:require 
     [clojure.contrib.greatest-least :as g-least]

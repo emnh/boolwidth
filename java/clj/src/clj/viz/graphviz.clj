@@ -1,17 +1,17 @@
 (ns clj.viz.graphviz
-  (:use 
+  (:use
 ;    [clojure.contrib.duck-streams]
 ;    [clj.boolwidth.cutbool]
     [clojure.pprint]
+   [clojure.contrib.def :only [defnk]]
     )
   (:require
     [clj.util.util :as util]
     [clj.sets.bitset :as bitset]
-    [clojure.contrib.def :as cdef]
-    [clojure.contrib.string :as cstr]
     [clj.graph.graph :as graph]
     [clj.decomposition.decomposition :as dc]
-    [clojure.contrib.shell-out :as shell]
+    [clojure.java.shell :as shell]
+    [clojure.string :as cstr]
     )
   (:import
     io.DiskGraph
@@ -79,7 +79,7 @@
   )
 
 (defn
-  graph-to-dot 
+  graph-to-dot
   "Convert graph to dot format"
   ([graph] (graph-to-dot graph {}))
   (
@@ -87,9 +87,9 @@
    (let
      [nodename (fn [node] (qstr (str node)))
       nodelabel (fn [node] (graph/node-label graph node))
-      nodestr (fn 
+      nodestr (fn
                 [node]
-                (util/sprintf 
+                (util/sprintf
                   "%s [label=\"%s\"];\n"
                   (nodename node)
                   (nodelabel node)
@@ -97,8 +97,8 @@
                 )
       edgestr (fn
                 [node]
-                (util/sprintf 
-                  "%s -- %s;\n" 
+                (util/sprintf
+                  "%s -- %s;\n"
                   (nodename (first node))
                   (nodename (second node))
                   )
@@ -116,13 +116,13 @@
          )))))
 
 (defn
-  decomposition-to-dot 
+  decomposition-to-dot
   "Convert decomposition to dot format"
   ([decomposition] (decomposition-to-dot decomposition {}))
   (
    [decomposition options]
    (let
-     [nodename 
+     [nodename
       (apply merge
         (map-indexed
           (fn [i v]
@@ -139,9 +139,9 @@
           (graph/node-label graph (dc/leaf-vertex decomposition node))
           )
         )
-      nodestr (fn 
+      nodestr (fn
                 [node]
-                (util/sprintf 
+                (util/sprintf
                   "%s [label=\"%s\"];\n"
                   (nodename node)
                   (nodelabel node)
@@ -149,8 +149,8 @@
                 )
       edgestr (fn
                 [node]
-                (util/sprintf 
-                  "%s -- %s;\n" 
+                (util/sprintf
+                  "%s -- %s;\n"
                   (nodename (first node))
                   (nodename (second node))
                   )
@@ -169,7 +169,7 @@
 
 (defn
   to-dot
-  [x] 
+  [x]
   (cond
     (satisfies? dc/PDecomposition x) (decomposition-to-dot x)
     (satisfies? graph/PGraph x) (graph-to-dot x)
@@ -181,9 +181,9 @@
 
 
 (def dotprog "dot")
-(def *tikz-scale* 0.5)
+(def ^:dynamic *tikz-scale* 0.5)
 
-(cdef/defnk dot-to-tex
+(defnk dot-to-tex
   [dotfname :prog dotprog :scale *tikz-scale*]
   (let
     [
@@ -200,7 +200,7 @@
        "-o" texfname
        dotfname
        :return-map true)
-     success (not (cstr/substring? "ERROR" err))
+     success (not (.contains "ERROR" err))
      ]
     (spit texlogfname (str "STDOUT\n" out "STDERR\n" err))
     (if
@@ -213,7 +213,7 @@
     )
   )
 
-(cdef/defnk tex-to-pdf
+(defnk tex-to-pdf
   [texfname]
   (let
     [
