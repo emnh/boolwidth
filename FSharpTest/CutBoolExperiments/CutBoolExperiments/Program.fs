@@ -14,11 +14,14 @@ module Graph =
             mutable IsProcessed : bool;
     }
 
-    let rec dfs (graph : IGraph<'a>) getNeighbors node seen =
+    let rec dfs (graph : IGraph<'a>) getNeighbors (node : 'a) seen =
         seq {
             yield node
             for neighbor in (getNeighbors node) do
-                yield! dfs graph neighbor
+                if not (Set.contains neighbor seen) then
+                    let newSeen = Set.add neighbor seen
+                    let a = dfs graph getNeighbors neighbor newSeen
+                    yield! a
         }
 
 module ListNeighborHoods =
@@ -50,20 +53,20 @@ module ListNeighborHoods =
 
     //let a = if true then Count(2) else HoodSeq(seq { yield 3 })
 
-    let connectedComponents neighborHoods = 
-        let ar = Array.ofSeq neighborHoods
-        let graph = Array.ofSeq seq {
-            for h1 in neighborHoods do
-                yield {
-                    Content = h1; 
-                    Neighbors = Array.ofSeq seq {
-                        for h2 in neighborHoods do
-                            if Set.intersect h1 h2 then yield h2
-                    };
-                    IsProcessed = False;
-                }
-        }
-        graph
+//    let connectedComponents neighborHoods = 
+//        let ar = Array.ofSeq neighborHoods
+//        let graph = Array.ofSeq seq {
+//            for h1 in neighborHoods do
+//                yield {
+//                    Content = h1; 
+//                    Neighbors = Array.ofSeq seq {
+//                        for h2 in neighborHoods do
+//                            if Set.intersect h1 h2 then yield h2
+//                    };
+//                    IsProcessed = False;
+//                }
+//        }
+//        graph
         //for (node, neighbors) in graph do    
 
     let countNeighborHoods neighborHoods countOnly = 
@@ -201,6 +204,8 @@ module Performance =
         
     showTiming (fun() -> (Test.testCount 16)) "TestCount"
     showTiming (fun() -> (Test.testCount2 16)) "TestCount2"
+
+    System.Console.ReadKey() |> ignore
 
     //printfn "%d" (Test.testCount 8)
 
