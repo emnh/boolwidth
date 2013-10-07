@@ -4,7 +4,7 @@
 
 The data files and boolwidth-explorer are in submodules:
 
-    git submodule update
+    git submodule update --init
 
 # Submodules
 
