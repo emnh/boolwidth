@@ -27,9 +27,9 @@ Main:
 
 - cbool: reimplementation of basic cutbool algorithm in C. I think I remember it works, but is not very general (using ints) or usable as library.
 
-- CSharp/BoolWidth: Partial rewrite in C#. Nothing works .
+- csharp/BoolWidth: Partial rewrite in C#. Nothing works .
 
-- FSharpTest/CutBoolExperiments: Testing a new smart algorithm for fast cutbool computation in F#. Doesn't work yet. Don't think it even compiles ATM. I think the idea is good though.
+- fsharp/CutBoolExperiments: Testing a new smart algorithm for fast cutbool computation in F#.
 
 # Resources
 
