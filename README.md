@@ -6,10 +6,14 @@ The data files and boolwidth-explorer are in submodules:
 
     git submodule update --init
 
-# Submodules
+# Git submodules
 
-- [explorer](https://github.com/emnh/boolwidth-explorer): boolwidth-explorer repository as git submodule
-- [java/data](https://github.com/emnh/boolwidth-data): boolwidth-data repository as git submodule
+A git submodule is a subfolder stored in a different repository.
+
+- [explorer](https://github.com/emnh/boolwidth-explorer)
+  - Separate repository for easy push to heroku.
+- [java/data](https://github.com/emnh/boolwidth-data)
+  - Separate for convenience because of data size.
 
 # Contents
 
@@ -22,14 +26,13 @@ Main:
     - Oliver Tynes (did coding for us as part of University course work)
     - Eivind Magnus Hvidevold (me. did most of the project coding for my Master thesis)
 
-- java/clj: Clojure addons and rewrites os java/src. A bit unorganized still.
-  - Needs cleanup and build/run instructions to be more useful.
+- java/clj: Clojure addons and rewrites os java/src.
 
 - cbool: reimplementation of basic cutbool algorithm in C. I think I remember it works, but is not very general (using ints) or usable as library.
 
-- csharp/BoolWidth: Partial rewrite in C#. Nothing works .
-
 - fsharp/CutBoolExperiments: Testing a new smart algorithm for fast cutbool computation in F#.
+
+- csharp/BoolWidth: Partial rewrite in C#. Nothing works.
 
 # Resources
 
