@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="src_generated"/>
 	<classpathentry kind="lib" path="lib/prefuse.jar"/>
 	<classpathentry kind="lib" path="lib/glazedlists-1.8.0_java15.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
@@ -10,12 +9,5 @@
 	<classpathentry kind="lib" path="lib/scala-library.jar"/>
 	<classpathentry kind="lib" path="lib/staticproxy.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="sbuild/classes"/>
-	<classpathentry kind="lib" path="/usr/lib/jvm/java-6-sun/lib/tools.jar" sourcepath="/media/data/software/javasrc/src/j2se/src/share/classes"/>
-	<classpathentry kind="src" path=".apt_generated">
-		<attributes>
-			<attribute name="optional" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
