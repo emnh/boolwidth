@@ -1,2 +1,2 @@
 #!/bin/bash
-vim -S ./start.vim
+vim -S ./scripts/start.vim
