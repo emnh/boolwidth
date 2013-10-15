@@ -4,16 +4,8 @@ This is a heuristic search project to generate boolean width decompositions of g
 
 # Prepare
 
-Library dependencies are in dropbox.
-
-Download libraries with provided script:
-
-    cd lib
-    bash download.sh
-
-Or download and extract manually to lib folder:
-
-    https://dl.dropboxusercontent.com/u/101905846/boolwidth-lib/lib.tar.gz
+Library dependencies are in git submodule.
+Make sure you have updated them, as in main project readme.
 
 # Compile
 
@@ -28,6 +20,11 @@ I haven't used the Eclipse project in a while, but you can try.
 Run:
 
     bash scripts/build-java.sh
+
+Or with leiningen (build tool for clojure that does java as well):
+
+    cd clj
+    lein javac
 
 # Run
 
