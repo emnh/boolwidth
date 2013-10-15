@@ -4,3 +4,6 @@
 [submodule "java/data"]
 	path = java/data
 	url = https://github.com/emnh/boolwidth-data
+[submodule "java/lib"]
+	path = java/lib
+	url = https://github.com/emnh/boolwidth-lib
