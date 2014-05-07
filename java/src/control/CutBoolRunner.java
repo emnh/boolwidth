@@ -20,7 +20,7 @@ public class CutBoolRunner {
 		// AdjacencyListGraph<String,String> graph;
 		// String fileName = "graphLib/protein/1brf_graph.dimacs";
 		// graph = ConstructGraph.buildGraph(fileName);
-		IntegerGraph graph = ConstructGraph.randomGraph(60, 0.1);
+		IntegerGraph graph = ConstructGraph.randomGraph(20, 0.1);
 		// IntegerGraph graph = ExactTest.createCycle(30);
 
 		PosSet<Vertex<Integer>> lefts = new PosSet<Vertex<Integer>>();
