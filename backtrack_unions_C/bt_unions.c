@@ -10,7 +10,7 @@ struct union_state {
   int colCount;
   int** mat;
   int* sample;
-  float prob;
+  int estimate;
   int position;
 };
 
@@ -58,56 +58,65 @@ bool isPartialHood(struct union_state* state, int* sample) {
   return subsetUnionEqualsSample; 
 }
 
-float unions_sample(struct union_state* state) {
+int unions_sample(struct union_state* state) {
   int* qpos = malloc(sizeof(int) * state->colCount);
   int qcount = 0;
-  float prob;
+  int estimate;
   for (int i = 0; i < state->colCount; i++) {
     if (state->sample[i] == QVAL) {
       qpos[qcount] = i;
       qcount++;
     }
   }
+  if (DEBUG) printf("qcount: %d\n", qcount);
   if (qcount == 0) {
-    prob = state->prob;
+    estimate = 1; //state->estimate;
   } else {
     int newposrand = rand() % qcount;
     int newposition = qpos[newposrand];
     int* newsample0 = malloc(sizeof(int) * state->colCount);
     int* newsample1 = malloc(sizeof(int) * state->colCount);
+    memcpy(newsample0, state->sample, state->colCount * sizeof(int));
+    memcpy(newsample1, state->sample, state->colCount * sizeof(int));
     newsample0[newposition] = 0;
     newsample1[newposition] = 1;
     int val0 = isPartialHood(state, newsample0);
     int val1 = isPartialHood(state, newsample1);
-    struct union_state newstate;
+    if (DEBUG) printf("val0: %d\n", val0);
+    if (DEBUG) printf("val1: %d\n", val1);
+    struct union_state* newstate;
     int randval;
     switch (val0 + val1) {
       case 0:
-        prob = state->prob;
+        estimate = 1; //state->estimate;
         break;
       case 1:
-        memcpy(&newstate, state, sizeof(newstate));
+        newstate = malloc(sizeof(struct union_state));
+        memcpy(newstate, state, sizeof(struct union_state));
         if (val0) {
-          newstate.sample = newsample0;
+          newstate->sample = newsample0;
         } else if (val1) {
-          newstate.sample = newsample1;
+          newstate->sample = newsample1;
         }
-        prob = unions_sample(&newstate);
+        estimate = unions_sample(newstate);
+        break;
       case 2:
-        memcpy(&newstate, state, sizeof(newstate));
+        newstate = malloc(sizeof(struct union_state));
+        memcpy(newstate, state, sizeof(struct union_state));
         randval = rand() % 2;
         if (randval == 0) {
-          newstate.sample = newsample0;
+          newstate->sample = newsample0;
         } else if (val1) {
-          newstate.sample = newsample1;
+          newstate->sample = newsample1;
         }
-        prob = unions_sample(&newstate);
+        estimate = unions_sample(newstate) * 2;
+        break;
     }
     free(newsample0);
     free(newsample1);
   }
   free(qpos);
-  return prob;
+  return estimate;
 }
 
 int unions_iterate(struct union_state* state) {
@@ -124,8 +133,8 @@ int unions_iterate(struct union_state* state) {
     newsample0[position] = 0;
     newsample1[position] = 1;
     int val0 = isPartialHood(state, newsample0);
-    if (DEBUG) printf("val0: %d\n", val0);
     int val1 = isPartialHood(state, newsample1);
+    if (DEBUG) printf("val0: %d\n", val0);
     if (DEBUG) printf("val1: %d\n", val1);
     struct union_state* newstate;
     int randval;
@@ -165,9 +174,10 @@ int unions_iterate(struct union_state* state) {
 
 int main (int argc, char* argv[]) {
     struct union_state state;
-    //int max = 18;
-    state.colCount = 8;
-    state.rowCount = 8;
+
+    scanf("%d", &state.colCount);
+    scanf("%d", &state.rowCount);
+
     int mat[5][5] = {
       {0, 0, 0, 0, 1},
       {0, 0, 0, 1, 0},
@@ -188,17 +198,29 @@ int main (int argc, char* argv[]) {
     for (int i = 0; i < state.rowCount; i++) {
       state.mat[i] = malloc(state.colCount * sizeof(int));
       for (int j = 0; j < state.colCount; j++) {
+        scanf("%d", &state.mat[i][j]);
+        /*
         if (i == j) {
           state.mat[i][j] = 1;
         } else {
           state.mat[i][j] = 0;
-        }
+        }*/
         //state.mat[i][j] = mat[i][j];
       }
     }
 
     int hoodcount = unions_iterate(&state);
-    printf("%d\n", hoodcount);
+    printf("exact: %d\n", hoodcount);
+
+    int samplect = 100;
+    int sum = 0;
+    int sample = 0;
+    for (int i = 0; i < samplect; i++) {
+      sample = unions_sample(&state);
+      //printf("sample: %d\n", sample);
+      sum += sample;
+    }
+    printf("sampled: %d\n", sum / samplect);
 
     // free mat
     for (int i = 0; i < state.rowCount; i++) {
