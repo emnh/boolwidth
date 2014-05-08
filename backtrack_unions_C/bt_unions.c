@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define DEBUG false
 
@@ -209,18 +210,25 @@ int main (int argc, char* argv[]) {
       }
     }
 
+    clock_t cstart = clock();
+    clock_t cend = 0;
     int hoodcount = unions_iterate(&state);
-    printf("exact: %d\n", hoodcount);
+    cend = clock();
+    long elapsed = ((long) cend - (long) cstart) / 1000;
+    printf("exact (%ldms): %d\n", elapsed, hoodcount);
 
     int samplect = 100;
     int sum = 0;
     int sample = 0;
+    cstart = clock();
     for (int i = 0; i < samplect; i++) {
       sample = unions_sample(&state);
       //printf("sample: %d\n", sample);
       sum += sample;
     }
-    printf("sampled: %d\n", sum / samplect);
+    cend = clock();
+    elapsed = ((long) cend - (long) cstart) / 1000;
+    printf("sampled (%ldms): %d\n", elapsed, sum / samplect);
 
     // free mat
     for (int i = 0; i < state.rowCount; i++) {
