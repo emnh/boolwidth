@@ -1,0 +1,592 @@
+Processing out/graphdata/graphLib/protein/1j75_graph.dimacs.cut
+sampled (22ms): 1513, log2 sampled: 10.56
+exact (180ms): 3496, log2 exact: 11.77
+accuracy: 0.433, accuracy log2: 0.897
+
+Processing out/graphdata/graphLib/protein/1jo8_graph.dimacs.cut
+sampled (20ms): 10974, log2 sampled: 13.42
+exact (347ms): 11212, log2 exact: 13.45
+accuracy: 0.979, accuracy log2: 0.998
+
+Processing out/graphdata/graphLib/protein/1bf4_graph.dimacs.cut
+sampled (31ms): 15516, log2 sampled: 13.92
+exact (2041ms): 29916, log2 exact: 14.87
+accuracy: 0.519, accuracy log2: 0.936
+
+Processing out/graphdata/graphLib/protein/1cuk_graph.dimacs.cut
+sampled (772ms): 1083252449, log2 sampled: 30.01
+
+Processing out/graphdata/graphLib/protein/1ctj_graph.dimacs.cut
+sampled (74ms): 355768, log2 sampled: 18.44
+
+Processing out/graphdata/graphLib/protein/1g2r_graph-pp.dimacs.cut
+sampled (94ms): 412538, log2 sampled: 18.65
+
+Processing out/graphdata/graphLib/protein/1ljo_graph-pp.dimacs.cut
+sampled (51ms): 15079, log2 sampled: 13.88
+exact (6643ms): 60938, log2 exact: 15.90
+accuracy: 0.247, accuracy log2: 0.873
+
+Processing out/graphdata/graphLib/protein/1e0b_graph-pp.dimacs.cut
+sampled (22ms): 4057, log2 sampled: 11.99
+exact (319ms): 7303, log2 exact: 12.83
+accuracy: 0.556, accuracy log2: 0.934
+
+Processing out/graphdata/graphLib/protein/1gcq_graph-pp.dimacs.cut
+sampled (35ms): 12349, log2 sampled: 13.59
+exact (2042ms): 24715, log2 exact: 14.59
+accuracy: 0.500, accuracy log2: 0.931
+
+Processing out/graphdata/graphLib/protein/1bkf_graph-pp.dimacs.cut
+sampled (125ms): 1864744, log2 sampled: 20.83
+
+Processing out/graphdata/graphLib/protein/1on2_graph-pp.dimacs.cut
+sampled (265ms): 1492232437, log2 sampled: 30.47
+
+Processing out/graphdata/graphLib/protein/1gef_graph.dimacs.cut
+sampled (193ms): 5376784, log2 sampled: 22.36
+
+Processing out/graphdata/graphLib/protein/1dd3_graph.dimacs.cut
+sampled (202ms): 307115130, log2 sampled: 28.19
+
+Processing out/graphdata/graphLib/protein/1cka_graph.dimacs.cut
+sampled (21ms): 4096, log2 sampled: 12.00
+exact (414ms): 9399, log2 exact: 13.20
+accuracy: 0.436, accuracy log2: 0.909
+
+Processing out/graphdata/graphLib/protein/1dp7_graph-pp.dimacs.cut
+sampled (44ms): 108198, log2 sampled: 16.72
+
+Processing out/graphdata/graphLib/protein/1kw4_graph.dimacs.cut
+sampled (37ms): 21811, log2 sampled: 14.41
+exact (4688ms): 62141, log2 exact: 15.92
+accuracy: 0.351, accuracy log2: 0.905
+
+Processing out/graphdata/graphLib/protein/1i2t_graph.dimacs.cut
+sampled (30ms): 16847, log2 sampled: 14.04
+exact (1201ms): 18785, log2 exact: 14.20
+accuracy: 0.897, accuracy log2: 0.989
+
+Processing out/graphdata/graphLib/protein/1en2_graph-pp.dimacs.cut
+sampled (32ms): 137290, log2 sampled: 17.07
+
+Processing out/graphdata/graphLib/protein/1dj7_graph-pp.dimacs.cut
+sampled (44ms): 56663, log2 sampled: 15.79
+exact (6521ms): 69455, log2 exact: 16.08
+accuracy: 0.816, accuracy log2: 0.982
+
+Processing out/graphdata/graphLib/protein/1g2b_graph-pp.dimacs.cut
+sampled (26ms): 9530, log2 sampled: 13.22
+exact (748ms): 12230, log2 exact: 13.58
+accuracy: 0.779, accuracy log2: 0.973
+
+Processing out/graphdata/graphLib/protein/1gut_graph.dimacs.cut
+sampled (44ms): 25072, log2 sampled: 14.61
+exact (4007ms): 43567, log2 exact: 15.41
+accuracy: 0.575, accuracy log2: 0.948
+
+Processing out/graphdata/graphLib/protein/1oai_graph.dimacs.cut
+sampled (18ms): 6145, log2 sampled: 12.59
+exact (242ms): 8703, log2 exact: 13.09
+accuracy: 0.706, accuracy log2: 0.962
+
+Processing out/graphdata/graphLib/protein/1rro_graph.dimacs.cut
+sampled (135ms): 59212523, log2 sampled: 25.82
+
+Processing out/graphdata/graphLib/protein/1i07_graph-pp.dimacs.cut
+sampled (15ms): 4675, log2 sampled: 12.19
+exact (186ms): 7336, log2 exact: 12.84
+accuracy: 0.637, accuracy log2: 0.949
+
+Processing out/graphdata/graphLib/protein/1czp_graph.dimacs.cut
+sampled (92ms): 204531, log2 sampled: 17.64
+
+Processing out/graphdata/graphLib/protein/1kth_graph.dimacs.cut
+sampled (19ms): 12441, log2 sampled: 13.60
+exact (463ms): 12851, log2 exact: 13.65
+accuracy: 0.968, accuracy log2: 0.997
+
+Processing out/graphdata/graphLib/protein/1brf_graph-pp.dimacs.cut
+sampled (15ms): 4792, log2 sampled: 12.23
+exact (104ms): 3176, log2 exact: 11.63
+accuracy: 1.509, accuracy log2: 1.051
+
+Processing out/graphdata/graphLib/protein/1d4t_graph-pp.dimacs.cut
+sampled (111ms): 989460, log2 sampled: 19.92
+
+Processing out/graphdata/graphLib/protein/1iqz_graph.dimacs.cut
+sampled (54ms): 77569, log2 sampled: 16.24
+exact (33715ms): 360482, log2 exact: 18.46
+accuracy: 0.215, accuracy log2: 0.880
+
+Processing out/graphdata/graphLib/protein/1fse_graph.dimacs.cut
+sampled (32ms): 18919, log2 sampled: 14.21
+exact (1990ms): 37432, log2 exact: 15.19
+accuracy: 0.505, accuracy log2: 0.935
+
+Processing out/graphdata/graphLib/protein/1ail_graph.dimacs.cut
+sampled (35ms): 23370, log2 sampled: 14.51
+exact (1892ms): 44330, log2 exact: 15.44
+accuracy: 0.527, accuracy log2: 0.940
+
+Processing out/graphdata/graphLib/protein/1ezg_graph.dimacs.cut
+sampled (41ms): 41406, log2 sampled: 15.34
+exact (5106ms): 57789, log2 exact: 15.82
+accuracy: 0.717, accuracy log2: 0.970
+
+Processing out/graphdata/graphLib/protein/1c5e_graph.dimacs.cut
+sampled (81ms): 13102407, log2 sampled: 23.64
+
+Processing out/graphdata/graphLib/protein/1bx7_graph-pp.dimacs.cut
+sampled (7ms): 479, log2 sampled: 8.90
+exact (12ms): 694, log2 exact: 9.44
+accuracy: 0.690, accuracy log2: 0.943
+
+Processing out/graphdata/graphLib/protein/1gcq_graph.dimacs.cut
+sampled (36ms): 16377, log2 sampled: 14.00
+exact (3951ms): 47414, log2 exact: 15.53
+accuracy: 0.345, accuracy log2: 0.901
+
+Processing out/graphdata/graphLib/protein/1dp7_graph.dimacs.cut
+sampled (50ms): 296535, log2 sampled: 18.18
+
+Processing out/graphdata/graphLib/protein/1erv_graph.dimacs.cut
+sampled (98ms): 6527160, log2 sampled: 22.64
+
+Processing out/graphdata/graphLib/protein/1bx7_graph.dimacs.cut
+sampled (8ms): 1227, log2 sampled: 10.26
+exact (13ms): 1438, log2 exact: 10.49
+accuracy: 0.853, accuracy log2: 0.978
+
+Processing out/graphdata/graphLib/protein/1g2r_graph.dimacs.cut
+sampled (78ms): 3333038, log2 sampled: 21.67
+
+Processing out/graphdata/graphLib/protein/1f9m_graph.dimacs.cut
+sampled (147ms): 22832865, log2 sampled: 24.44
+
+Processing out/graphdata/graphLib/protein/1bkr_graph.dimacs.cut
+sampled (129ms): 11071242, log2 sampled: 23.40
+
+Processing out/graphdata/graphLib/protein/1dj7_graph.dimacs.cut
+sampled (47ms): 92263, log2 sampled: 16.49
+exact (9741ms): 127674, log2 exact: 16.96
+accuracy: 0.723, accuracy log2: 0.972
+
+Processing out/graphdata/graphLib/protein/1a62_graph.dimacs.cut
+sampled (183ms): 26337771, log2 sampled: 24.65
+
+Processing out/graphdata/graphLib/protein/1mgq_graph-pp.dimacs.cut
+sampled (45ms): 40874, log2 sampled: 15.32
+exact (8773ms): 105423, log2 exact: 16.69
+accuracy: 0.388, accuracy log2: 0.918
+
+Processing out/graphdata/graphLib/protein/1sem_graph-pp.dimacs.cut
+sampled (18ms): 2968, log2 sampled: 11.54
+exact (168ms): 5129, log2 exact: 12.32
+accuracy: 0.579, accuracy log2: 0.936
+
+Processing out/graphdata/graphLib/protein/1lkk_graph-pp.dimacs.cut
+sampled (96ms): 6581002, log2 sampled: 22.65
+
+Processing out/graphdata/graphLib/protein/1c9o_graph.dimacs.cut
+sampled (32ms): 13009, log2 sampled: 13.67
+exact (2104ms): 43812, log2 exact: 15.42
+accuracy: 0.297, accuracy log2: 0.886
+
+Processing out/graphdata/graphLib/protein/1or7_graph.dimacs.cut
+sampled (560ms): 3025955454976, log2 sampled: 41.46
+
+Processing out/graphdata/graphLib/protein/1ku3_graph.dimacs.cut
+sampled (30ms): 9396, log2 sampled: 13.20
+exact (1216ms): 14290, log2 exact: 13.80
+accuracy: 0.658, accuracy log2: 0.956
+
+Processing out/graphdata/graphLib/protein/1b0n_graph.dimacs.cut
+sampled (128ms): 12840140, log2 sampled: 23.61
+
+Processing out/graphdata/graphLib/protein/1oai_graph-pp.dimacs.cut
+sampled (22ms): 15436, log2 sampled: 13.91
+exact (230ms): 7909, log2 exact: 12.95
+accuracy: 1.952, accuracy log2: 1.075
+
+Processing out/graphdata/graphLib/protein/1jhg_graph-pp.dimacs.cut
+sampled (98ms): 2558491, log2 sampled: 21.29
+
+Processing out/graphdata/graphLib/protein/1sem_graph.dimacs.cut
+sampled (24ms): 16778, log2 sampled: 14.03
+exact (744ms): 12974, log2 exact: 13.66
+accuracy: 1.293, accuracy log2: 1.027
+
+Processing out/graphdata/graphLib/protein/1bkb_graph.dimacs.cut
+sampled (254ms): 113887641, log2 sampled: 26.76
+
+Processing out/graphdata/graphLib/protein/1igq_graph-pp.dimacs.cut
+sampled (14ms): 1919, log2 sampled: 10.91
+exact (74ms): 2881, log2 exact: 11.49
+accuracy: 0.666, accuracy log2: 0.949
+
+Processing out/graphdata/graphLib/protein/1i0v_graph.dimacs.cut
+sampled (100ms): 1737154, log2 sampled: 20.73
+
+Processing out/graphdata/graphLib/protein/1jhg_graph.dimacs.cut
+sampled (116ms): 30833397, log2 sampled: 24.88
+
+Processing out/graphdata/graphLib/protein/1iib_graph.dimacs.cut
+sampled (126ms): 1986319, log2 sampled: 20.92
+
+Processing out/graphdata/graphLib/protein/1d3b_graph-pp.dimacs.cut
+sampled (41ms): 45487, log2 sampled: 15.47
+exact (5144ms): 63403, log2 exact: 15.95
+accuracy: 0.717, accuracy log2: 0.970
+
+Processing out/graphdata/graphLib/protein/1bbz_graph.dimacs.cut
+sampled (28ms): 6827, log2 sampled: 12.74
+exact (720ms): 11709, log2 exact: 13.52
+accuracy: 0.583, accuracy log2: 0.942
+
+Processing out/graphdata/graphLib/protein/1ptf_graph.dimacs.cut
+sampled (66ms): 494264, log2 sampled: 18.91
+
+Processing out/graphdata/graphLib/protein/1igd_graph-pp.dimacs.cut
+sampled (28ms): 7958, log2 sampled: 12.96
+exact (630ms): 12660, log2 exact: 13.63
+accuracy: 0.629, accuracy log2: 0.951
+
+Processing out/graphdata/graphLib/protein/1on2_graph.dimacs.cut
+sampled (232ms): 1088956661, log2 sampled: 30.02
+
+Processing out/graphdata/graphLib/protein/1ljo_graph.dimacs.cut
+sampled (51ms): 170030, log2 sampled: 17.38
+
+Processing out/graphdata/graphLib/protein/1ku3_graph-pp.dimacs.cut
+sampled (30ms): 3135, log2 sampled: 11.61
+exact (776ms): 9630, log2 exact: 13.23
+accuracy: 0.326, accuracy log2: 0.878
+
+Processing out/graphdata/graphLib/protein/1fpo_graph-pp.dimacs.cut
+sampled (531ms): 2873173716500, log2 sampled: 41.39
+
+Processing out/graphdata/graphLib/protein/1kth_graph-pp.dimacs.cut
+sampled (18ms): 15318, log2 sampled: 13.90
+exact (272ms): 6517, log2 exact: 12.67
+accuracy: 2.350, accuracy log2: 1.097
+
+Processing out/graphdata/graphLib/protein/1a62_graph-pp.dimacs.cut
+sampled (175ms): 24717434, log2 sampled: 24.56
+
+Processing out/graphdata/graphLib/protein/1hg7_graph.dimacs.cut
+sampled (34ms): 26717, log2 sampled: 14.71
+exact (4238ms): 59155, log2 exact: 15.85
+accuracy: 0.452, accuracy log2: 0.928
+
+Processing out/graphdata/graphLib/protein/1awd_graph.dimacs.cut
+sampled (89ms): 368793, log2 sampled: 18.49
+
+Processing out/graphdata/graphLib/protein/1bkb_graph-pp.dimacs.cut
+sampled (231ms): 80919429, log2 sampled: 26.27
+
+Processing out/graphdata/graphLib/protein/1qtn_graph.dimacs.cut
+sampled (72ms): 1286901, log2 sampled: 20.30
+
+Processing out/graphdata/graphLib/protein/1ldd_graph.dimacs.cut
+sampled (50ms): 28922, log2 sampled: 14.82
+exact (11345ms): 104857, log2 exact: 16.68
+accuracy: 0.276, accuracy log2: 0.889
+
+Processing out/graphdata/graphLib/protein/1fjl_graph-pp.dimacs.cut
+sampled (24ms): 18449, log2 sampled: 14.17
+exact (572ms): 21250, log2 exact: 14.38
+accuracy: 0.868, accuracy log2: 0.986
+
+Processing out/graphdata/graphLib/protein/1g2b_graph.dimacs.cut
+sampled (30ms): 22847, log2 sampled: 14.48
+exact (1660ms): 25693, log2 exact: 14.65
+accuracy: 0.889, accuracy log2: 0.988
+
+Processing out/graphdata/graphLib/protein/1d3b_graph.dimacs.cut
+sampled (43ms): 23380, log2 sampled: 14.51
+exact (6496ms): 61036, log2 exact: 15.90
+accuracy: 0.383, accuracy log2: 0.913
+
+Processing out/graphdata/graphLib/protein/1dd3_graph-pp.dimacs.cut
+sampled (192ms): 372750663, log2 sampled: 28.47
+
+Processing out/graphdata/graphLib/protein/1fjl_graph.dimacs.cut
+sampled (35ms): 13848, log2 sampled: 13.76
+exact (3466ms): 33736, log2 exact: 15.04
+accuracy: 0.410, accuracy log2: 0.915
+
+Processing out/graphdata/graphLib/protein/1psr_graph.dimacs.cut
+sampled (119ms): 2797568, log2 sampled: 21.42
+
+Processing out/graphdata/graphLib/protein/1aba_graph.dimacs.cut
+sampled (75ms): 766832, log2 sampled: 19.55
+
+Processing out/graphdata/graphLib/protein/1igd_graph.dimacs.cut
+sampled (27ms): 26531, log2 sampled: 14.70
+exact (916ms): 19707, log2 exact: 14.27
+accuracy: 1.346, accuracy log2: 1.030
+
+Processing out/graphdata/graphLib/protein/1ail_graph-pp.dimacs.cut
+sampled (40ms): 14374, log2 sampled: 13.81
+exact (3219ms): 38017, log2 exact: 15.21
+accuracy: 0.378, accuracy log2: 0.908
+
+Processing out/graphdata/graphLib/protein/1c75_graph.dimacs.cut
+sampled (39ms): 43043, log2 sampled: 15.39
+exact (4649ms): 86718, log2 exact: 16.40
+accuracy: 0.496, accuracy log2: 0.938
+
+Processing out/graphdata/graphLib/protein/1bf4_graph-pp.dimacs.cut
+sampled (21ms): 10393, log2 sampled: 13.34
+exact (472ms): 10860, log2 exact: 13.41
+accuracy: 0.957, accuracy log2: 0.995
+
+Processing out/graphdata/graphLib/protein/1iib_graph-pp.dimacs.cut
+sampled (117ms): 598410, log2 sampled: 19.19
+
+Processing out/graphdata/graphLib/protein/1or7_graph-pp.dimacs.cut
+sampled (579ms): 153337295011, log2 sampled: 37.16
+
+Processing out/graphdata/graphLib/protein/1brf_graph.dimacs.cut
+sampled (16ms): 7146, log2 sampled: 12.80
+exact (127ms): 4885, log2 exact: 12.25
+accuracy: 1.463, accuracy log2: 1.045
+
+Processing out/graphdata/graphLib/protein/1pwt_graph-pp.dimacs.cut
+sampled (27ms): 14250, log2 sampled: 13.80
+exact (635ms): 9571, log2 exact: 13.22
+accuracy: 1.489, accuracy log2: 1.043
+
+Processing out/graphdata/graphLib/protein/1cc8_graph.dimacs.cut
+sampled (41ms): 12531, log2 sampled: 13.61
+exact (4025ms): 51691, log2 exact: 15.66
+accuracy: 0.242, accuracy log2: 0.869
+
+Processing out/graphdata/graphLib/protein/1mgq_graph.dimacs.cut
+sampled (51ms): 343493, log2 sampled: 18.39
+
+Processing out/graphdata/graphLib/protein/1kq1_graph-pp.dimacs.cut
+sampled (26ms): 9067, log2 sampled: 13.15
+exact (710ms): 17007, log2 exact: 14.05
+accuracy: 0.533, accuracy log2: 0.935
+
+Processing out/graphdata/graphLib/protein/1k61_graph.dimacs.cut
+sampled (29ms): 7336, log2 sampled: 12.84
+exact (1119ms): 15289, log2 exact: 13.90
+accuracy: 0.480, accuracy log2: 0.924
+
+Processing out/graphdata/graphLib/protein/1ig5_graph.dimacs.cut
+sampled (43ms): 72592, log2 sampled: 16.15
+exact (4293ms): 83538, log2 exact: 16.35
+accuracy: 0.869, accuracy log2: 0.988
+
+Processing out/graphdata/graphLib/protein/1e0b_graph.dimacs.cut
+sampled (28ms): 15968, log2 sampled: 13.96
+exact (1550ms): 22921, log2 exact: 14.48
+accuracy: 0.697, accuracy log2: 0.964
+
+Processing out/graphdata/graphLib/protein/1qtn_graph-pp.dimacs.cut
+sampled (61ms): 168591, log2 sampled: 17.36
+
+Processing out/graphdata/graphLib/protein/1gut_graph-pp.dimacs.cut
+sampled (26ms): 13699, log2 sampled: 13.74
+exact (826ms): 19465, log2 exact: 14.25
+accuracy: 0.704, accuracy log2: 0.964
+
+Processing out/graphdata/graphLib/protein/1i07_graph.dimacs.cut
+sampled (30ms): 104081, log2 sampled: 16.67
+
+Processing out/graphdata/graphLib/protein/1aac_graph-pp.dimacs.cut
+sampled (124ms): 12215377, log2 sampled: 23.54
+
+Processing out/graphdata/graphLib/protein/1fk5_graph.dimacs.cut
+sampled (69ms): 334796, log2 sampled: 18.35
+
+Processing out/graphdata/graphLib/protein/1igq_graph.dimacs.cut
+sampled (17ms): 2468, log2 sampled: 11.27
+exact (158ms): 5640, log2 exact: 12.46
+accuracy: 0.438, accuracy log2: 0.904
+
+Processing out/graphdata/graphLib/protein/1aac_graph.dimacs.cut
+sampled (134ms): 4139345, log2 sampled: 21.98
+
+Processing out/graphdata/graphLib/protein/1i27_graph.dimacs.cut
+sampled (50ms): 48750, log2 sampled: 15.57
+exact (8922ms): 111913, log2 exact: 16.77
+accuracy: 0.436, accuracy log2: 0.929
+
+Processing out/graphdata/graphLib/protein/1gef_graph-pp.dimacs.cut
+sampled (170ms): 12835109, log2 sampled: 23.61
+
+Processing out/graphdata/graphLib/protein/1fs1_graph.dimacs.cut
+sampled (166ms): 8598323, log2 sampled: 23.04
+
+Processing out/graphdata/graphLib/protein/1b67_graph.dimacs.cut
+sampled (31ms): 37191, log2 sampled: 15.18
+exact (1192ms): 45960, log2 exact: 15.49
+accuracy: 0.809, accuracy log2: 0.980
+
+Processing out/graphdata/graphLib/protein/1ctj_graph-pp.dimacs.cut
+sampled (71ms): 115878, log2 sampled: 16.82
+
+Processing out/graphdata/graphLib/protein/1lkk_graph.dimacs.cut
+sampled (97ms): 13826129, log2 sampled: 23.72
+
+Processing out/graphdata/graphLib/protein/1r69_graph.dimacs.cut
+sampled (32ms): 17356, log2 sampled: 14.08
+exact (2392ms): 25157, log2 exact: 14.62
+accuracy: 0.690, accuracy log2: 0.963
+
+Processing out/graphdata/graphLib/protein/1kq1_graph.dimacs.cut
+sampled (23ms): 20896, log2 sampled: 14.35
+exact (628ms): 17010, log2 exact: 14.05
+accuracy: 1.228, accuracy log2: 1.021
+
+Processing out/graphdata/graphLib/protein/1cuk_graph-pp.dimacs.cut
+sampled (677ms): 366250484039, log2 sampled: 38.41
+
+Processing out/graphdata/graphLib/protein/1c4q_graph.dimacs.cut
+sampled (29ms): 32124, log2 sampled: 14.97
+exact (1334ms): 29090, log2 exact: 14.83
+accuracy: 1.104, accuracy log2: 1.010
+
+Processing out/graphdata/graphLib/protein/1g3p_graph-pp.dimacs.cut
+sampled (575ms): 111747079864, log2 sampled: 36.70
+
+Processing out/graphdata/graphLib/protein/1g3p_graph.dimacs.cut
+sampled (668ms): 536795750072, log2 sampled: 38.97
+
+Processing out/graphdata/graphLib/protein/1bbz_graph-pp.dimacs.cut
+sampled (20ms): 5677, log2 sampled: 12.47
+exact (359ms): 10007, log2 exact: 13.29
+accuracy: 0.567, accuracy log2: 0.938
+
+Processing out/graphdata/graphLib/protein/1i27_graph-pp.dimacs.cut
+sampled (45ms): 30807, log2 sampled: 14.91
+exact (5804ms): 69763, log2 exact: 16.09
+accuracy: 0.442, accuracy log2: 0.927
+
+Processing out/graphdata/graphLib/protein/1fpo_graph.dimacs.cut
+sampled (533ms): 1614499345858, log2 sampled: 40.55
+
+Processing out/graphdata/graphLib/protein/1b67_graph-pp.dimacs.cut
+sampled (38ms): 32185, log2 sampled: 14.97
+exact (4630ms): 68618, log2 exact: 16.07
+accuracy: 0.469, accuracy log2: 0.932
+
+Processing out/graphdata/graphLib/protein/1l9l_graph.dimacs.cut
+sampled (48ms): 54369, log2 sampled: 15.73
+exact (5734ms): 52619, log2 exact: 15.68
+accuracy: 1.033, accuracy log2: 1.003
+
+Processing out/graphdata/graphLib/protein/1k61_graph-pp.dimacs.cut
+sampled (23ms): 4415, log2 sampled: 12.11
+exact (270ms): 5739, log2 exact: 12.49
+accuracy: 0.769, accuracy log2: 0.970
+
+Processing out/graphdata/graphLib/protein/1fr3_graph.dimacs.cut
+sampled (34ms): 47342, log2 sampled: 15.53
+exact (4135ms): 100542, log2 exact: 16.62
+accuracy: 0.471, accuracy log2: 0.935
+
+Processing out/graphdata/graphLib/protein/1en2_graph.dimacs.cut
+sampled (53ms): 99555, log2 sampled: 16.60
+exact (14821ms): 136740, log2 exact: 17.06
+accuracy: 0.728, accuracy log2: 0.973
+
+Processing out/graphdata/graphLib/protein/1g6x_graph.dimacs.cut
+sampled (21ms): 9012, log2 sampled: 13.14
+exact (409ms): 10886, log2 exact: 13.41
+accuracy: 0.828, accuracy log2: 0.980
+
+Processing out/graphdata/graphLib/protein/1d4t_graph.dimacs.cut
+sampled (112ms): 3878051, log2 sampled: 21.89
+
+Processing out/graphdata/graphLib/protein/1a8o_graph.dimacs.cut
+sampled (24ms): 46438, log2 sampled: 15.50
+exact (1944ms): 59908, log2 exact: 15.87
+accuracy: 0.775, accuracy log2: 0.977
+
+Processing out/graphdata/graphLib/protein/1plc_graph.dimacs.cut
+sampled (114ms): 886323, log2 sampled: 19.76
+
+Processing out/graphdata/graphLib/protein/1bkf_graph.dimacs.cut
+sampled (147ms): 1641523, log2 sampled: 20.65
+
+Processing out/graphdata/graphLib/protein/1pwt_graph.dimacs.cut
+sampled (27ms): 7809, log2 sampled: 12.93
+exact (607ms): 11633, log2 exact: 13.51
+accuracy: 0.671, accuracy log2: 0.957
+
+Processing out/graphdata/graphLib/protein/1rb9_graph.dimacs.cut
+sampled (15ms): 1926, log2 sampled: 10.91
+exact (101ms): 3859, log2 exact: 11.91
+accuracy: 0.499, accuracy log2: 0.916
+
+Processing out/graphdata/graphLib/protein/1psr_graph-pp.dimacs.cut
+sampled (94ms): 3380234, log2 sampled: 21.69
+
+Processing out/graphdata/graphLib/protein/1fr3_graph-pp.dimacs.cut
+sampled (30ms): 26720, log2 sampled: 14.71
+exact (1545ms): 31514, log2 exact: 14.94
+accuracy: 0.848, accuracy log2: 0.984
+
+Processing out/graphdata/graphLib_ours/new/max.dimacs.cut
+sampled (1ms): 2, log2 sampled: 1.00
+exact (0ms): 2, log2 exact: 1.00
+accuracy: 1.000, accuracy log2: 1.000
+
+Processing out/graphdata/graphLib_ours/new/10bw9.dimacs.cut
+sampled (0ms): 5, log2 sampled: 2.32
+exact (0ms): 6, log2 exact: 2.58
+accuracy: 0.833, accuracy log2: 0.898
+
+Processing out/graphdata/graphLib_ours/hsugrid/hsu-4x4.dimacs.cut
+sampled (1ms): 42, log2 sampled: 5.39
+exact (0ms): 42, log2 exact: 5.39
+accuracy: 1.000, accuracy log2: 1.000
+
+Processing out/graphdata/graphLib_ours/hsugrid/hsu-5x5.dimacs.cut
+sampled (2ms): 82, log2 sampled: 6.36
+exact (0ms): 88, log2 exact: 6.46
+accuracy: 0.932, accuracy log2: 0.984
+
+Processing out/graphdata/graphLib_ours/hsugrid/hsu-6x5.dimacs.cut
+sampled (5ms): 278, log2 sampled: 8.12
+exact (4ms): 273, log2 exact: 8.09
+accuracy: 1.018, accuracy log2: 1.003
+
+Processing out/graphdata/graphLib_ours/hsugrid/hsu-3x3.dimacs.cut
+sampled (0ms): 2, log2 sampled: 1.00
+exact (0ms): 3, log2 exact: 1.58
+accuracy: 0.667, accuracy log2: 0.631
+
+Processing out/graphdata/graphLib_ours/hsugrid/hsu-2x2.dimacs.cut
+sampled (0ms): 3, log2 sampled: 1.58
+exact (0ms): 3, log2 exact: 1.58
+accuracy: 1.000, accuracy log2: 1.000
+
+Processing out/graphdata/graphLib_ours/hsugrid/hsu-5x4.dimacs.cut
+sampled (1ms): 54, log2 sampled: 5.75
+exact (0ms): 60, log2 exact: 5.91
+accuracy: 0.900, accuracy log2: 0.974
+
+Processing out/graphdata/graphLib_ours/hsugrid/hsu-4x3.dimacs.cut
+sampled (0ms): 8, log2 sampled: 3.00
+exact (0ms): 8, log2 exact: 3.00
+accuracy: 1.000, accuracy log2: 1.000
+
+Processing out/graphdata/graphLib_ours/cycle/c5.dimacs.cut
+sampled (0ms): 2, log2 sampled: 1.00
+exact (0ms): 2, log2 exact: 1.00
+accuracy: 1.000, accuracy log2: 1.000
+
+Processing out/graphdata/graphLib_ours/test/testGraph.dimacs.cut
+sampled (348ms): 720688906, log2 sampled: 29.42
+
+Processing out/graphdata/graphLib_ours/test/8.dimacs.cut
+sampled (0ms): 2, log2 sampled: 1.00
+exact (0ms): 3, log2 exact: 1.58
+accuracy: 0.667, accuracy log2: 0.631
+
