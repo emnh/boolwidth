@@ -213,18 +213,16 @@ int main (int argc, char* argv[]) {
     cend = clock();
     elapsed = ((long) cend - (long) cstart) / 1000;
     long estimate = sum / samplect;
-    printf("sampled (%ldms): %ld\n", elapsed, estimate);
+    printf("sampled (%ldms): %ld, log2 sampled: %.2f\n", elapsed, estimate, log2(estimate));
 
     if (estimate < 100000) {
       cstart = clock();
       int hoodcount = unions_iterate(&state);
       cend = clock();
       elapsed = ((long) cend - (long) cstart) / 1000;
-      printf("exact (%ldms): %d\n", elapsed, hoodcount);
+      printf("exact (%ldms): %d, log2 exact: %.2f\n", elapsed, hoodcount, log2(hoodcount));
       double accuracy = (double) estimate / (double) hoodcount;
-      printf("log2 sample: %.2f, cutbw = log2 exact: %.2f, accuracy: %.3f, log2 accuracy: %.3f\n",
-          log2(estimate),
-          log2(hoodcount),
+      printf("accuracy: %.3f, accuracy log2: %.3f\n",
           accuracy,
           log2(estimate) / log2(hoodcount));
     }

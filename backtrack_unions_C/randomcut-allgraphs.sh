@@ -10,4 +10,5 @@ while read fname; do
   #mkdir -p $(dirname $outfname)
   echo "Processing $fname"
   ./bt_unions < $fname
+  echo
 done
