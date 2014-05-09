@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
 
 #define DEBUG false
 
@@ -59,10 +60,10 @@ bool isPartialHood(struct union_state* state, int* sample) {
   return subsetUnionEqualsSample; 
 }
 
-int unions_sample(struct union_state* state) {
+long unions_sample(struct union_state* state) {
   int* qpos = malloc(sizeof(int) * state->colCount);
   int qcount = 0;
-  int estimate;
+  long estimate;
   for (int i = 0; i < state->colCount; i++) {
     if (state->sample[i] == QVAL) {
       qpos[qcount] = i;
@@ -179,13 +180,6 @@ int main (int argc, char* argv[]) {
     scanf("%d", &state.colCount);
     scanf("%d", &state.rowCount);
 
-    int mat[5][5] = {
-      {0, 0, 0, 0, 1},
-      {0, 0, 0, 1, 0},
-      {0, 0, 1, 0, 0},
-      {0, 1, 0, 0, 0},
-      {1, 0, 0, 0, 0}
-    };
     state.position = 0;
     state.sample = malloc(state.colCount * sizeof(int));
 
@@ -200,26 +194,16 @@ int main (int argc, char* argv[]) {
       state.mat[i] = malloc(state.colCount * sizeof(int));
       for (int j = 0; j < state.colCount; j++) {
         scanf("%d", &state.mat[i][j]);
-        /*
-        if (i == j) {
-          state.mat[i][j] = 1;
-        } else {
-          state.mat[i][j] = 0;
-        }*/
-        //state.mat[i][j] = mat[i][j];
       }
     }
 
-    clock_t cstart = clock();
-    clock_t cend = 0;
-    int hoodcount = unions_iterate(&state);
-    cend = clock();
-    long elapsed = ((long) cend - (long) cstart) / 1000;
-    printf("exact (%ldms): %d\n", elapsed, hoodcount);
+    clock_t cstart;
+    clock_t cend;
+    long elapsed;
 
     int samplect = 100;
-    int sum = 0;
-    int sample = 0;
+    long sum = 0;
+    long sample = 0;
     cstart = clock();
     for (int i = 0; i < samplect; i++) {
       sample = unions_sample(&state);
@@ -228,7 +212,22 @@ int main (int argc, char* argv[]) {
     }
     cend = clock();
     elapsed = ((long) cend - (long) cstart) / 1000;
-    printf("sampled (%ldms): %d\n", elapsed, sum / samplect);
+    long estimate = sum / samplect;
+    printf("sampled (%ldms): %ld\n", elapsed, estimate);
+
+    if (estimate < 100000) {
+      cstart = clock();
+      int hoodcount = unions_iterate(&state);
+      cend = clock();
+      elapsed = ((long) cend - (long) cstart) / 1000;
+      printf("exact (%ldms): %d\n", elapsed, hoodcount);
+      double accuracy = (double) estimate / (double) hoodcount;
+      printf("log2 sample: %.2f, cutbw = log2 exact: %.2f, accuracy: %.3f, log2 accuracy: %.3f\n",
+          log2(estimate),
+          log2(hoodcount),
+          accuracy,
+          log2(estimate) / log2(hoodcount));
+    }
 
     // free mat
     for (int i = 0; i < state.rowCount; i++) {
