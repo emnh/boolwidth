@@ -4,3 +4,4 @@
  - Implement sampler in Haskell and compare performance with C
  - Make better greedy decompositions with sampling algorithm
   - Try all single node moves
+ - Implement sampling algorithm in Java and plug in to original heuristic
