@@ -80,7 +80,7 @@ public class CutBoolRunner {
 		start = System.currentTimeMillis();
 		CutBool cb = new CutBool(true);
 		System.out.println("neighborhoods: "
-				+ cb.countNeighborhoods(graph.intAdjacencyMatrix(),
+				+ cb.countNeighborhoods(graph.intBitsAdjacencyMatrix(),
 						rights_bits, lefts_bits, 0));
 		System.out.println(cb.stats);
 		end = System.currentTimeMillis();

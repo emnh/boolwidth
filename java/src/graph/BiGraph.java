@@ -15,9 +15,9 @@ import java.util.Formatter;
  */
 public class BiGraph<V, E> extends AdjacencyListGraph.D<V, E> implements
 IBiGraph<V, E> {
+
 	// We use the left/right lists to keep track of used vertexes in this graph
 	PosSet<Vertex<V>> leftList;
-
 	PosSet<Vertex<V>> rightList;
 	ArrayList<Boolean> isLeft;
 
@@ -246,6 +246,50 @@ IBiGraph<V, E> {
 	//	public void setReverse(Vertex<V> v, Vertex<V> bi_v) {
 	//		v.setAttr(REVERSEFIELD, bi_v);
 	//	}
+
+    public int[][] getAdjacencyMatrix() {
+        BiGraph<V,E> g = this;
+        int[][] mat = new int[g.numLeftVertices()][g.numRightVertices()];
+
+        // use left/right iteration order as new matrix index
+        int[] fromGraphToBiGraphNodeIndexLeft = new int[g.numVertices() + 1];
+        int[] fromGraphToBiGraphNodeIndexRight = new int[g.numVertices() + 1];
+        int leftid = 0;
+        for (Vertex<V> v : g.leftVertices()) {
+            fromGraphToBiGraphNodeIndexLeft[v.id()] = leftid;
+            leftid++;
+        }
+        int rightid = 0;
+        for (Vertex<V> v : g.rightVertices()) {
+            fromGraphToBiGraphNodeIndexRight[v.id()] = rightid;
+            rightid++;
+        }
+
+        for (Edge<Vertex<V>, V, E> edge : g.edges()) {
+            Vertex<V> left = edge.left();
+            Vertex<V> right = edge.right();
+            //System.out.printf("e: %d %d\n", left.id(), right.id() - g.numLeftVertices());
+            leftid = fromGraphToBiGraphNodeIndexLeft[left.id()];
+            rightid = fromGraphToBiGraphNodeIndexRight[right.id()];
+            //System.out.printf("%b", this.isLeft.get(left.id()) != this.isLeft.get(right.id()));
+            mat[leftid][rightid] = 1;
+        }
+
+        return mat;
+    }
+
+    public void printAdjacencyMatrix(int[][] mat) {
+        int leftid = 0;
+        for (Vertex<V> v1 : leftVertices()) {
+            int rightid = 0;
+            for (Vertex<V> v2 : rightVertices()) {
+                System.out.printf("%d ", mat[leftid][rightid]);
+                rightid++;
+            }
+            leftid++;
+            System.out.println("");
+        }
+    }
 
 	@Override
 	protected void toGraphVizNodes(Formatter f) {

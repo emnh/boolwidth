@@ -1,5 +1,6 @@
 package control;
 
+import boolwidth.heuristics.cutbool.CBBacktrackEstimate;
 import graph.BiGraph;
 import io.ConstructGraph;
 
@@ -33,10 +34,11 @@ public class CutBoolHeuristicTest {
 		f.format("Vertices,Edges,Edge probability,"
 				+ "2^boolwidth,est\n");
 
-		final int MAX = 101;
-		for (int i = 0; i < MAX; i++) {
+		final int MAX_ITER = 100;
+        final int sampleCount = 100;
+		for (int i = 0; i < MAX_ITER; i++) {
 			probability = Math.random() * 0.6 + 0.2;
-			if (MAX > 100 && i % (MAX / 100) == 0) {
+			if (MAX_ITER > 100 && i % (MAX_ITER / 100) == 0) {
 				System.out.println(i);
 			}
 			for (N = 30; N < 31; N++) {
@@ -45,17 +47,17 @@ public class CutBoolHeuristicTest {
 				int bw = CutBool.countNeighborhoods(g);
 				//CutBoolHeuristics.EstResult est = CutBoolHeuristics
 				//.neighborhoodEstimator(g, N);
-				System.out.printf("%d: ", bw);
-				for (int k = 0; k < 10; k++) {
-					int est = CBFirstCollisionPerm.estimateNeighborhoods(g, CutBool.BOUND_UNINITIALIZED, 100);
+				System.out.printf("exact %d: ", bw);
+				for (int k = 0; k < 1; k++) {
+					//int est = CBFirstCollisionPerm.estimateNeighborhoods(g, CutBool.BOUND_UNINITIALIZED, 100);
+                    long est = CBBacktrackEstimate.estimateNeighborhoods(g, sampleCount);
 					System.out.printf("%d, ", est);
 				}
 				int est = CBFirstCollision.estimateNeighborhoods(g, CutBool.BOUND_UNINITIALIZED, 100);
 				System.out.println();
 				//System.out.printf("bw: %d, est: %d\n");
 
-				f.format("%d,%d,%f,%d,", g.numVertices(), g.numEdges(),
-						probability, bw);
+				f.format("%d,%d,%f,%d,", g.numVertices(), g.numEdges(), probability, bw);
 				f.format("%d\n", est);
 				//f.format("%f,%f,%f\n", est.min, est.avg, est.max);
 				// System.out.printf("bw: %d, est: %f\n", bw, est);

@@ -45,7 +45,7 @@ public interface IGraph<TVertex extends Vertex<V>, V, E> extends
 	public TVertex insertVertex(V o);
 
 	/** Returns the int adjacency matrix of the graph */
-	public int[] intAdjacencyMatrix();
+	public int[] intBitsAdjacencyMatrix();
 
 	/** Returns the number of edges of the graph */
 	public int numEdges();

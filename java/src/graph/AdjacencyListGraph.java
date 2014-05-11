@@ -281,7 +281,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	// int.class);
 	// }
 
-	public int[] intAdjacencyMatrix() {
+	public int[] intBitsAdjacencyMatrix() {
 		assert numVertices() <= 30; // 31?
 
 		int[] m = new int[numVertices()];

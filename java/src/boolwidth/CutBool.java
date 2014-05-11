@@ -182,70 +182,33 @@ public class CutBool {
 	public static <V, E> int countNeighborhoods(BiGraph<V, E> g,
 			long upper_bound) {
 
-		// set of right nodes
+		// set of right,left nodes
 		final PosSet<Vertex<V>> rights = new PosSet<Vertex<V>>(g.rightVertices());
-		// set of left nodes
 		final PosSet<Vertex<V>> lefts = new PosSet<Vertex<V>>(g.leftVertices());
 
-		/**
-		 * If vertices that contribute many neighborhoods are added at the end,
-		 * and the ones that don't contribute much are added at the start,
-		 * we don't have to iterate on such a long list in the start.
-		 * @author emh
-		 */
-		//		class DegreeComparator implements Comparator<PosSubSet<Vertex<V>>> {
-		//
-		//			/*
-		//			 * Sorts in descending order of degree.
-		//			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		//			 */
-		//			@Override
-		//			public int compare(PosSubSet<Vertex<V>> o1, PosSubSet<Vertex<V>> o2) {
-		//				int a = o1.size();
-		//				int b = o2.size();
-		//				int cmp;
-		//				if (a == b) {
-		//					cmp = o1.compareTo(o2);
-		//				} else {
-		//					cmp = (a < b) ? 1 : -1;
-		//				}
-		//				return cmp;
-		//			}
-		//
-		//		}
-
 		TreeSet<PosSubSet<Vertex<V>>> initialhoods;
+
 		// set of neighborhoods of left nodes
-		//final TreeSet<PosSubSet<Vertex<V>>> leftnodes = useit ? new TreeSet<PosSubSet<Vertex<V>>>(new DegreeComparator()) : new TreeSet<PosSubSet<Vertex<V>>>();
-		final TreeSet<PosSubSet<Vertex<V>>> leftnodes = new TreeSet<PosSubSet<Vertex<V>>>();
+        final TreeSet<PosSubSet<Vertex<V>>> leftnodes = new TreeSet<PosSubSet<Vertex<V>>>();
+
 		// set of neighborhoods of right nodes
-		//final TreeSet<PosSubSet<Vertex<V>>> rightnodes = useit ? new TreeSet<PosSubSet<Vertex<V>>>(new DegreeComparator()) : new TreeSet<PosSubSet<Vertex<V>>>();
 		final TreeSet<PosSubSet<Vertex<V>>> rightnodes = new TreeSet<PosSubSet<Vertex<V>>>();
 
 		// initialize all neighborhood sets of 1 left node
-		//int left_twin_count = 0;
 		for (Vertex<V> node : g.leftVertices()) {
 			PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(rights, g
 					.incidentVertices(node));
-			//			if (leftnodes.contains(neighbors)) {
-			//				left_twin_count++;
-			//			}
 			if (neighbors.size() > 0) {
 				leftnodes.add(neighbors);
 			}
 		}
-		//		int right_twin_count = 0;
 		for (Vertex<V> node : g.rightVertices()) {
 			PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(lefts, g
 					.incidentVertices(node));
-			//			if (rightnodes.contains(neighbors)) {
-			//				right_twin_count++;
-			//			}
 			if (neighbors.size() > 0) {
 				rightnodes.add(neighbors);
 			}
 		}
-		//System.out.printf("leftnodes: %s\n", leftnodes);
 
 		TreeSet<PosSubSet<Vertex<V>>> hoods = new TreeSet<PosSubSet<Vertex<V>>>();
 		// choose the smallest neighborhood set
@@ -269,11 +232,6 @@ public class CutBool {
 				}
 			}
 			hoods.addAll(newhoods);
-			// TODO: hack. remove
-			// if (hoods.size() > 1024) {
-			// System.out.println("WARNING! neighborlimit exceeded!");
-			// return hoods.size();
-			// }
 
 			if (upper_bound != BOUND_UNINITIALIZED
 					&& hoods.size() > upper_bound) {

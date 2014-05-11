@@ -73,7 +73,7 @@ public class ExactBoolWidth<TVertex extends Vertex<V>, V, E> {
 			this.vertexct = graph.numVertices();
 			this.fullset = (1 << graph.numVertices()) - 1;
 			this.numpartitions = 1 << this.vertexct;
-			this.adjMatrix = graph.intAdjacencyMatrix();
+			this.adjMatrix = graph.intBitsAdjacencyMatrix();
 
 			CutBool cutbool_computer;
 			if (ExactBoolWidth.this.statistics == null) {

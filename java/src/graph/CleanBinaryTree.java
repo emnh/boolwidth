@@ -387,10 +387,10 @@ public class CleanBinaryTree<TVertex extends BinNode<TVertex, V>, V, E> extends
 	}
 
 	@Override
-	public int[] intAdjacencyMatrix() {
+	public int[] intBitsAdjacencyMatrix() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException(
-				"The method IGraph<TVertex,V,E>.intAdjacencyMatrix is not yet implemented");
+				"The method IGraph<TVertex,V,E>.intBitsAdjacencyMatrix is not yet implemented");
 		// return null;
 	}
 

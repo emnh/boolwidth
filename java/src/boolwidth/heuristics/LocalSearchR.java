@@ -250,11 +250,11 @@ public class LocalSearchR<V, E> {
 
 		// initialize
 		this.decomposition = new LSDecomposition.D<V, E>(g);
-		this.cmp = new CutBoolComparator<V, E>(this.decomposition,
-				new RandomHeuristic<V, E>());
+		//this.cmp = new CutBoolComparator<V, E>(this.decomposition, new RandomHeuristic<V, E>());
+        this.cmp = new CutBoolComparatorApprox<V, E>(this.decomposition, new RandomHeuristic<V, E>());
 		rnd = new Random();
-		this.rootset = new PosSet<Vertex<V>>(this.decomposition.root()
-				.element());
+
+        this.rootset = new PosSet<Vertex<V>>(this.decomposition.root().element());
 		if (oldBestDecomposition != null) {
 			int oldbw = BooleanDecomposition.getBoolWidth(oldBestDecomposition);
 			setGraphBoolwidthUpperBound(oldbw);
@@ -507,9 +507,6 @@ public class LocalSearchR<V, E> {
 	 * @param searchsteps
 	 *            how much work to do
 	 * @param decomposition_bw_lower_bound
-	 * 
-	 * @param leftmost
-	 *            used for knowing when the decomposition is complete
 	 * @return subtree upper bound
 	 */
 
