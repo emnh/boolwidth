@@ -6,12 +6,7 @@ import interfaces.IGraph;
 import interfaces.IPosition;
 import interfaces.IVertexFactory;
 
-import java.util.AbstractSet;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 public class AdjacencyListGraph<TVertex extends Vertex<V>, V, E> extends
 AbstractSet<TVertex> implements IGraph<TVertex, V, E>,
@@ -231,6 +226,19 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 		return vertices;
 	}
 
+    /**
+     * Return an iterator over the vertices incident to a vertex. Running time:
+     * O(n)
+     */
+    public Collection<TVertex> incidentVerticesCollection(TVertex v)
+            throws InvalidPositionException {
+        ArrayList<TVertex> vertices = new ArrayList<TVertex>();
+        for (Edge<TVertex, V, E> edge : incidentEdges(v)) {
+            vertices.add(edge.opposite(v));
+        }
+        return vertices;
+    }
+
 	// Auxiliary methods
 
 	/**
@@ -262,7 +270,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	/**
 	 * Insert and return a new vertex with a given element. Running time: O(1)
 	 */
-	@Deprecated
+	@Deprecated // Why?
 	public TVertex insertVertex(V v) {
 		// TVertex vv = new TVertex(v, vList.size());
 		TVertex vv = createVertex(v, this.vList.size());
@@ -502,5 +510,9 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	public Iterable<TVertex> vertices() {
 		return this.vList;
 	}
+
+    public Collection<TVertex> verticesCollection() {
+        return this.vList;
+    }
 
 }

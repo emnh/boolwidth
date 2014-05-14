@@ -60,7 +60,7 @@ public class Vertex<V> extends Position<V>
 		return id() - v.id();
 	}
 
-	/**
+    /**
 	 * Returns a string representation of the element stored at this vertex.
 	 */
 	@Override

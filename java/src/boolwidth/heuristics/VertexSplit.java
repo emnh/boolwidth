@@ -66,6 +66,7 @@ Cloneable  {
 		}
 
 		public VertexSplit<V> createNew(PosSubSet<Vertex<V>> element, int id) {
+            // unresolved constructor is just an IntelliJ IDEA problem, not a compile problem
 			return new VertexSplit<V>(this.graph, element, id);
 		}
 
@@ -362,6 +363,7 @@ Cloneable  {
 		if (new_subtree_upper_bound < getSubTreeUpperBound()) {
 			update = true;
 			setSubTreeUpperBound(new_subtree_upper_bound);
+            // unresolved constructor is just an IntelliJ IDEA problem, not a compile problem
 			this.bestcut = new VertexSplit<V>(this.groundSet, vertices(), 0);
 			this.bestcut.setLeft(this.left);
 			this.bestcut.setRight(this.right);

@@ -169,8 +169,11 @@ public class HeuristicTest<V, E> {
 
             //String fileName = ControlUtil.GRAPHLIB + "prob/pigs-pp.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
-            //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
-            String fileName = ControlUtil.GRAPHLIB + "coloring/jean.dgf";
+            String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "coloring/jean.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "coloring/zeroin.i.1.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "coloring/queen9_9.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "protein/1a62_graph.dimacs";
             if (args.length > 0) {
                 fileName = args[0];
             }
@@ -244,6 +247,7 @@ public class HeuristicTest<V, E> {
 
         LocalSearchR<V, E>.Result result = lsr.localSearch(graph, st
                 .getBestDecomposition());
+        System.out.flush();
 
         if (result.success) {
             this.decomposition = result.decomposition;

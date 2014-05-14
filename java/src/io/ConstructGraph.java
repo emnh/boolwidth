@@ -81,12 +81,9 @@ public class ConstructGraph {
 
 			initialize(N1, N2);
 
-			int i = 0;
-			int j = 0;
-
 			Random r = new Random();
-			for (i = 0; i < N1; i++) {
-				for (j = 0; j < N2; j++) {
+			for (int i = 0; i < N1; i++) {
+				for (int j = 0; j < N2; j++) {
 					boolean isEdge = r.nextDouble() <= probability;
 					if (isEdge) {
 						addEdge(i, j);

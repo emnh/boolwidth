@@ -34,6 +34,7 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
 
             // we can afford exact
             if (cb < 100000) {
+                //System.out.printf("switching to exact, cb: %d\n", cb);
                 cb = CutBool.countNeighborhoods(cut, upper_bound);
             }
 

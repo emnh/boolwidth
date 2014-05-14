@@ -20,7 +20,24 @@ public class Position<T> implements IPosition<T> {
 		this.id = id;
 	}
 
-	/** Returns the element stored at this position. */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Position)) return false;
+
+        Position position = (Position) o;
+
+        if (id != position.id) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    /** Returns the element stored at this position. */
 	public T element() {
 		return this.elem;
 	}
