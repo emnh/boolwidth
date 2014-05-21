@@ -40,8 +40,8 @@ public class MISBackTrack {
     }*/
 
     public static <V, E> long unionIterate(MISState<V, E> state) {
-        System.out.println("P_any: " + state.P_any.toString());
-        System.out.println("X_out: " + state.X_out.toString());
+        //System.out.println("P_any: " + state.P_any.toString());
+        //System.out.println("X_out: " + state.X_out.toString());
 
         //HashSet<Vertex<V>> term = new HashSet<>(state.P_any);
         //term.removeAll(state.X_out);
@@ -57,33 +57,28 @@ public class MISBackTrack {
         }
         long count = 0;
 
-        for (Vertex<V> v : new ArrayList<>(state.P_any)) {
-            state.R_in.add(v);
-            HashSet<Vertex<V>> neighbors = new HashSet<>(state.g.incidentVerticesCollection(v));
+        Vertex<V> v = state.P_any.iterator().next();
 
-            MISState<V, E> newState = new MISState<>(state);
-            newState.P_any = new HashSet<>(state.P_any);
-            newState.X_out = new HashSet<>(state.X_out);
-            newState.P_any.removeAll(neighbors);
-            newState.X_out.removeAll(neighbors);
-            if (newState.P_any.size() < state.P_any.size() || newState.X_out.size() < state.X_out.size()) {
-                System.out.println("v: " + v);
-                //System.out.println("branching on NG(v)");
-                count += unionIterate(newState);
-            } else {
-                count += 1;
-            }
+        //state.R_in.add(v);
+        HashSet<Vertex<V>> neighbors = new HashSet<>(state.g.incidentVerticesCollection(v));
 
-            /*MISState<V, E> newState2 = new MISState<>(state);
-            newState2.P_any = new HashSet<>(state.P_any);
-            newState2.X_out = new HashSet<>(state.X_out);
-            newState2.P_any.remove(v);
-            newState2.X_out.add(v);
-            count += unionIterate(newState2);
-*/
-            state.P_any.remove(v);
-            state.X_out.remove(v);
-        }
+        MISState<V, E> newState = new MISState<>(state);
+        newState.P_any = new HashSet<>(state.P_any);
+        newState.X_out = new HashSet<>(state.X_out);
+        newState.P_any.remove(v);
+        newState.X_out.remove(v);
+        newState.P_any.removeAll(neighbors);
+        newState.X_out.removeAll(neighbors);
+        //System.out.println("v: " + v);
+        //System.out.println("branching on NG(v)");
+        count += unionIterate(newState);
+
+        MISState<V, E> newState2 = new MISState<>(state);
+        newState2.P_any = new HashSet<>(state.P_any);
+        newState2.X_out = new HashSet<>(state.X_out);
+        newState2.P_any.remove(v);
+        newState2.X_out.add(v);
+        count += unionIterate(newState2);
 
         return count;
     }

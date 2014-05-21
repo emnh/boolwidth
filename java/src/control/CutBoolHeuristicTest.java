@@ -81,7 +81,7 @@ public class CutBoolHeuristicTest {
 
         int bw = CutBool.countNeighborhoods(bigraph);
         System.out.printf("exact %d\n", bw);
-        long est = MISBackTrack.countNeighborhoods(graph);
+        long est = MISBackTrack.countNeighborhoods(bigraph);
         System.out.printf("estimate %d", est);
 
 
