@@ -423,7 +423,36 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 		return temp;
 	}
 
-	// TODO: accept configuration with types and defaults
+
+    protected void depthFirstComponent(TVertex v, ArrayList<TVertex> component, ArrayList<ArrayList<TVertex>> components) {
+        if (components.get(getId(v)) == null) {
+            component.add(v);
+            components.set(getId(v), component);
+            for (TVertex neighbor : incidentVertices(v)) {
+                depthFirstComponent(neighbor, component, components);
+            }
+        }
+    }
+
+    public ArrayList<SubsetGraph<TVertex, V, E>> connectedComponents() {
+        ArrayList<SubsetGraph<TVertex, V, E>> graphComponents = new ArrayList<>();
+        ArrayList<ArrayList<TVertex>> components = new ArrayList<>(numVertices());
+        for (TVertex v : vertices()) {
+            components.add(null);
+        }
+        for (TVertex v : vertices()) {
+            if (components.get(getId(v)) == null) {
+                ArrayList<TVertex> component = new ArrayList<TVertex>();
+                depthFirstComponent(v, component, components);
+
+                SubsetGraph<TVertex, V, E> graph = new SubsetGraph(this, component);
+                graphComponents.add(graph);
+            }
+        }
+        return graphComponents;
+    }
+
+    // TODO: accept configuration with types and defaults
 	@Override
 	public void setAttr(String key, Object value) {
 		this.attributes.put(key, value);

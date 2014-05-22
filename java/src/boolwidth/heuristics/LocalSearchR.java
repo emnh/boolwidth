@@ -251,7 +251,7 @@ public class LocalSearchR<V, E> {
 		// initialize
 		this.decomposition = new LSDecomposition.D<V, E>(g);
 		//this.cmp = new CutBoolComparator<V, E>(this.decomposition, new RandomHeuristic<V, E>());
-        this.cmp = new CutBoolComparatorApprox<V, E>(this.decomposition, new RandomHeuristic<V, E>());
+        this.cmp = new CutBoolComparator<V, E>(this.decomposition, new RandomHeuristic<V, E>());
 		rnd = new Random();
 
         this.rootset = new PosSet<Vertex<V>>(this.decomposition.root().element());

@@ -1,9 +1,6 @@
 package boolwidth;
 
-import graph.BiGraph;
-import graph.PosSet;
-import graph.PosSubSet;
-import graph.Vertex;
+import graph.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -241,6 +238,54 @@ public class CutBool {
 		}
 		return hoods.size();
 	}
+
+    public static <TVertex extends Vertex<V>, V, E> int countNeighborhoods(AdjacencyListGraph<TVertex, V, E> g) {
+        return countNeighborhoods(g, BOUND_UNINITIALIZED);
+    }
+
+    /** @return 2^Boolean-width of given cut. */
+    public static <TVertex extends Vertex<V>, V, E> int countNeighborhoods(AdjacencyListGraph<TVertex, V, E> g,
+                                                long upper_bound) {
+        // set of right,left nodes
+        final PosSet<TVertex> nodes = new PosSet<TVertex>(g.vertices());
+
+        TreeSet<PosSubSet<TVertex>> initialhoods;
+
+        // set of neighborhoods of left nodes
+        final TreeSet<PosSubSet<TVertex>> lrhoods = new TreeSet<PosSubSet<TVertex>>();
+
+        // initialize all neighborhood sets of 1 left node
+        for (TVertex node : g.vertices()) {
+            PosSubSet<TVertex> neighbors = new PosSubSet<TVertex>(nodes, g.incidentVertices(node));
+            if (neighbors.size() > 0) {
+                lrhoods.add(neighbors);
+            }
+        }
+
+        TreeSet<PosSubSet<TVertex>> hoods = new TreeSet<PosSubSet<TVertex>>();
+
+        lrhoods.add(new PosSubSet<TVertex>(nodes));
+        initialhoods = lrhoods;
+
+        for (PosSubSet<TVertex> neighbors : initialhoods) {
+            TreeSet<PosSubSet<TVertex>> newhoods = new TreeSet<PosSubSet<TVertex>>();
+            for (PosSubSet<TVertex> hood : lrhoods) {
+                PosSubSet<TVertex> newhood = hood.union(neighbors);
+                if (!(hoods.contains(newhood) || newhoods.contains(newhood))) {
+                    newhoods.add(newhood);
+                }
+            }
+            hoods.addAll(newhoods);
+
+            if (upper_bound != BOUND_UNINITIALIZED
+                    && hoods.size() > upper_bound) {
+                return BOUND_EXCEEDED;
+            }
+            // System.out.println("Number of neighbourhoods found so far: "+hoods.size());
+        }
+        return hoods.size();
+    }
+
 
 	public static <V, E> int countNeighborhoodsLazy(final BiGraph<V, E> g) {
 		int i = 0;

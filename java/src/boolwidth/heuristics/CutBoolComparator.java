@@ -1,5 +1,6 @@
 package boolwidth.heuristics;
 
+import boolwidth.heuristics.cutbool.MISBackTrack;
 import graph.BiGraph;
 import interfaces.IDecomposition;
 
@@ -25,7 +26,8 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 		} else {
 			BiGraph<V, E> cut = decomposition.getCut(node);
 			int cb = CutBool.countNeighborhoods(cut, upper_bound);
-			if (cb == CutBool.BOUND_EXCEEDED) {
+            //int cb = (int) MISBackTrack.countNeighborhoods(cut);
+            if (cb == CutBool.BOUND_EXCEEDED) {
 				node.setCutBoolLowerBound(cb);
 			} else {
 				node.setCutBool(cb);

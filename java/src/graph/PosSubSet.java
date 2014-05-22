@@ -327,13 +327,13 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 		return new PosSubSet<TVertex>(this.groundSet, newWords);
 	}
 
-	public PosSubSet<TVertex> union(Set<TVertex> set) {
+	/*public PosSubSet<TVertex> union(Set<TVertex> set) {
 		if (set instanceof PosSubSet<?>) {
 			return union((PosSubSet<TVertex>) set);
 		} else {
 			throw new UnsupportedOperationException("not implemented");
 		}
-	}
+	}*/
 }
 
 // @SuppressWarnings("unchecked")
