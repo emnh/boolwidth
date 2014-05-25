@@ -20,7 +20,7 @@ class PersistentMISStateApproximation<V, E> {
 
     public PersistentHashSet<Vertex<V>> P_any;
     public PersistentHashSet<Vertex<V>> X_out;
-    public int depth = 0;
+    public int depth = 1;
 
     public PersistentMISStateApproximation(AdjacencyListGraph<Vertex<V>, V, E> graph) {
         this.graph = graph;
@@ -84,6 +84,7 @@ public class MISBackTrackPersistentApproximation {
 
         while (count == 0 && (!firstBranchDone || !secondBranchDone)) {
             if (firstBranch && !firstBranchDone) {
+                //System.out.println("first branch");
                 PersistentMISStateApproximation<V, E> newState = new PersistentMISStateApproximation<>(state);
                 newState.P_any = newState.P_any.disjoin(v);
                 newState.X_out = newState.X_out.disjoin(v);
@@ -95,21 +96,27 @@ public class MISBackTrackPersistentApproximation {
                 //System.out.println("v: " + v);
                 //System.out.println("branching on NG(v)");
                 newState.depth = state.depth + 1;
-                count = unionIterate(newState);
-                secondBranch = (count == 0);
-                firstBranchDone = true;
+                count += unionIterate(newState);
+                return count;
+                //secondBranch = (count == 0);
+                //firstBranchDone = true;
             }
             if (secondBranch && !secondBranchDone) {
+                //System.out.println("second branch");
                 PersistentMISStateApproximation<V, E> newState2 = new PersistentMISStateApproximation<>(state);
                 newState2.depth = state.depth + 1;
                 newState2.P_any = newState2.P_any.disjoin(v);
                 newState2.X_out = newState2.X_out.cons(v);
-                count = unionIterate(newState2);
-                firstBranch = (count == 0);
-                secondBranchDone = true;
+                count += unionIterate(newState2);
+                return count;
+                //firstBranch = (count == 0);
+                //secondBranchDone = true;
             }
         }
-
+        if (firstBranchDone && secondBranchDone) {
+            //System.out.printf("miss at depth: %d\n", state.depth);
+            count--;
+        }
         return count;
     }
 
@@ -125,7 +132,7 @@ public class MISBackTrackPersistentApproximation {
             }
         }
         //System.out.printf("success count: %d\n", successCount);
-        //return (long) Math.pow(2, (double) sum / successCount);
-        return sum / successCount;
+        return (long) Math.pow(2, (double) sum / successCount);
+        //return sum / successCount;
     }
 }

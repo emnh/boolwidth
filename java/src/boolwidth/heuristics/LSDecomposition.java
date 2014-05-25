@@ -64,7 +64,7 @@ public class LSDecomposition<V, E> extends Decomposition<VertexSplit<V>, V, E> {
 	// return vList.size();
 	// }
 
-	public int boolWidth() {
+	public long boolWidth() {
 		return boolWidth(this.root);
 	}
 
@@ -74,11 +74,11 @@ public class LSDecomposition<V, E> extends Decomposition<VertexSplit<V>, V, E> {
 	 * 
 	 * @return 2^boolwidth
 	 */
-	public int boolWidth(VertexSplit<V> node) {
-		int maxcut = 0;
+	public long boolWidth(VertexSplit<V> node) {
+		long maxcut = 0;
 		for (VertexSplit<V> v : depthFirst(node)) {
 			if (hasLeft(v) && hasRight(v)) {
-				int cb = CutBoolComparator.maxLeftRightCutBool(this, v);
+				long cb = CutBoolComparator.maxLeftRightCutBool(this, v);
 				maxcut = Math.max(maxcut, cb);
 			}
 		}

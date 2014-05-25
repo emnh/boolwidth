@@ -12,20 +12,20 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 
 	private final LSDecomposition<V, E> decomposition;
 
-	private int upper_bound;
+	private long upper_bound;
 
-	public static <V, E> int getCutBool(IDecomposition<?, V, E> decomposition,
+	public static <V, E> long getCutBool(IDecomposition<?, V, E> decomposition,
 			VertexSplit<V> node) {
 		return getCutBool(decomposition, node, CutBool.BOUND_UNINITIALIZED);
 	}
 
-	public static <V, E> int getCutBool(IDecomposition<?, V, E> decomposition,
-			VertexSplit<V> node, int upper_bound) {
+	public static <V, E> long getCutBool(IDecomposition<?, V, E> decomposition,
+			VertexSplit<V> node, long upper_bound) {
 		if (node.hasCutBool()) {
 			return node.getCutBool();
 		} else {
 			BiGraph<V, E> cut = decomposition.getCut(node);
-			int cb = CutBool.countNeighborhoods(cut, upper_bound);
+			long cb = CutBool.countNeighborhoods(cut, upper_bound);
             //int cb = (int) MISBackTrack.countNeighborhoods(cut);
             if (cb == CutBool.BOUND_EXCEEDED) {
 				node.setCutBoolLowerBound(cb);
@@ -36,24 +36,24 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 		}
 	}
 
-	public static <V, E> int maxLeftRightCutBool(
+	public static <V, E> long maxLeftRightCutBool(
 			IDecomposition<?, V, E> decomposition, VertexSplit<V> node) {
 		return maxLeftRightCutBool(decomposition, node,
 				CutBool.BOUND_UNINITIALIZED);
 	}
 
-	public static <V, E> int maxLeftRightCutBool(
+	public static <V, E> long maxLeftRightCutBool(
 			IDecomposition<?, V, E> decomposition, VertexSplit<V> node,
-			int upper_bound) {
-		int retval = 0;
+			long upper_bound) {
+		long retval = 0;
 
 		if (node.getLeft().size() + node.getRight().size() == decomposition
 				.numGraphVertices()) {
 			retval = getCutBool(decomposition, node.getLeft(), upper_bound);
 		} else {
-			int leftcutbool = getCutBool(decomposition, node.getLeft(),
+			long leftcutbool = getCutBool(decomposition, node.getLeft(),
 					upper_bound);
-			int rightcutbool = getCutBool(decomposition, node.getRight(),
+			long rightcutbool = getCutBool(decomposition, node.getRight(),
 					upper_bound);
 			if (leftcutbool == CutBool.BOUND_EXCEEDED
 					|| rightcutbool == CutBool.BOUND_EXCEEDED) {
@@ -95,8 +95,8 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 		final int EQUAL = 0;
 
 		// TODO: use lower bounds
-		int cb1 = maxLeftRightCutBool(this.decomposition, o1);
-		int cb2 = maxLeftRightCutBool(this.decomposition, o2, cb1);
+		long cb1 = maxLeftRightCutBool(this.decomposition, o1);
+		long cb2 = maxLeftRightCutBool(this.decomposition, o2, cb1);
 		if (cb2 == CutBool.BOUND_EXCEEDED) {
 			// System.out.println("bound hit");
 			return O1_LESS_THAN_O2;
@@ -134,24 +134,24 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 		}
 	}
 
-	public int getCutBool(VertexSplit<V> node) {
+	public long getCutBool(VertexSplit<V> node) {
 		return getCutBool(this.decomposition, node);
 	}
 
-	public int getUpperBound() {
+	public long getUpperBound() {
 		return this.upper_bound;
 	}
 
-	public int maxLeftRightCutBool(VertexSplit<V> node) {
+	public long maxLeftRightCutBool(VertexSplit<V> node) {
 		return maxLeftRightCutBool(this.decomposition, node);
 	}
 
-	public int maxLeftRightCutBool(VertexSplit<V> node, int upper_bound) {
+	public long maxLeftRightCutBool(VertexSplit<V> node, long upper_bound) {
 		return maxLeftRightCutBool(this.decomposition, node, upper_bound);
 	}
 
 
-	public void setUpperBound(int upper_bound) {
+	public void setUpperBound(long upper_bound) {
 		this.upper_bound = upper_bound;
 	}
 }

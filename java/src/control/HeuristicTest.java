@@ -172,8 +172,11 @@ public class HeuristicTest<V, E> {
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/jean.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/zeroin.i.1.dgf";
-            String fileName = ControlUtil.GRAPHLIB + "coloring/queen9_9.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "coloring/queen9_9.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "protein/1a62_graph.dimacs";
+            //String fileName  = ControlUtil.GRAPHLIB + "other/risk.dgf";
+            String fileName = null;
+
             if (args.length > 0) {
                 fileName = args[0];
             }
@@ -208,7 +211,7 @@ public class HeuristicTest<V, E> {
 
                 ht.doHeuristic(graph);
 
-                if (ht.decomposition != null) {
+                if (ht.decomposition != null && graph.numVertices() < 100) {
                     GraphViz.saveGraphDecomposition(fileName, graph, ht.bw,
                             ht.decomposition, ht.time);
                 }
@@ -227,6 +230,7 @@ public class HeuristicTest<V, E> {
         long start = System.currentTimeMillis();
 
         String fileName = DiskGraph.getFileName(graph);
+        System.out.printf("Graph %s (v=%d,e=%d).\n", fileName, graph.numVertices(), graph.numEdges());
         assert (fileName != null);
 
         File outputFile = new File(ControlUtil.getOutputDir(fileName),
@@ -234,6 +238,7 @@ public class HeuristicTest<V, E> {
         Storage st = null;
         if (outputFile.exists()) {
             st = Storage.fromFile(outputFile.toString());
+            System.out.printf("Reading previous results from %s.\n", outputFile.toString());
             // if (st.getBestDecomposition() != null) {
             // System.out.printf("boolean-width(decomposition(%s)): %d, ",
             // fileName,
@@ -251,23 +256,37 @@ public class HeuristicTest<V, E> {
 
         if (result.success) {
             this.decomposition = result.decomposition;
-            this.bw = CutBool.booleanWidth(this.decomposition);
-            st.updateBestDecomposition(this.decomposition);
+            final int MAXBWBOUND = 1000000;
+            this.bw = CutBool.booleanWidth(this.decomposition, MAXBWBOUND);
+            if (this.bw != CutBool.BOUND_EXCEEDED) {
+                st.updateBestDecomposition(this.decomposition);
+            } else {
+                System.out.printf("exact decomposition bw exceeded bound: %d\n", MAXBWBOUND);
+            }
         } else {
             System.out.println("failed to meet bound");
             return;
         }
 
-        // System.out.println("Decomposition: " +
-        // this.decomposition.toString());
-        System.out.println("Decomposition: "
-                + st.getBestDecomposition().toString());
-
         st.save(outputFile.toString());
 
-        System.out.printf("boolean-width(decomposition(%s(v=%d,e=%d))): bw=%d, ", fileName,
-                graph.numVertices(), graph.numEdges(),
-                BooleanDecomposition.getBoolWidth(st.getBestDecomposition()));
+        // System.out.println("Decomposition: " +
+        // this.decomposition.toString());
+        if (this.bw != CutBool.BOUND_EXCEEDED) {
+            System.out.println("Decomposition: "
+                    + st.getBestDecomposition().toString());
+
+            long bw = BooleanDecomposition.getBoolWidth(st.getBestDecomposition());
+            System.out.printf("boolean-width(decomposition(%s(v=%d,e=%d))): 2^bw=%d, bw=%.2f\n",
+                    fileName,
+                    graph.numVertices(),
+                    graph.numEdges(),
+                    bw,
+                    Math.log(bw) / Math.log(2));
+        } else {
+            System.out.println("Approximate Decomposition: " + this.decomposition.toString());
+        }
+
         long end = System.currentTimeMillis();
         this.time = end - start;
         System.out.println("time: " + this.time);

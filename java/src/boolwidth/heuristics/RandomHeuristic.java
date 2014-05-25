@@ -7,9 +7,9 @@ public class RandomHeuristic<V, E> implements
 	 * splits one level randomly
 	 */
 	@Override
-	public int runHeuristic(LSDecomposition<V, E> decomposition,
-			VertexSplit<V> node, int upperBound) {
-		int retval = 0;
+	public long runHeuristic(LSDecomposition<V, E> decomposition,
+			VertexSplit<V> node, long upperBound) {
+		long retval = 0;
 
 		VertexSplit<V> newnode = node.clone();
 

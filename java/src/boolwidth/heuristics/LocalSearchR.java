@@ -26,20 +26,20 @@ public class LocalSearchR<V, E> {
 	// dynamic search state
 	private boolean has_valid_best_decomposition = false;
 	private LSDecomposition.D<V, E> decomposition;
-	private int graph_boolwidth_upper_bound = CutBool.BOUND_UNINITIALIZED;
+	private long graph_boolwidth_upper_bound = CutBool.BOUND_UNINITIALIZED;
 	TreeMap<PosSubSet<Vertex<V>>, VertexSplit<V>> foundsplits = new TreeMap<PosSubSet<Vertex<V>>, VertexSplit<V>>();
 
 	// === Algorithm configuration parameters
 
 	// do local search if true, re-randomize cuts completely if not
-	private final boolean greedy = true;
+	private final boolean localSwaps = true;
 
 	// set one side full, other empty, and move node by node greedy until the cut is balanced
 	private final boolean useInitGreedy = true;
 	private final boolean useInitGreedyExitEarly = false;
 
 	// use lists of active cuts to investigate instead of just one
-	private final boolean useActives = true;
+	private final boolean useActives = false;
 	// use size of list for inner search steps
 	private final boolean useActivesInner = false;
 
@@ -80,11 +80,11 @@ public class LocalSearchR<V, E> {
 	}
 
 	public boolean beatsGraphUpperBound(VertexSplit<V> bag) {
-		int bw = this.cmp.maxLeftRightCutBool(bag, getGraphBoolwidthUpperBound());
+		long bw = this.cmp.maxLeftRightCutBool(bag, getGraphBoolwidthUpperBound());
 		return bw != CutBool.BOUND_EXCEEDED;
 	}
 
-	public int getGraphBoolwidthUpperBound() {
+	public long getGraphBoolwidthUpperBound() {
 		return this.graph_boolwidth_upper_bound;
 	}
 
@@ -131,7 +131,7 @@ public class LocalSearchR<V, E> {
 		ArrayList<VertexSplit<V>> newSplit = new ArrayList<VertexSplit<V>>(1);
 		newSplit.add(null);
 
-		int[] minNewBoolwidth = { Integer.MAX_VALUE };
+		long[] minNewBoolwidth = { Long.MAX_VALUE };
 
 		boolean allover = this.useActives;
 
@@ -179,10 +179,10 @@ public class LocalSearchR<V, E> {
 	 * @return
 	 */
 	public boolean initGreedyCheck(VertexSplit<V> bag, VertexSplit<V> swapSplit,
-			ArrayList<VertexSplit<V>> newSplit, int[] minNewBoolwidth) {
+			ArrayList<VertexSplit<V>> newSplit, long[] minNewBoolwidth) {
 		if (SwapConstraints.isValid(swapSplit)) {
 			addActiveIfGood(bag, swapSplit.clone(), -1);
-			int boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth[0]);
+			long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth[0]);
 			//int boolwidth = this.cmp.maxLeftRightCutBool(swapSplit);
 			if (boolwidth != CutBool.BOUND_EXCEEDED) {
 				if (boolwidth < minNewBoolwidth[0]) {
@@ -198,7 +198,7 @@ public class LocalSearchR<V, E> {
 	public boolean keepCut(VertexSplit<V> split, VertexSplit<V> newsplit, int depth) {
 		boolean useNewCut = false;
 		Comparator<VertexSplit<V>> valuecmp = this.cmp;
-		if (this.greedy) {
+		if (this.localSwaps) {
 			//useNewCut = valuecmp.compare(split, newsplit) <= 0;
 			if (!this.allowEverythingBelowGraphUpperBound) {
 				// first, be very greedy
@@ -251,7 +251,7 @@ public class LocalSearchR<V, E> {
 		// initialize
 		this.decomposition = new LSDecomposition.D<V, E>(g);
 		//this.cmp = new CutBoolComparator<V, E>(this.decomposition, new RandomHeuristic<V, E>());
-        this.cmp = new CutBoolComparator<V, E>(this.decomposition, new RandomHeuristic<V, E>());
+        this.cmp = new CutBoolComparatorApprox<V, E>(this.decomposition, new RandomHeuristic<V, E>());
 		rnd = new Random();
 
         this.rootset = new PosSet<Vertex<V>>(this.decomposition.root().element());
@@ -299,8 +299,10 @@ public class LocalSearchR<V, E> {
 				this.has_valid_best_decomposition = true;
 			}
 			if (i % 10 == 0) {
-				System.out.printf("iteration: %d, foundsplits: %d, upper: %d\n", i,
-						this.foundsplits.size(), getGraphBoolwidthUpperBound());
+				System.out.printf("iteration: %d, foundsplits: %d, UB: %d, log2UB: %.2f\n", i,
+						this.foundsplits.size(),
+                        getGraphBoolwidthUpperBound(),
+                        Math.log(getGraphBoolwidthUpperBound()) / Math.log(2));
 				System.out.printf("cut fails/tries: %d/%d\n", this.failsToImproveCut, this.triesToImproveCut);
 			}
 			// ArrayList<VertexSplit<V>> goodstuff = new
@@ -348,7 +350,7 @@ public class LocalSearchR<V, E> {
 	}
 
 
-	public void setGraphBoolwidthUpperBound(int graph_bw_upper_bound) {
+	public void setGraphBoolwidthUpperBound(long graph_bw_upper_bound) {
 		this.graph_boolwidth_upper_bound = graph_bw_upper_bound;
 	}
 
@@ -359,7 +361,7 @@ public class LocalSearchR<V, E> {
 	 */
 	public VertexSplit<V> swapGreedyLeft(VertexSplit<V> bag) {
 		VertexSplit<V> newsplit = null;
-		int minNewBoolwidth = Integer.MAX_VALUE;
+		long minNewBoolwidth = Long.MAX_VALUE;
 
 		assert bag.getLeft().size() > 0;
 		for (Vertex<V> v : bag.getLeft().vertices()) {
@@ -370,7 +372,7 @@ public class LocalSearchR<V, E> {
 			// experimental
 			addActiveIfGood(bag, swapSplit.clone(), -1);
 
-			int boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
+			long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
 			if (boolwidth != CutBool.BOUND_EXCEEDED) {
 				if (boolwidth < minNewBoolwidth) {
 					newsplit = swapSplit;
@@ -392,14 +394,14 @@ public class LocalSearchR<V, E> {
 	 */
 	public VertexSplit<V> swapGreedyRight(VertexSplit<V> bag) {
 		VertexSplit<V> newsplit = null;
-		int minNewBoolwidth = Integer.MAX_VALUE;
+		long minNewBoolwidth = Long.MAX_VALUE;
 
 		assert bag.getRight().size() > 0;
 		for (Vertex<V> v : bag.getRight().vertices()) {
 			ArrayList<Vertex<V>> toswap = new ArrayList<Vertex<V>>(1);
 			toswap.add(v);
 			VertexSplit<V> swapSplit = this.decomposition.swapNodes(bag, null, toswap);
-			int boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
+			long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
 			if (boolwidth != CutBool.BOUND_EXCEEDED) {
 				if (boolwidth < minNewBoolwidth) {
 					newsplit = swapSplit;
@@ -422,7 +424,7 @@ public class LocalSearchR<V, E> {
 	 * @return
 	 */
 	public ArrayList<VertexSplit<V>> tryToImproveCut(VertexSplit<V> split,
-			Comparator<VertexSplit<V>> valuecmp, int lower_bound, int depth) {
+			Comparator<VertexSplit<V>> valuecmp, long lower_bound, int depth) {
 
 		// System.out.printf("initial: cutbool=%d, left=%s, right=%s\n", cmp
 		// .getCutBool(split), split.getLeft(), split.getRight());
@@ -455,7 +457,7 @@ public class LocalSearchR<V, E> {
 		//this.cmp.compare(newsplit2, newsplit) <=
 
 		// completely re-randomize
-		if (!this.greedy) {
+		if (!this.localSwaps) {
 			int newleftsize = rnd.nextInt(split.size() / 2 - split.size() / 3
 					+ 1)
 					+ split.size() / 3;
@@ -511,7 +513,7 @@ public class LocalSearchR<V, E> {
 	 */
 
 	protected void tryToImproveSubTree(VertexSplit<V> split, int searchsteps,
-			int decomposition_bw_lower_bound, int depth) {
+			long decomposition_bw_lower_bound, int depth) {
 
 		if (split.size() == 1) {
 			this.cmp.getCutBool(split); // will be cached
@@ -533,7 +535,7 @@ public class LocalSearchR<V, E> {
 			split.activeCuts.add(split.clone());
 		}
 
-		int next_lower_bound = Math.max(decomposition_bw_lower_bound, this.cmp
+		long next_lower_bound = Math.max(decomposition_bw_lower_bound, this.cmp
 				.getCutBool(split));
 
 		//for (int i = 0; i < Math.max(searchsteps, split.activeCuts.size()); i++) {
@@ -648,7 +650,7 @@ public class LocalSearchR<V, E> {
 			tryToImproveSubTree(first, searchsteps, next_lower_bound, depth + 1);
 			// it's the max of all computed cuts so far on this particular
 			// decomposition
-			int lower_bound_for_other_side = next_lower_bound;
+			long lower_bound_for_other_side = next_lower_bound;
 			lower_bound_for_other_side = Math.max(lower_bound_for_other_side,
 					first.getSubTreeUpperBound());
 			tryToImproveSubTree(second, searchsteps, lower_bound_for_other_side, depth + 1);
@@ -670,7 +672,7 @@ public class LocalSearchR<V, E> {
 		// }
 	}
 
-	public boolean updateGraphBoolwidthUpperBound(int graph_boolw_upper_bound) {
+	public boolean updateGraphBoolwidthUpperBound(long graph_boolw_upper_bound) {
 		boolean updated = false;
 		if (graph_boolw_upper_bound < this.graph_boolwidth_upper_bound) {
 			System.out.printf("new bw: %d -> %d\n",

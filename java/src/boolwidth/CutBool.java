@@ -71,19 +71,18 @@ public class CutBool {
 	 * Returns the best general upper bound on 2^bw, if the cut is not at the
 	 * top, that is, 2^(n / 2).
 	 * 
-	 * @param n
+	 * @param nodeCount
 	 *            number of vertices
 	 * @return
 	 */
-	public static int bestGeneralUpperBound(int n, boolean toplevelcut) {
+	public static long bestGeneralUpperBound(int nodeCount, boolean toplevelcut) {
 		if (toplevelcut) {
-			return bestGeneralUpperBound(n);
+			return bestGeneralUpperBound(nodeCount);
 		} else {
-			int bw = (n - 1) / 2 + 1;
-			if (bw >= 31) {
-				System.out
-				.println("Warning: returning MAX_VALUE for bestGeneralUpperBound");
-				return Integer.MAX_VALUE;
+			int bw = (nodeCount - 1) / 2 + 1;
+			if (bw >= 63) {
+				System.out.println("Warning: returning Long.MAX_VALUE for bestGeneralUpperBound instead of (nodeCount - 1) / 2 + 1.");
+				return Long.MAX_VALUE;
 			}
 			return 1 << bw;
 		}

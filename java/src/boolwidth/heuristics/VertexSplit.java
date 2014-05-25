@@ -44,9 +44,9 @@ Cloneable  {
 	public transient boolean initialized = false;
 
 	// max(cutbool(left), cutbool(right))
-	private int cutbool = CUTBOOL_INITVAL;
-	private transient int cutbool_lower_bound = CUTBOOL_INITVAL;
-	private transient int subtree_upper_bound = SUBCUTS_INITVAL;
+	private long cutbool = CUTBOOL_INITVAL;
+	private transient long cutbool_lower_bound = CUTBOOL_INITVAL;
+	private transient long subtree_upper_bound = SUBCUTS_INITVAL;
 	private transient VertexSplit<V> bestcut = null;
 	public transient int steps = 0;
 
@@ -209,12 +209,12 @@ Cloneable  {
 		}
 	}
 
-	public int getCutBool() {
+	public long getCutBool() {
 		assert hasCutBool();
 		return this.cutbool;
 	}
 
-	public int getCutBoolLowerBound() {
+	public long getCutBoolLowerBound() {
 		return this.cutbool_lower_bound;
 	}
 
@@ -231,7 +231,7 @@ Cloneable  {
 		}
 	}
 
-	public int getSubTreeUpperBound() {
+	public long getSubTreeUpperBound() {
 		if (this.subtree_upper_bound == SUBCUTS_INITVAL) {
 			assert hasCutBool();
 			this.subtree_upper_bound = Math.max(getCutBool(), CutBool
@@ -279,11 +279,11 @@ Cloneable  {
 		foundsplits.put(newsplitright, this.getRight());
 	}
 
-	public void setCutBool(int cutbool) {
+	public void setCutBool(long cutbool) {
 		this.cutbool = cutbool;
 	}
 
-	public void setCutBoolLowerBound(int cutbool_lower_bound) {
+	public void setCutBoolLowerBound(long cutbool_lower_bound) {
 		this.cutbool_lower_bound = cutbool_lower_bound;
 	}
 
@@ -291,7 +291,7 @@ Cloneable  {
 		this.horizontalParent = horizontalParent;
 	}
 
-	public void setSubTreeUpperBound(int subtree_upper_bound) {
+	public void setSubTreeUpperBound(long subtree_upper_bound) {
 		this.subtree_upper_bound = subtree_upper_bound;
 	}
 
@@ -339,7 +339,7 @@ Cloneable  {
 	public <E> boolean updateSubTreeUpperBound() {
 		assert hasCutBool();
 		if (size() > 1) {
-			int subtree_upper_bound = Math.max(
+			long subtree_upper_bound = Math.max(
 					getLeft().getSubTreeUpperBound(), getRight()
 					.getSubTreeUpperBound());
 
@@ -358,7 +358,7 @@ Cloneable  {
 		}
 	}
 
-	public boolean updateSubTreeUpperBound(int new_subtree_upper_bound) {
+	public boolean updateSubTreeUpperBound(long new_subtree_upper_bound) {
 		boolean update = false;
 		if (new_subtree_upper_bound < getSubTreeUpperBound()) {
 			update = true;

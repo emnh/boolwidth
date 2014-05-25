@@ -16,13 +16,13 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
 
     private static int sampleCount = 10;
 
-    public static <V, E> int getCutBool(IDecomposition<?, V, E> decomposition,
+    public static <V, E> long getCutBool(IDecomposition<?, V, E> decomposition,
                                         VertexSplit<V> node) {
         return getCutBool(decomposition, node, CutBool.BOUND_UNINITIALIZED);
     }
 
-    public static <V, E> int getCutBool(IDecomposition<?, V, E> decomposition,
-                                        VertexSplit<V> node, int upper_bound) {
+    public static <V, E> long getCutBool(IDecomposition<?, V, E> decomposition,
+                                        VertexSplit<V> node, long upper_bound) {
         if (node.hasCutBool()) {
             return node.getCutBool();
         } else {
@@ -30,41 +30,44 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
 
             // TODO: cannot get BOUND_EXCEEDED from estimator, simplify code?
             // TODO: can return long, should refactor whole chain to use long, or make a type for it
-            int cb = (int) CBBacktrackEstimate.estimateNeighborhoods(cut, sampleCount);
+            long cbApproximation = CBBacktrackEstimate.estimateNeighborhoods(cut, sampleCount);
 
-            // we can afford exact
-            if (cb < 100000) {
+            final long CAN_AFFORD_EXACT = 10000;
+
+            if (cbApproximation < CAN_AFFORD_EXACT) {
                 //System.out.printf("switching to exact, cb: %d\n", cb);
-                cb = CutBool.countNeighborhoods(cut, upper_bound);
-            }
+                long cbExact = CutBool.countNeighborhoods(cut, CAN_AFFORD_EXACT);
 
-            if (cb == CutBool.BOUND_EXCEEDED) {
-                node.setCutBoolLowerBound(cb);
-            } else {
-                node.setCutBool(cb);
+                if (cbExact == CutBool.BOUND_EXCEEDED) {
+                    node.setCutBoolLowerBound(CAN_AFFORD_EXACT);
+                } else {
+                    node.setCutBool(cbExact);
+                    return cbExact;
+                }
             }
-            return cb;
+            node.setCutBool(cbApproximation);
+            return cbApproximation;
         }
     }
 
-    public static <V, E> int maxLeftRightCutBool(
+    public static <V, E> long maxLeftRightCutBool(
             IDecomposition<?, V, E> decomposition, VertexSplit<V> node) {
         return maxLeftRightCutBool(decomposition, node,
                 CutBool.BOUND_UNINITIALIZED);
     }
 
-    public static <V, E> int maxLeftRightCutBool(
+    public static <V, E> long maxLeftRightCutBool(
             IDecomposition<?, V, E> decomposition, VertexSplit<V> node,
-            int upper_bound) {
-        int retval = 0;
+            long upper_bound) {
+        long retval = 0;
 
         if (node.getLeft().size() + node.getRight().size() == decomposition
                 .numGraphVertices()) {
             retval = getCutBool(decomposition, node.getLeft(), upper_bound);
         } else {
-            int leftcutbool = getCutBool(decomposition, node.getLeft(),
+            long leftcutbool = getCutBool(decomposition, node.getLeft(),
                     upper_bound);
-            int rightcutbool = getCutBool(decomposition, node.getRight(),
+            long rightcutbool = getCutBool(decomposition, node.getRight(),
                     upper_bound);
             if (leftcutbool == CutBool.BOUND_EXCEEDED
                     || rightcutbool == CutBool.BOUND_EXCEEDED) {
@@ -107,8 +110,8 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
         final int EQUAL = 0;
 
         // TODO: use lower bounds
-        int cb1 = maxLeftRightCutBool(this.decomposition, o1);
-        int cb2 = maxLeftRightCutBool(this.decomposition, o2, cb1);
+        long cb1 = maxLeftRightCutBool(this.decomposition, o1);
+        long cb2 = maxLeftRightCutBool(this.decomposition, o2, cb1);
         if (cb2 == CutBool.BOUND_EXCEEDED) {
             // System.out.println("bound hit");
             return O1_LESS_THAN_O2;
@@ -146,19 +149,19 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
         }
     }
 
-    public int getCutBool(VertexSplit<V> node) {
+    public long getCutBool(VertexSplit<V> node) {
         return getCutBool(this.decomposition, node);
     }
 
-    public int getUpperBound() {
+    public long getUpperBound() {
         return this.upper_bound;
     }
 
-    public int maxLeftRightCutBool(VertexSplit<V> node) {
+    public long maxLeftRightCutBool(VertexSplit<V> node) {
         return maxLeftRightCutBool(this.decomposition, node);
     }
 
-    public int maxLeftRightCutBool(VertexSplit<V> node, int upper_bound) {
+    public long maxLeftRightCutBool(VertexSplit<V> node, long upper_bound) {
         return maxLeftRightCutBool(this.decomposition, node, upper_bound);
     }
 
