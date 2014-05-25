@@ -63,35 +63,37 @@ public class MISBackTrackPersistent {
         }
         long count = 0;
 
-        ArrayList<Vertex<V>> component = new ArrayList<Vertex<V>>();
-        component.addAll(state.P_any);
-        component.addAll(state.X_out);
-        SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph(state.graph, component);
-        ArrayList<SubsetGraph<Vertex<V>, V, E>> components = graph.newGraph.connectedComponents();
-        if (components.size() > 1) {
-            //System.out.printf("components: %d\n", components.size());
-            count = 1;
-            for (SubsetGraph<Vertex<V>, V, E> subgraph : components) {
-                PersistentMISState<V, E> newState = new PersistentMISState<>(state);
-                newState.graph = subgraph.newGraph;
-                newState.P_any = PersistentHashSet.EMPTY; // subgraph.newGraph.verticesCollection());
-                newState.X_out = PersistentHashSet.EMPTY;
+        if (state.P_any.size() >= 10) {
+            ArrayList<Vertex<V>> component = new ArrayList<Vertex<V>>();
+            component.addAll(state.P_any);
+            component.addAll(state.X_out);
+            SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph(state.graph, component);
+            ArrayList<SubsetGraph<Vertex<V>, V, E>> components = graph.newGraph.connectedComponents();
+            if (components.size() > 1) {
+                //System.out.printf("components: %d\n", components.size());
+                count = 1;
+                for (SubsetGraph<Vertex<V>, V, E> subgraph : components) {
+                    PersistentMISState<V, E> newState = new PersistentMISState<>(state);
+                    newState.graph = subgraph.newGraph;
+                    newState.P_any = PersistentHashSet.EMPTY; // subgraph.newGraph.verticesCollection());
+                    newState.X_out = PersistentHashSet.EMPTY;
 
-                for (Vertex<V> v : state.P_any) {
-                    Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
-                    if (newV != null) {
-                        newState.P_any = newState.P_any.cons(newV);
+                    for (Vertex<V> v : state.P_any) {
+                        Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
+                        if (newV != null) {
+                            newState.P_any = newState.P_any.cons(newV);
+                        }
                     }
-                }
-                for (Vertex<V> v : state.X_out) {
-                    Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
-                    if (newV != null) {
-                        newState.X_out = newState.X_out.cons(newV);
+                    for (Vertex<V> v : state.X_out) {
+                        Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
+                        if (newV != null) {
+                            newState.X_out = newState.X_out.cons(newV);
+                        }
                     }
+                    count *= unionIterate(newState);
                 }
-                count *= unionIterate(newState);
+                return count;
             }
-            return count;
         }
 
         Vertex<V> v = null;

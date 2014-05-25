@@ -79,10 +79,19 @@ public class CutBoolHeuristicTest {
         }
         BiGraph<Integer, String> bigraph = new BiGraph<>(lefts, graph);
 
+        long startTime = System.nanoTime();
         int bw = CutBool.countNeighborhoods(bigraph);
-        System.out.printf("exact %d\n", bw);
-        long est = MISBackTrack.countNeighborhoods(bigraph);
-        System.out.printf("estimate %d", est);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime) / 1000000;
+        System.out.printf("UNN (bigraph) (%dms): %d\n", duration, bw);
+
+        final int sampleCount = 100;
+
+        startTime = System.nanoTime();
+        long est = CBBacktrackEstimate.estimateNeighborhoods(bigraph, sampleCount);
+        endTime = System.nanoTime();
+        duration = (endTime - startTime) / 1000000;
+        System.out.printf("CB bactrack approximation (%dms): %d\n", duration, est);
 
 
 	}

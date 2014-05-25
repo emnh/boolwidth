@@ -57,31 +57,33 @@ public class MISBackTrack {
         }
         long count = 0;
 
-        ArrayList<Vertex<V>> component = new ArrayList<Vertex<V>>();
-        component.addAll(state.P_any);
-        component.addAll(state.X_out);
-        SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph(state.graph, component);
-        ArrayList<SubsetGraph<Vertex<V>, V, E>> components = graph.newGraph.connectedComponents();
-        if (components.size() > 1) {
-            //System.out.printf("components: %d\n", components.size());
-            count = 1;
-            for (SubsetGraph<Vertex<V>, V, E> subgraph : components) {
-                MISState<V, E> newState = new MISState<>(state);
-                newState.graph = subgraph.newGraph;
-                newState.P_any = new HashSet<Vertex<V>>(); // subgraph.newGraph.verticesCollection());
-                newState.X_out = new HashSet<Vertex<V>>();
+        if (state.P_any.size() >= 10) {
+            ArrayList<Vertex<V>> component = new ArrayList<Vertex<V>>();
+            component.addAll(state.P_any);
+            component.addAll(state.X_out);
+            SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph(state.graph, component);
+            ArrayList<SubsetGraph<Vertex<V>, V, E>> components = graph.newGraph.connectedComponents();
+            if (components.size() > 1) {
+                //System.out.printf("components: %d\n", components.size());
+                count = 1;
+                for (SubsetGraph<Vertex<V>, V, E> subgraph : components) {
+                    MISState<V, E> newState = new MISState<>(state);
+                    newState.graph = subgraph.newGraph;
+                    newState.P_any = new HashSet<Vertex<V>>(); // subgraph.newGraph.verticesCollection());
+                    newState.X_out = new HashSet<Vertex<V>>();
 
-                for (Vertex<V> v : state.P_any) {
-                    Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
-                    if (newV != null) newState.P_any.add(newV);
+                    for (Vertex<V> v : state.P_any) {
+                        Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
+                        if (newV != null) newState.P_any.add(newV);
+                    }
+                    for (Vertex<V> v : state.X_out) {
+                        Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
+                        if (newV != null) newState.X_out.add(newV);
+                    }
+                    count *= unionIterate(newState);
                 }
-                for (Vertex<V> v : state.X_out) {
-                    Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
-                    if (newV != null) newState.X_out.add(newV);
-                }
-                count *= unionIterate(newState);
+                return count;
             }
-            return count;
         }
 
         Vertex<V> v = null;
