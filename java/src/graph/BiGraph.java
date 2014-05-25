@@ -105,11 +105,11 @@ IBiGraph<V, E> {
 
         // add left and right vertices
         for (Vertex<V> v : graph.vertices()) {
-            Vertex<V> newVertexLeft = createVertex(v.element(), this.vList.size());
+            Vertex<V> newVertexLeft = createVertex(v.element(), getNextID());
             insertLeft(newVertexLeft);
         }
         for (Vertex<V> v : graph.vertices()) {
-            Vertex<V> newVertexRight = createVertex(v.element(), this.vList.size());
+            Vertex<V> newVertexRight = createVertex(v.element(), getNextID());
             insertRight(newVertexRight); // maybe dup it?
         }
 

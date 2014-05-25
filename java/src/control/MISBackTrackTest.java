@@ -2,6 +2,7 @@ package control;
 
 import boolwidth.CutBool;
 import boolwidth.heuristics.cutbool.MISBackTrack;
+import boolwidth.heuristics.cutbool.MISBackTrackPersistent;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Vertex;
@@ -16,12 +17,25 @@ public class MISBackTrackTest {
 
     public static void main(String[] args) {
 
-        //String fileName = ControlUtil.GRAPHLIB + "prob/pigs-pp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs";
-        //String fileName = ControlUtil.GRAPHLIB + "other/risk.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "protein/1r69_graph.dimacs";
-        //String fileName = ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs";
+        ArrayList<String> fileNames  = new ArrayList<String>();
 
+        fileNames.add(ControlUtil.GRAPHLIB + "prob/pigs-pp.dgf");
+        fileNames.add(ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs");
+        fileNames.add(ControlUtil.GRAPHLIB + "other/risk.dgf");
+        fileNames.add(ControlUtil.GRAPHLIB + "protein/1r69_graph.dimacs");
+        fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
+
+        //fileNames.clear();
+        //fileNames.add(ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs");
+
+        for (String file : fileNames) {
+            System.out.println(file);
+            processFile(file);
+            System.out.println("");
+        }
+    }
+
+    public static void processFile(String fileName) {
         AdjacencyListGraph<Vertex<Integer>, Integer, String> graph = new AdjacencyListGraph.D<Integer, String>();
         DiskGraph.readGraph(fileName, graph);
         ArrayList<Vertex<Integer>> lefts = new ArrayList<Vertex<Integer>>();
@@ -30,17 +44,25 @@ public class MISBackTrackTest {
         }
         BiGraph<Integer, String> bigraph = new BiGraph<>(lefts, graph);
 
+        BiGraph<Integer, String> bigraphdup = new BiGraph<>(graph);
+
         long startTime = System.nanoTime();
         int bw = CutBool.countNeighborhoods(bigraph);
         long endTime = System.nanoTime();
         long duration = (endTime - startTime) / 1000000;
 
-        System.out.printf("UNN (%dms): %d\n", duration, bw);
+        System.out.printf("UNN (bigraph) (%dms): %d\n", duration, bw);
 
         startTime = System.nanoTime();
-        long est = MISBackTrack.countNeighborhoods(graph);
+        long est = MISBackTrack.countNeighborhoods(bigraph);
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
-        System.out.printf("MIS backtrack (%dms): %d", duration, est);
+        System.out.printf("MIS backtrack (%dms): %d\n", duration, est);
+
+        startTime = System.nanoTime();
+        est = MISBackTrackPersistent.countNeighborhoods(bigraph);
+        endTime = System.nanoTime();
+        duration = (endTime - startTime) / 1000000;
+        System.out.printf("MIS backtrack persistent (%dms): %d\n", duration, est);
     }
 }
