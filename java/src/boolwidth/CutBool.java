@@ -54,15 +54,15 @@ public class CutBool {
 	 *            number of vertices
 	 * @return
 	 */
-	public static int bestGeneralUpperBound(int n) {
+	public static long bestGeneralUpperBound(int n) {
 		if (n <= 4) {
 			return 1;
 		}
 		int bw = (n - 1) / 3 + 1;
-		if (bw >= 31) {
+		if (bw >= 63) {
 			System.out
 			.println("Warning: returning MAX_VALUE for bestGeneralUpperBound");
-			return Integer.MAX_VALUE;
+			return Long.MAX_VALUE;
 		}
 		return 1 << bw;
 	}
@@ -76,6 +76,10 @@ public class CutBool {
 	 * @return
 	 */
 	public static long bestGeneralUpperBound(int nodeCount, boolean toplevelcut) {
+        // XXX: this should not be committed
+        return Long.MAX_VALUE;
+
+        /*
 		if (toplevelcut) {
 			return bestGeneralUpperBound(nodeCount);
 		} else {
@@ -85,7 +89,7 @@ public class CutBool {
 				return Long.MAX_VALUE;
 			}
 			return 1 << bw;
-		}
+		}*/
 	}
 
 	/**

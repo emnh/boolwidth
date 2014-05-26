@@ -342,7 +342,7 @@ public class Decomposition<TVertex extends DNode<TVertex, V>, V, E> extends
 		return this.root;
 	}
 
-	public void toFile(File outFile, int hoods) {
+	public void toFile(File outFile, long hoods) {
 		try {
 			FileWriter fw = new FileWriter(outFile);
 			fw.write("" + hoods + "\n");

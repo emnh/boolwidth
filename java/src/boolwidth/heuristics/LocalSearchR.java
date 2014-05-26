@@ -162,6 +162,7 @@ public class LocalSearchR<V, E> {
 					return newSplit.get(0);
 				}
 			}
+            System.out.printf("Greedy init: %d/%d\n", i, bag.getLeft().size());
 			swapSplit = swapGreedyLeft(swapSplit);
 		}
 		initGreedyCheck(bag, swapSplit, newSplit, minNewBoolwidth);

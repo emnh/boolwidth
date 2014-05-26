@@ -326,8 +326,8 @@ Cloneable  {
 				} else {
 					bag = String.format("%s | %s", lefts, rights);
 				}
-				return String.format("VSplit(%d): steps=%d, cutbool=%d, bag=%s",
-						this.id, this.steps, this.cutbool, bag);
+				return String.format("VSplit(%d): steps=%d, bw=%.2f, cutbool=%d, bag=%s",
+						this.id, this.steps, Math.log(this.cutbool) / Math.log(2), this.cutbool, bag);
 	}
 
 	public void updateCached(PosSet<Vertex<V>> rootset,

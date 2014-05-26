@@ -30,15 +30,15 @@ public class DecompositionTest {
 		new File(path).mkdirs();
 		outFile.createNewFile();
 
-		int minbw = CutBool.bestGeneralUpperBound(graph.numVertices());
+		long minbw = CutBool.bestGeneralUpperBound(graph.numVertices());
 		boolean hasDecomp = false;
-		int readbw = 0;
+		long readbw = 0;
 		Scanner ofsc;
 		try {
 			ofsc = new Scanner(outFile);
 			if (ofsc.hasNextInt()) {
 				hasDecomp = true;
-				readbw = minbw = ofsc.nextInt();
+				readbw = minbw = ofsc.nextLong();
 			}
 		} catch (Exception e) {
 		}

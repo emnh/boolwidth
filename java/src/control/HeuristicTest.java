@@ -175,7 +175,8 @@ public class HeuristicTest<V, E> {
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen9_9.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "protein/1a62_graph.dimacs";
             //String fileName  = ControlUtil.GRAPHLIB + "other/risk.dgf";
-            String fileName = null;
+            //String fileName = null;
+            String fileName = ControlUtil.GRAPHLIB + "coloring/queen10_10.dgf";
 
             if (args.length > 0) {
                 fileName = args[0];

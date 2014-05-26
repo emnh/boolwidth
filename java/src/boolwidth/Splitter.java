@@ -222,7 +222,7 @@ public class Splitter {
 	 * @param minbw
 	 */
 	public static Decomposition.D<Integer, String> searchSplit(IntegerGraph g,
-			int minbw) {
+			long minbw) {
 		PosSet<Vertex<Integer>> s1 = new PosSet<Vertex<Integer>>();
 		PosSet<Vertex<Integer>> s2 = new PosSet<Vertex<Integer>>();
 		PosSet<Vertex<Integer>> s3 = new PosSet<Vertex<Integer>>();
