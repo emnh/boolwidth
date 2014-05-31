@@ -1,10 +1,7 @@
 package control;
 
 import boolwidth.CutBool;
-import boolwidth.heuristics.cutbool.CBBacktrackEstimate;
-import boolwidth.heuristics.cutbool.MISBackTrack;
-import boolwidth.heuristics.cutbool.MISBackTrackPersistent;
-import boolwidth.heuristics.cutbool.MISBackTrackPersistentApproximation;
+import boolwidth.heuristics.cutbool.*;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Vertex;
@@ -82,11 +79,13 @@ public class MISBackTrackTest {
         System.out.printf("MIS backtrack persistent (%dms): %d\n", duration, est);
         */
 
+        /*
         startTime = System.nanoTime();
         est = MISBackTrackPersistentApproximation.countNeighborhoods(bigraph, sampleCount);
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
         System.out.printf("MIS approximation (%dms): %d\n", duration, est);
+        */
 
         startTime = System.nanoTime();
         est = CBBacktrackEstimate.estimateNeighborhoods(bigraph, sampleCount);
@@ -94,5 +93,10 @@ public class MISBackTrackTest {
         duration = (endTime - startTime) / 1000000;
         System.out.printf("CB bactrack approximation (%dms): %d\n", duration, est);
 
+        startTime = System.nanoTime();
+        est = CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount);
+        endTime = System.nanoTime();
+        duration = (endTime - startTime) / 1000000;
+        System.out.printf("CB bactrack bin approximation (%dms): %d\n", duration, est);
     }
 }

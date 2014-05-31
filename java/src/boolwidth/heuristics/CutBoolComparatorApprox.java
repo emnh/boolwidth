@@ -1,6 +1,7 @@
 package boolwidth.heuristics;
 
 import boolwidth.heuristics.cutbool.CBBacktrackEstimate;
+import boolwidth.heuristics.cutbool.CBBacktrackEstimateBinary;
 import graph.BiGraph;
 import interfaces.IDecomposition;
 
@@ -29,8 +30,7 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
             BiGraph<V, E> cut = decomposition.getCut(node);
 
             // TODO: cannot get BOUND_EXCEEDED from estimator, simplify code?
-            // TODO: can return long, should refactor whole chain to use long, or make a type for it
-            long cbApproximation = CBBacktrackEstimate.estimateNeighborhoods(cut, sampleCount);
+            long cbApproximation = CBBacktrackEstimateBinary.estimateNeighborhoods(cut, sampleCount);
 
             final long CAN_AFFORD_EXACT = 10000;
 
