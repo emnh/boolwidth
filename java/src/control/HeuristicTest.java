@@ -152,7 +152,7 @@ public class HeuristicTest<V, E> {
                 graph.numVertices(), graph.numEdges(),
                 BooleanDecomposition.getBoolWidth(st.getBestDecomposition()));
 
-        
+
         System.out.println("time: " + 0);
     }
 
