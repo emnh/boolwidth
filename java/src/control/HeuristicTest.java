@@ -152,6 +152,7 @@ public class HeuristicTest<V, E> {
                 graph.numVertices(), graph.numEdges(),
                 BooleanDecomposition.getBoolWidth(st.getBestDecomposition()));
 
+        
         System.out.println("time: " + 0);
     }
 
@@ -176,7 +177,7 @@ public class HeuristicTest<V, E> {
             //String fileName = ControlUtil.GRAPHLIB + "protein/1a62_graph.dimacs";
             //String fileName  = ControlUtil.GRAPHLIB + "other/risk.dgf";
             //String fileName = null;
-            String fileName = ControlUtil.GRAPHLIB + "coloring/queen10_10.dgf";
+            String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
 
             if (args.length > 0) {
                 fileName = args[0];

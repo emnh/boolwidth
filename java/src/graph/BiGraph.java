@@ -97,7 +97,9 @@ IBiGraph<V, E> {
 
     /**
      * Convert graph to bigraph.
-     * Duplicate nodes in a graph to both left and right.
+     * Just uses methods in parent, but is not a real bigraph.
+     * Algorithms will fail on this graph if BiGraph methods are used.
+     * The reason is that some algorithms take bigraph as parameter but process as graph, so might as well have taken a graph.
      * @param graph
      */
     public BiGraph(IGraph<Vertex<V>, V, E> graph) {
@@ -106,25 +108,30 @@ IBiGraph<V, E> {
         // add left and right vertices
         for (Vertex<V> v : graph.vertices()) {
             Vertex<V> newVertexLeft = createVertex(v.element(), getNextID());
-            insertLeft(newVertexLeft);
+            insertVertex(newVertexLeft);
+            //insertLeft(newVertexLeft);
+            //insertRight(newVertexLeft);
         }
-        for (Vertex<V> v : graph.vertices()) {
+        /*for (Vertex<V> v : graph.vertices()) {
             Vertex<V> newVertexRight = createVertex(v.element(), getNextID());
             insertRight(newVertexRight); // maybe dup it?
-        }
+        }*/
 
         // add edges going between left and right
         for (Edge<Vertex<V>, V, E> e : graph.edges()) {
             int a = e.endVertices().get(0).id();
             int b = e.endVertices().get(1).id();
             // add right offset
-            b += graph.numVertices();
-            if (this.isLeft.get(a) != this.isLeft.get(b)) {
-                Vertex<V> va = this.vList.get(a);
-                Vertex<V> vb = this.vList.get(b);
-                insertEdge(va, vb, e.element());
-            }
+            // b += graph.numVertices();
+
+            Vertex<V> va = this.vList.get(a);
+            Vertex<V> vb = this.vList.get(b);
+            insertEdge(va, vb, e.element());
         }
+    }
+
+    public BiGraph() {
+        this(0);
     }
 
 	/**
