@@ -89,7 +89,6 @@ public class MISBackTrackTest {
 
         startTime = System.nanoTime();
         //IndexGraph g = new IndexGraph(bigraph);
-
         est = CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
         //est = MISBackTrackPersistent.countNeighborhoods(g);
         endTime = System.nanoTime();
@@ -102,14 +101,21 @@ public class MISBackTrackTest {
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
         System.out.printf("MIS backtrack persistent (%dms): %d\n", duration, est);
-        */
 
         startTime = System.nanoTime();
         est = MISBackTrackPersistentApproximation.countNeighborhoods(bigraph, sampleCount);
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
         System.out.printf("MIS approximation (%dms): %d\n", duration, est);
+*/
 
+        startTime = System.nanoTime();
+        est = CBBacktrackBinary.countNeighborhoods(bigraph);
+        endTime = System.nanoTime();
+        duration = (endTime - startTime) / 1000000;
+        System.out.printf("CB bactrack (%dms): %d\n", duration, est);
+
+        /*
         startTime = System.nanoTime();
         est = CBBacktrackEstimate.estimateNeighborhoods(bigraph, sampleCount);
         endTime = System.nanoTime();
@@ -121,5 +127,7 @@ public class MISBackTrackTest {
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
         System.out.printf("CB bactrack bin approximation (%dms): %d\n", duration, est);
+        */
+
     }
 }

@@ -177,7 +177,7 @@ public class HeuristicTest<V, E> {
             //String fileName = ControlUtil.GRAPHLIB + "protein/1a62_graph.dimacs";
             //String fileName  = ControlUtil.GRAPHLIB + "other/risk.dgf";
             //String fileName = null;
-            String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
+            String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
 
             if (args.length > 0) {
                 fileName = args[0];
@@ -232,7 +232,9 @@ public class HeuristicTest<V, E> {
         long start = System.currentTimeMillis();
 
         String fileName = DiskGraph.getFileName(graph);
-        System.out.printf("Graph %s (v=%d,e=%d).\n", fileName, graph.numVertices(), graph.numEdges());
+        System.out.printf("{ time: %d, graph: \"%s\", v: %d, e: %d }\n",
+                System.currentTimeMillis(),
+                fileName, graph.numVertices(), graph.numEdges());
         assert (fileName != null);
 
         File outputFile = new File(ControlUtil.getOutputDir(fileName),
@@ -251,6 +253,9 @@ public class HeuristicTest<V, E> {
         }
 
         LocalSearchR<V, E> lsr = new LocalSearchR<V, E>();
+
+        // for logging
+        lsr.graphName = fileName;
 
         LocalSearchR<V, E>.Result result = lsr.localSearch(graph, st
                 .getBestDecomposition());
@@ -279,7 +284,8 @@ public class HeuristicTest<V, E> {
                     + st.getBestDecomposition().toString());
 
             long bw = BooleanDecomposition.getBoolWidth(st.getBestDecomposition());
-            System.out.printf("boolean-width(decomposition(%s(v=%d,e=%d))): 2^bw=%d, bw=%.2f\n",
+            System.out.printf("{ time: %d, graph: \"%s\", v: %d, e: %d, CB: %d, BW: %.2f }\n",
+                    System.currentTimeMillis(),
                     fileName,
                     graph.numVertices(),
                     graph.numEdges(),
