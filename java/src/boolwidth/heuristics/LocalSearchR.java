@@ -18,6 +18,10 @@ import boolwidth.CutBool;
 
 public class LocalSearchR<V, E> {
 
+    // log values
+
+    public String graphName;
+
 	// static search state
 	private CutBoolComparator<V, E> cmp;
 
@@ -677,8 +681,14 @@ public class LocalSearchR<V, E> {
 	public boolean updateGraphBoolwidthUpperBound(long graph_boolw_upper_bound) {
 		boolean updated = false;
 		if (graph_boolw_upper_bound < this.graph_boolwidth_upper_bound) {
-			System.out.printf("new bw: %d -> %d\n",
-					this.graph_boolwidth_upper_bound, graph_boolw_upper_bound);
+            long time = System.currentTimeMillis();
+			System.out.printf("{ time: %d, graph: \"%s\", oldCB: %d, oldBW: %.2f, newCB: %d, newBW: %.2f }\n",
+                    time,
+                    this.graphName,
+					this.graph_boolwidth_upper_bound,
+                    Math.log(this.graph_boolwidth_upper_bound) / Math.log(2),
+                    graph_boolw_upper_bound,
+                    Math.log(graph_boolw_upper_bound) / Math.log(2));
 			this.graph_boolwidth_upper_bound = graph_boolw_upper_bound;
 			updated = true;
 		}
