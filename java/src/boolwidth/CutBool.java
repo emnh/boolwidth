@@ -18,9 +18,9 @@ public class CutBool {
 
 	public Statistics stats;
 
-	public final static int BOUND_EXCEEDED = 0;
+	public final static int BOUND_EXCEEDED = -1;
 
-	public final static int BOUND_UNINITIALIZED = 0;
+	public final static int BOUND_UNINITIALIZED = -1;
 
 	public static final class Statistics {
 		/* /I = "Integer"; */
