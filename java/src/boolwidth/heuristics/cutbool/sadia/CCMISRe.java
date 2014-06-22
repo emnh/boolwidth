@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
 
-public class CCMIS {
+public class CCMISRe {
 
 	//stores neighborhood in bitsets for faster intersection and union
 	private static ArrayList<VSubSet> neighbourhoods;
