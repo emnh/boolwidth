@@ -16,6 +16,8 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 	private long upper_bound;
 
     public static <V, E> sadiasrc.graph.BiGraph convertSadiaBiGraph(BiGraph<V, E> bigraph) {
+        //long before = System.currentTimeMillis();
+
         sadiasrc.graph.BiGraph sadiaBiGraph = new sadiasrc.graph.BiGraph(bigraph.numLeftVertices(), bigraph.numRightVertices());
 
         for (Edge<Vertex<V>, V, E> e : bigraph.edges()) {
@@ -23,6 +25,9 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
             int id2 =  e.endVertices().get(1).id();
             sadiaBiGraph.insertEdge(id1, id2);
         }
+
+        //long after = System.currentTimeMillis();
+        //System.out.printf("convertSadiaBiGraph time: %d\n", after - before);
 
         return sadiaBiGraph;
     }
@@ -41,13 +46,33 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 
             long cb;
 
-            int CUTOFF = 16;
+            /*int CUTOFF = 16;
             if (cut.numLeftVertices() < CUTOFF || cut.numRightVertices() < CUTOFF) {
                 cb = CutBool.countNeighborhoods(cut, upper_bound);
                 //System.out.printf("cut: %d/%d, cb: %d\n", cut.numLeftVertices(), cut.numRightVertices(), cb);
             } else {
                 cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
-            }
+            }*/
+
+
+            long before, after;
+            before = System.currentTimeMillis();
+            cb = CutBool.countNeighborhoods(cut, upper_bound);
+            after = System.currentTimeMillis();
+            //System.out.printf("UNN time (v=%d/%d,CB=%d): %d\n",
+            //        cut.numLeftVertices(), cut.numRightVertices(), cb, after - before);
+            long unnDuration = after - before;
+
+            before = System.currentTimeMillis();
+            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut), upper_bound);
+//            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
+            after = System.currentTimeMillis();
+            System.out.printf("CCMIS time (v=%d/%d,CB=%d): %d\n",
+                    cut.numLeftVertices(), cut.numRightVertices(), cb, after - before);
+
+            long ccmisDuration = after - before;
+            System.out.printf("UNN time - CCMIS time (v=%d/%d,CB=%d): %d\n",
+                    cut.numLeftVertices(), cut.numRightVertices(), cb, unnDuration - ccmisDuration);
 
             //int cb = (int) MISBackTrack.countNeighborhoods(cut);
             if (cb == CutBool.BOUND_EXCEEDED) {
