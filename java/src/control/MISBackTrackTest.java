@@ -6,11 +6,17 @@ import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Edge;
 import graph.Vertex;
+import interfaces.IGraph;
 import io.DiskGraph;
 import sadiasrc.decomposition.CCMIS;
 import sadiasrc.graph.IndexGraph;
+import scala.testing.Benchmark;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.function.Function;
+import java.util.function.LongSupplier;
 
 /**
  * Created by emh on 5/22/14.
@@ -30,12 +36,14 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "other/macaque71.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/jean.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
-        //fileNames.clear();
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
+        //fileNames.clear();
         fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
 
         //fileNames.clear();
         //fileNames.add(ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs");
+
+        JITWarmUp();
 
         for (String file : fileNames) {
             System.out.println(file);
@@ -43,6 +51,22 @@ public class MISBackTrackTest {
             DiskGraph.readGraph(file, graph);
             processFile(file);
             System.out.println("");
+        }
+    }
+
+    protected static void JITWarmUp() {
+        String fileName = ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs"; //ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+        AdjacencyListGraph<Vertex<Integer>, Integer, String> graph = new AdjacencyListGraph.D<Integer, String>();
+        DiskGraph.readGraph(fileName, graph);
+        ArrayList<Vertex<Integer>> lefts = new ArrayList<Vertex<Integer>>();
+        for (int i = 0; i < graph.numVertices() / 2; i++) {
+            lefts.add(graph.getVertex(i));
+        }
+        BiGraph<Integer, String> bigraph = new BiGraph<>(lefts, graph);
+
+        for (int i = 0; i < 100000; i++) {
+            CutBool.countNeighborhoods(bigraph);
+            CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
         }
     }
 
@@ -59,6 +83,39 @@ public class MISBackTrackTest {
         return sadiaBiGraph;
     }
 
+    static class BenchmarkResult {
+        public long duration;
+        public long count;
+        public long returnValue;
+
+        public long eachDuration() {
+            return duration / count;
+        }
+    }
+
+    public static BenchmarkResult doBenchMark(LongSupplier fun) {
+        long startTime;
+        long endTime;
+        long duration = 0;
+        int count = 0;
+
+        startTime = System.nanoTime();
+        long ret = fun.getAsLong();
+        endTime = System.nanoTime();
+        duration = (endTime - startTime) / 1000000;
+        while (duration < 1000) {
+            ret = fun.getAsLong();
+            count++;
+            endTime = System.nanoTime();
+            duration = (endTime - startTime) / 1000000;
+        }
+        BenchmarkResult result = new BenchmarkResult();
+        result.duration = duration;
+        result.count = count;
+        result.returnValue = ret;
+        return result;
+    }
+
     public static void processFile(String fileName) {
         AdjacencyListGraph<Vertex<Integer>, Integer, String> graph = new AdjacencyListGraph.D<Integer, String>();
         DiskGraph.readGraph(fileName, graph);
@@ -71,13 +128,14 @@ public class MISBackTrackTest {
         BiGraph<Integer, String> bigraphdup = new BiGraph<>(graph);
 
         final int sampleCount = 100;
-        long startTime = System.nanoTime();
-        int bw = CutBool.countNeighborhoods(bigraph);
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime) / 1000000;
+        long bw = 0;
         long est;
 
-        System.out.printf("UNN (bigraph) (%dms): %d\n", duration, bw);
+        BenchmarkResult ret;
+        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph));
+        System.out.printf("UNN (bigraph) (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)));
+        System.out.printf("Sadia MIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         /*
         startTime = System.nanoTime();
@@ -85,17 +143,7 @@ public class MISBackTrackTest {
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
         System.out.printf("MIS backtrack (%dms): %d\n", duration, est);
-        */
 
-        startTime = System.nanoTime();
-        //IndexGraph g = new IndexGraph(bigraph);
-        est = CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
-        //est = MISBackTrackPersistent.countNeighborhoods(g);
-        endTime = System.nanoTime();
-        duration = (endTime - startTime) / 1000000;
-        System.out.printf("Sadia MIS backtrack (%dms): %d\n", duration, est);
-
-        /*
         startTime = System.nanoTime();
         est = MISBackTrackPersistent.countNeighborhoods(graph);
         endTime = System.nanoTime();
@@ -107,7 +155,6 @@ public class MISBackTrackTest {
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
         System.out.printf("MIS approximation (%dms): %d\n", duration, est);
-*/
 
         startTime = System.nanoTime();
         est = CBBacktrackBinary.countNeighborhoods(bigraph);
@@ -115,7 +162,6 @@ public class MISBackTrackTest {
         duration = (endTime - startTime) / 1000000;
         System.out.printf("CB bactrack (%dms): %d\n", duration, est);
 
-        /*
         startTime = System.nanoTime();
         est = CBBacktrackEstimate.estimateNeighborhoods(bigraph, sampleCount);
         endTime = System.nanoTime();
