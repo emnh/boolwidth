@@ -1,5 +1,3 @@
-# Estimation
- 
 # Dynamic Graph Connectivity
 
 ## [Starting Point: StackExchange](http://cstheory.stackexchange.com/questions/2548/is-there-an-online-algorithm-to-keep-track-of-components-in-a-changing-undirecte)
