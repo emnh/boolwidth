@@ -2,6 +2,8 @@
  
 # Dynamic Graph Connectivity
 
+- [Starting Point: StackExchange](http://cstheory.stackexchange.com/questions/2548/is-there-an-online-algorithm-to-keep-track-of-components-in-a-changing-undirecte)
+
 - Theory: [Poly-logarithmic deterministic fully-dynamic algorithms for connectivity, minimum spanning tree, 2-edge, and biconnectivity](http://csclub.uwaterloo.ca/~gzsong/papers/Poly-logarithmic%20deterministic%20fully-dynamic%20algorithms%20for%20connectivity,%20minimum%20spanning%20tree,%202-edge,%20and%20biconnectivity.pdf)
 - Implementation: [An experimental study of polylogarithmic, fully dynamic, connectivity algorithms](http://people.csail.mit.edu/karger/Papers/impconn.pdf)
 
