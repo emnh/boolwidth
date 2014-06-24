@@ -17,7 +17,7 @@ There are several data structures that support edge insertions, edge deletions, 
 
 ## Implementation
  - [An experimental study of polylogarithmic, fully dynamic, connectivity algorithms](http://people.csail.mit.edu/karger/Papers/impconn.pdf)
- - [Source Code for Henzinger-King: p5-alberts.tar](http://dl.acm.org/citation.cfm?id=264223)
+ - [Source Code for Henzinger-King: An empirical study of dynamic graph algorithms: p5-alberts.tar](http://dl.acm.org/citation.cfm?id=264223)
 
 - Related data structures:
  - [Top Tree](http://en.wikipedia.org/wiki/Top_tree)
