@@ -18,6 +18,7 @@ There are several data structures that support edge insertions, edge deletions, 
 ## Implementation
  - [An experimental study of polylogarithmic, fully dynamic, connectivity algorithms](http://people.csail.mit.edu/karger/Papers/impconn.pdf)
  - [C Source Code for Henzinger-King: An empirical study of dynamic graph algorithms: p5-alberts.tar](http://dl.acm.org/citation.cfm?id=264223)
+ - [HDT Source: An Experimental Study of Polylogarithmic, Fully Dynamic, Connectivity Algorithms](http://dl.acm.org/citation.cfm?id=945398)
  - [Boost C++ Graph Library: Incremental Connectivity](http://www.boost.org/doc/libs/1_55_0/libs/graph/doc/incremental_components.html) Sadly, this is only incremental and doesn't support deletions.
 - Related data structures:
  - [Top Tree](http://en.wikipedia.org/wiki/Top_tree)
