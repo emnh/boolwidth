@@ -64,7 +64,7 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
             long unnDuration = after - before;
 
             before = System.currentTimeMillis();
-            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut), upper_bound);
+            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
 //            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
             after = System.currentTimeMillis();
             System.out.printf("CCMIS time (v=%d/%d,CB=%d): %d\n",

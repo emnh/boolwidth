@@ -100,6 +100,7 @@ IBiGraph<V, E> {
      * Just uses methods in parent, but is not a real bigraph.
      * Algorithms will fail on this graph if BiGraph methods are used.
      * The reason is that some algorithms take bigraph as parameter but process as graph, so might as well have taken a graph.
+     * XXX: This is a big hack. Doesn't work. Should modify the algorithms instead.
      * @param graph
      */
     public BiGraph(IGraph<Vertex<V>, V, E> graph) {
@@ -109,9 +110,13 @@ IBiGraph<V, E> {
         for (Vertex<V> v : graph.vertices()) {
             Vertex<V> newVertexLeft = createVertex(v.element(), getNextID());
             insertVertex(newVertexLeft);
+            this.leftList.add(v);
+            this.isLeft.add(true);
+            this.rightList.add(v);
             //insertLeft(newVertexLeft);
             //insertRight(newVertexLeft);
         }
+        //this.rightList = this.leftList;
         /*for (Vertex<V> v : graph.vertices()) {
             Vertex<V> newVertexRight = createVertex(v.element(), getNextID());
             insertRight(newVertexRight); // maybe dup it?

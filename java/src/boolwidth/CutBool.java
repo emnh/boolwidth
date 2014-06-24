@@ -174,6 +174,57 @@ public class CutBool {
 		return hoods;
 	}
 
+    public static <TVertex extends Vertex<V>, V, E> int countNeighborhoodsG(AdjacencyListGraph<TVertex, V, E> g) {
+        return countNeighborhoods(g, BOUND_UNINITIALIZED);
+    }
+
+    /** @return 2^Boolean-width of given cut. */
+    public static <TVertex extends Vertex<V>, V, E> int countNeighborhoodsG(AdjacencyListGraph<TVertex, V, E> g,
+                                                long upper_bound) {
+
+        // set of right,left nodes
+        final PosSet<TVertex> all = new PosSet<>(g.vertices());
+        //final PosSet<TVertex> lefts = new PosSet<>(g.vertices());
+
+        TreeSet<PosSubSet<TVertex>> initialhoods;
+
+        // set of neighborhoods of right nodes
+        final TreeSet<PosSubSet<TVertex>> nodeHoods = new TreeSet<>();
+
+        // initialize all neighborhood sets of 1 left node
+        for (TVertex node : g.vertices()) {
+            PosSubSet<TVertex> neighbors = new PosSubSet<>(all, g.incidentVertices(node));
+            if (neighbors.size() > 0) {
+                nodeHoods.add(neighbors);
+            }
+        }
+
+        TreeSet<PosSubSet<TVertex>> hoods = new TreeSet<>();
+
+        // adds empty set, subset of all
+        hoods.add(new PosSubSet<>(all));
+        initialhoods = nodeHoods;
+
+        for (PosSubSet<TVertex> neighbors : initialhoods) {
+            TreeSet<PosSubSet<TVertex>> newhoods = new TreeSet<>();
+            for (PosSubSet<TVertex> hood : hoods) {
+                PosSubSet<TVertex> newhood = hood.union(neighbors);
+                if (!(hoods.contains(newhood) || newhoods.contains(newhood))) {
+                    newhoods.add(newhood);
+                }
+            }
+            hoods.addAll(newhoods);
+
+            if (upper_bound != BOUND_UNINITIALIZED
+                    && hoods.size() > upper_bound) {
+                return BOUND_EXCEEDED;
+            }
+            // System.out.println("Number of neighbourhoods found so far: "+hoods.size());
+        }
+        return hoods.size();
+    }
+
+
 	public static <V, E> int countNeighborhoods(BiGraph<V, E> g) {
 		return countNeighborhoods(g, BOUND_UNINITIALIZED);
 	}
@@ -183,48 +234,46 @@ public class CutBool {
 			long upper_bound) {
 
 		// set of right,left nodes
-		final PosSet<Vertex<V>> rights = new PosSet<Vertex<V>>(g.rightVertices());
-		final PosSet<Vertex<V>> lefts = new PosSet<Vertex<V>>(g.leftVertices());
+		final PosSet<Vertex<V>> rights = new PosSet<>(g.rightVertices());
+		final PosSet<Vertex<V>> lefts = new PosSet<>(g.leftVertices());
 
 		TreeSet<PosSubSet<Vertex<V>>> initialhoods;
 
 		// set of neighborhoods of left nodes
-        final TreeSet<PosSubSet<Vertex<V>>> leftnodes = new TreeSet<PosSubSet<Vertex<V>>>();
+        final TreeSet<PosSubSet<Vertex<V>>> leftnodes = new TreeSet<>();
 
 		// set of neighborhoods of right nodes
-		final TreeSet<PosSubSet<Vertex<V>>> rightnodes = new TreeSet<PosSubSet<Vertex<V>>>();
+		final TreeSet<PosSubSet<Vertex<V>>> rightnodes = new TreeSet<>();
 
 		// initialize all neighborhood sets of 1 left node
 		for (Vertex<V> node : g.leftVertices()) {
-			PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(rights, g
-					.incidentVertices(node));
+			PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(rights, g.incidentVertices(node));
 			if (neighbors.size() > 0) {
 				leftnodes.add(neighbors);
 			}
 		}
 		for (Vertex<V> node : g.rightVertices()) {
-			PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(lefts, g
-					.incidentVertices(node));
+			PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(lefts, g.incidentVertices(node));
 			if (neighbors.size() > 0) {
 				rightnodes.add(neighbors);
 			}
 		}
 
-		TreeSet<PosSubSet<Vertex<V>>> hoods = new TreeSet<PosSubSet<Vertex<V>>>();
+		TreeSet<PosSubSet<Vertex<V>>> hoods = new TreeSet<>();
 		// choose the smallest neighborhood set
 		// if (rights.size() - right_twin_count > lefts.size() - left_twin_count) {
 		if (rightnodes.size() > leftnodes.size()) {
 			// adds empty set, subset of rights
-			hoods.add(new PosSubSet<Vertex<V>>(rights));
+			hoods.add(new PosSubSet<>(rights));
 			initialhoods = leftnodes;
 		} else {
 			// adds empty set, subset of lefts
-			hoods.add(new PosSubSet<Vertex<V>>(lefts));
+			hoods.add(new PosSubSet<>(lefts));
 			initialhoods = rightnodes;
 		}
 
 		for (PosSubSet<Vertex<V>> neighbors : initialhoods) {
-			TreeSet<PosSubSet<Vertex<V>>> newhoods = new TreeSet<PosSubSet<Vertex<V>>>();
+			TreeSet<PosSubSet<Vertex<V>>> newhoods = new TreeSet<>();
 			for (PosSubSet<Vertex<V>> hood : hoods) {
 				PosSubSet<Vertex<V>> newhood = hood.union(neighbors);
 				if (!(hoods.contains(newhood) || newhoods.contains(newhood))) {

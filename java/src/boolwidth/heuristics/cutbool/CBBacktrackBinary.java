@@ -133,6 +133,11 @@ public class CBBacktrackBinary<V> {
         return estimate;
     }
 
+    // essential operations:
+    // remove left node: remove all left nodes intersecting its neighborhood, that is, neighbors of neighbors
+    // include left node: remove just neighborhood
+    // is connected: check if bigraph is connected and split into two bigraphs otherwise
+
     public static <V, E> long countNeighborhoods(BiGraph<V, E> g) {
 
         CBBacktrackBinary<V> state = new CBBacktrackBinary<V>();

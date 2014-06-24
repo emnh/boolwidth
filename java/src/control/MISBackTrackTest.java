@@ -93,17 +93,17 @@ public class MISBackTrackTest {
         }
     }
 
-    public static BenchmarkResult doBenchMark(LongSupplier fun) {
+    public static BenchmarkResult doBenchMark(LongSupplier fun, boolean once) {
         long startTime;
         long endTime;
         long duration = 0;
-        int count = 0;
+        int count = 1;
 
         startTime = System.nanoTime();
         long ret = fun.getAsLong();
         endTime = System.nanoTime();
         duration = (endTime - startTime) / 1000000;
-        while (duration < 1000) {
+        while (duration < 1000 && !once) {
             ret = fun.getAsLong();
             count++;
             endTime = System.nanoTime();
@@ -130,12 +130,15 @@ public class MISBackTrackTest {
         final int sampleCount = 100;
         long bw = 0;
         long est;
+        boolean test = true;
 
         BenchmarkResult ret;
-        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph));
+        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
         System.out.printf("UNN (bigraph) (%dms): %d\n", ret.eachDuration(), ret.returnValue);
-        ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)));
+        ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia MIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(bigraph), test);
+        System.out.printf("MIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         /*
         startTime = System.nanoTime();
