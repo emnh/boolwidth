@@ -26,7 +26,7 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 		} else {
 			BiGraph<V, E> cut = decomposition.getCut(node);
 			long cb = CutBool.countNeighborhoods(cut, upper_bound);
-            //int cb = (int) MISBackTrack.countNeighborhoods(cut);
+
             if (cb == CutBool.BOUND_EXCEEDED) {
 				node.setCutBoolLowerBound(cb);
 			} else {
@@ -71,12 +71,8 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 		return retval;
 	}
 
-	// private PartialDecompositionHeuristic<V, E> pdheuristic;
-
-	public CutBoolComparator(LSDecomposition<V, E> decomposition,
-			PartialDecompositionHeuristic<V, E> pdheuristic) {
+	public CutBoolComparator(LSDecomposition<V, E> decomposition) {
 		this.decomposition = decomposition;
-		// this.pdheuristic = pdheuristic;
 	}
 
 	/**
@@ -108,24 +104,6 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 		assert cb2 != CutBool.BOUND_EXCEEDED;
 
 		if (cb1 == cb2) {
-			// TODO: factor in time spent
-			// if (o1.subcuts_upper_bound == VertexSplit.SUBCUTS_INITVAL) {
-			// o1.subcuts_upper_bound = pdheuristic.runHeuristic(
-			// decomposition, o1, CutBool.BOUND_UNINITIALIZED);
-			// }
-			// int ubound1 = o1.subcuts_upper_bound;
-			// if (o2.subcuts_upper_bound == VertexSplit.SUBCUTS_INITVAL) {
-			// o2.subcuts_upper_bound = pdheuristic.runHeuristic(
-			// decomposition, o2, ubound1);
-			// }
-			// int ubound2 = o2.subcuts_upper_bound;
-			// if (ubound1 == ubound2) {
-			// return 0;
-			// } else if (ubound1 < ubound2) {
-			// return 1;
-			// } else {
-			// return -1;
-			// }
 			return EQUAL;
 		} else if (cb1 < cb2) {
 			return O1_LESS_THAN_O2;
@@ -149,7 +127,6 @@ public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 	public long maxLeftRightCutBool(VertexSplit<V> node, long upper_bound) {
 		return maxLeftRightCutBool(this.decomposition, node, upper_bound);
 	}
-
 
 	public void setUpperBound(long upper_bound) {
 		this.upper_bound = upper_bound;

@@ -131,13 +131,9 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 		return retval;
 	}
 
-	// private PartialDecompositionHeuristic<V, E> pdheuristic;
-
-	public CutBoolComparatorCCMIS(LSDecomposition<V, E> decomposition,
-                                  PartialDecompositionHeuristic<V, E> pdheuristic) {
-        super(decomposition, pdheuristic);
+	public CutBoolComparatorCCMIS(LSDecomposition<V, E> decomposition) {
+        super(decomposition);
         this.decomposition = decomposition;
-		// this.pdheuristic = pdheuristic;
 	}
 
 	/**

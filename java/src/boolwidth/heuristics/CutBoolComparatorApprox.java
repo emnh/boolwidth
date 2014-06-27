@@ -8,6 +8,7 @@ import interfaces.IDecomposition;
 import java.util.Comparator;
 
 import boolwidth.CutBool;
+import sadiasrc.decomposition.CCMISApprox;
 
 public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> implements Comparator<VertexSplit<V>>  {
 
@@ -29,13 +30,20 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
         } else {
             BiGraph<V, E> cut = decomposition.getCut(node);
 
-            // TODO: cannot get BOUND_EXCEEDED from estimator, simplify code?
-            long cbApproximation = CBBacktrackEstimateBinary.estimateNeighborhoods(cut, sampleCount);
+            final long CAN_AFFORD_EXACT = 100000;
 
-            final long CAN_AFFORD_EXACT = 10000;
+            long cbApproximation = CBBacktrackEstimateBinary.estimateNeighborhoods(cut, sampleCount);
+            long cbApproximation2 = CCMISApprox.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(cut), sampleCount);
+
+            /*long cbExactDebug = CutBool.countNeighborhoods(cut, CAN_AFFORD_EXACT);
+            if (cbExactDebug > 10000) {
+                System.out.printf("approx/approx2/exact: %d%% / %d%% : %d\n",
+                        cbApproximation * 100 / cbExactDebug,
+                        cbApproximation2 * 100 / cbExactDebug,
+                        cbExactDebug);
+            }*/
 
             if (cbApproximation < CAN_AFFORD_EXACT) {
-                //System.out.printf("switching to exact, cb: %d\n", cb);
                 long cbExact = CutBool.countNeighborhoods(cut, CAN_AFFORD_EXACT);
 
                 if (cbExact == CutBool.BOUND_EXCEEDED) {
@@ -85,13 +93,9 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
         return retval;
     }
 
-    // private PartialDecompositionHeuristic<V, E> pdheuristic;
-
-    public CutBoolComparatorApprox(LSDecomposition<V, E> decomposition,
-                             PartialDecompositionHeuristic<V, E> pdheuristic) {
-        super(decomposition, pdheuristic);
+    public CutBoolComparatorApprox(LSDecomposition<V, E> decomposition) {
+        super(decomposition);
         this.decomposition = decomposition;
-        // this.pdheuristic = pdheuristic;
     }
 
     /**
@@ -113,7 +117,6 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
         long cb1 = maxLeftRightCutBool(this.decomposition, o1);
         long cb2 = maxLeftRightCutBool(this.decomposition, o2, cb1);
         if (cb2 == CutBool.BOUND_EXCEEDED) {
-            // System.out.println("bound hit");
             return O1_LESS_THAN_O2;
         }
 
@@ -123,24 +126,6 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
         assert cb2 != CutBool.BOUND_EXCEEDED;
 
         if (cb1 == cb2) {
-            // TODO: factor in time spent
-            // if (o1.subcuts_upper_bound == VertexSplit.SUBCUTS_INITVAL) {
-            // o1.subcuts_upper_bound = pdheuristic.runHeuristic(
-            // decomposition, o1, CutBool.BOUND_UNINITIALIZED);
-            // }
-            // int ubound1 = o1.subcuts_upper_bound;
-            // if (o2.subcuts_upper_bound == VertexSplit.SUBCUTS_INITVAL) {
-            // o2.subcuts_upper_bound = pdheuristic.runHeuristic(
-            // decomposition, o2, ubound1);
-            // }
-            // int ubound2 = o2.subcuts_upper_bound;
-            // if (ubound1 == ubound2) {
-            // return 0;
-            // } else if (ubound1 < ubound2) {
-            // return 1;
-            // } else {
-            // return -1;
-            // }
             return EQUAL;
         } else if (cb1 < cb2) {
             return O1_LESS_THAN_O2;

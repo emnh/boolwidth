@@ -19,21 +19,34 @@ import boolwidth.CutBool;
 public class LocalSearchR<V, E> {
 
     // log values
-
     public String graphName;
 
-	// static search state
-	private CutBoolComparator<V, E> cmp;
-
-	private static Random rnd;
 
 	// dynamic search state
-	private boolean has_valid_best_decomposition = false;
+    private boolean has_valid_best_decomposition = false;
 	private LSDecomposition.D<V, E> decomposition;
 	private long graph_boolwidth_upper_bound = CutBool.BOUND_UNINITIALIZED;
 	TreeMap<PosSubSet<Vertex<V>>, VertexSplit<V>> foundsplits = new TreeMap<PosSubSet<Vertex<V>>, VertexSplit<V>>();
 
+    // static search state
+    private CutBoolComparator<V, E> cmp;
+    private static Random rnd;
+
 	// === Algorithm configuration parameters
+    private final String comparatorImplementation = "CCMIS";
+    private void initCutBoolComparator() {
+        switch (comparatorImplementation) {
+            case "UNN":
+                this.cmp = new CutBoolComparator<>(this.decomposition);
+                break;
+            case "CCMIS":
+                this.cmp = new CutBoolComparatorCCMIS<>(this.decomposition);
+                break;
+            case "APX":
+                this.cmp = new CutBoolComparatorApprox<>(this.decomposition);
+                break;
+        }
+    }
 
 	// do local search if true, re-randomize cuts completely if not
 	private final boolean localSwaps = true;
@@ -51,16 +64,14 @@ public class LocalSearchR<V, E> {
 	// instead of just cuts smaller than current
 	private final boolean allowEverythingBelowGraphUpperBound = false;
 
+    // search time in seconds
+    public static final int SEARCHTIME = 10;
+
+    public static final int INNER_SEARCHSTEPS = 1;
+
 	// === End config
 
 	private PosSet<Vertex<V>> rootset;
-
-	public static final int SEARCHSTEPS = 5000;
-
-	// search time in seconds
-	public static final int SEARCHTIME = 10;
-
-	public static final int INNER_SEARCHSTEPS = 1;
 
 	// stats
 	public int failsToImproveCut = 0;
@@ -146,22 +157,15 @@ public class LocalSearchR<V, E> {
 							new PosSubSet<Vertex<V>>(bag.vertices().getSet()), this.decomposition.getNextID()));
 		} else {
 			this.decomposition.splitRandom(bag, (bag.size() + 1) / 2);
-			//			System.out.printf("helo!?: %d+%d=%d, %s",
-			//					bag.getLeft().size(), bag.getRight().size(),
-			//					bag.size(), bag);
 			assert bag.checkNode() : String.format("BAG=\"%s\"\n", bag.toString());
 		}
-		//System.out.println(bag);
 
 		VertexSplit<V> swapSplit = bag;
 
 		assert bag.getLeft().size() > 0;
 
 		for (int i = 0; i < bag.getLeft().size(); i++) {
-			//			System.out.printf("%d: %s\n",
-			//					this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth), swapSplit);
 			if (initGreedyCheck(bag, swapSplit, newSplit, minNewBoolwidth)) {
-				// TODO: don't need to exit early if we use fast approximation
 				if (this.useInitGreedyExitEarly) {
 					return newSplit.get(0);
 				}
@@ -173,7 +177,6 @@ public class LocalSearchR<V, E> {
 
 		assert newSplit.get(0) != null;
 
-		//		System.out.printf("RET: %d: %s\n", this.cmp.maxLeftRightCutBool(newSplit), newSplit);
 		return newSplit.get(0);
 	}
 
@@ -250,14 +253,13 @@ public class LocalSearchR<V, E> {
 		return useNewCut;
 	}
 
-	public Result localSearch(IGraph<Vertex<V>, V, E> g,
-			IDecomposition<?, ?, ?> oldBestDecomposition) {
+	public Result localSearch(IGraph<Vertex<V>, V, E> g, IDecomposition<?, ?, ?> oldBestDecomposition) {
 
 		// initialize
 		this.decomposition = new LSDecomposition.D<V, E>(g);
-		//this.cmp = new CutBoolComparator<V, E>(this.decomposition, new RandomHeuristic<V, E>());
-        //this.cmp = new CutBoolComparatorApprox<V, E>(this.decomposition, new RandomHeuristic<V, E>());
-        this.cmp = new CutBoolComparatorCCMIS<V, E>(this.decomposition, new RandomHeuristic<V, E>());
+
+        initCutBoolComparator();
+
 		rnd = new Random();
 
         this.rootset = new PosSet<Vertex<V>>(this.decomposition.root().element());
@@ -268,39 +270,17 @@ public class LocalSearchR<V, E> {
 			setGraphBoolwidthUpperBound(CutBool.bestGeneralUpperBound(
 					this.decomposition.numGraphVertices(), false));
 		}
-		//setGraphBoolwidthUpperBound(100);
+
 		Result result = new Result();
-
-		//initGreedy(this.decomposition.root());
-
-		//System.exit(1);
-
-		// compute
-		//for (int i = 0; i < SEARCHSTEPS; i++) {
-
 		long start = System.currentTimeMillis();
 
 		for (int i = 0; System.currentTimeMillis() - start < SEARCHTIME * 1000; i++) {
 			// greedy = (i % 20 != 0);
 			tryToImproveSubTree(this.decomposition.root(), INNER_SEARCHSTEPS, 1, 0);
-			assert this.decomposition.root().size() == this.decomposition
-			.numGraphVertices();
-			// System.out.printf("i: %d, root cut: %d, steps: %d/%d\n", i, cmp
-			// .maxLeftRightCutBool(decomposition.root()), decomposition
-			// .root().getLeft().steps,
-			// decomposition.root().getRight().steps);
-			// System.out.printf("foundsplits: %d\n", foundsplits.size());
-
-			//this.allowEverythingBelowGraphUpperBound = i > SEARCHSTEPS / 2;
+			assert this.decomposition.root().size() == this.decomposition.numGraphVertices();
 
 			if (updateGraphBoolwidthUpperBound(this.decomposition.root()
 					.getSubTreeUpperBound())) {
-				// decomposition.root().buildDecomposition(this);
-				// decomposition.fixParents();
-				// assert CutBool.booleanWidth(decomposition,
-				// decomposition.root()
-				// .getSubTreeUpperBound()) == decomposition.root()
-				// .getSubTreeUpperBound();
 				System.out.println("iteration:" + i);
 				this.has_valid_best_decomposition = true;
 			}
@@ -311,42 +291,8 @@ public class LocalSearchR<V, E> {
                         Math.log(getGraphBoolwidthUpperBound()) / Math.log(2));
 				System.out.printf("cut fails/tries: %d/%d\n", this.failsToImproveCut, this.triesToImproveCut);
 			}
-			// ArrayList<VertexSplit<V>> goodstuff = new
-			// ArrayList<VertexSplit<V>>();
-			// for (Iterator<Map.Entry<PosSubSet<Vertex<V>>, VertexSplit<V>>> it
-			// =
-			// foundsplits
-			// .entrySet().iterator(); it.hasNext();) {
-			// Map.Entry<PosSubSet<Vertex<V>>, VertexSplit<V>> e = it.next();
-			// if (!e.getValue().hasCutBool()
-			// || e.getValue().getCutBool() > getGraphBoolwidthUpperBound()) {
-			// it.remove();
-			// } else {
-			// goodstuff.add(e.getValue());
-			// }
-			// }
-			// for (VertexSplit<V> goodone : goodstuff) {
-			// localSearch(goodone, 1, 1);
-			// }
-			/*
-			 * System.out.printf("BW: %d\n", decomposition.root()
-			 * .getSubTreeUpperBound());
-			 */
 		}
 		result.success = true;
-
-		// for (VertexSplit<V> v : foundsplits.values()) {
-		// if (v.size() < decomposition.numGraphVertices() / 3) {
-		// continue;
-		// }
-		// int ml = -1;
-		// try {
-		// ml = cmp.maxLeftRightCutBool(v);
-		// } catch (Exception e) {
-		//
-		// }
-		// System.out.printf("%d, %d: %s\n", cmp.getCutBool(v), ml, v);
-		// }
 
 		// present
 		this.decomposition.root().buildDecomposition(this);

@@ -26,7 +26,7 @@ public class CCMIS {
 		groundSet = new IndexedSet<IndexVertex>(G.vertices());
 		for(int i=0; i<G.numVertices(); i++)
 		{
-			neighbourhoods.add(new VSubSet(groundSet,G.neighbours(G.getVertex(i))));
+			neighbourhoods.add(new VSubSet(groundSet, G.neighbours(G.getVertex(i))));
 		}
 
 		
@@ -62,17 +62,19 @@ public class CCMIS {
 		//check if P and X are empty
 		if(rest.isEmpty())
 		{
-			if(out.isEmpty())
-				return 1;
-			else
-				return 0;
+			if(out.isEmpty()) {
+                return 1;
+            } else {
+                //System.out.println("no chance");
+                return 0;
+            }
 		}
 
 		//check to see if the graph is disconneced
         boolean isConnected = true;
-        if (all.size() >= 1000) {
+        //if (all.size() >= 10) {
             isConnected = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
-        }
+       //}
         /* INCORRECT
         if (rest.size() < 16 && out.size() == 0) {
             BiGraph bg = new BiGraph(G.numLeftVertices(), G.numRightVertices());

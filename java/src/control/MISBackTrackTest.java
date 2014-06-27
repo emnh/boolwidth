@@ -11,6 +11,7 @@ import graph.Vertex;
 import interfaces.IGraph;
 import io.DiskGraph;
 import sadiasrc.decomposition.CCMIS;
+import sadiasrc.decomposition.CCMISApprox;
 import scala.testing.Benchmark;
 
 import java.io.OutputStream;
@@ -154,6 +155,12 @@ public class MISBackTrackTest {
         */
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        ret = doBenchMark(() -> CCMISApprox.BoolDimBranch(convertSadiaBiGraph(bigraph), sampleCount), test);
+        System.out.printf("Approx CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
+        System.out.printf("Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         //ret = doBenchMark(() -> CCMISRe.BoolDimBranch(new IndexGraph(bigraph)), test);
         //System.out.printf("Eivind CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);

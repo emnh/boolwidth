@@ -183,35 +183,25 @@ public class HeuristicTest<V, E> {
                 fileName = args[0];
             }
 
+            final boolean useFileLock = false;
             FileLock fl = null;
             try {
-                /*
-                fl = FileLock.tryLockFile(fileName);
-                if (fl == null) {
-                    System.out.printf(
-                            "someone else is busy with \"%s\", skipping\n",
-                            fileName);
-                    return;
-                } */
+                if (useFileLock) {
+                    fl = FileLock.tryLockFile(fileName);
+                    if (fl == null) {
+                        System.out.printf(
+                                "someone else is busy with \"%s\", skipping\n",
+                                fileName);
+                        return;
+                    }
+                }
 
                 // int[] K = { 2, 3, 4 };
                 IGraph<Vertex<Integer>, Integer, String> graph;
                 graph = ControlUtil.getTestGraph(fileName);
 
-                // String fileName = "4x4-grid";
-                // graph = ConstructGraph.gridGraph(4, 4);
+                HeuristicTest<Integer, String> ht = new HeuristicTest<>();
 
-                // graph = ConstructGraph.gridGraph(5, 5);
-                // int[] K = { 2, 3, 4 };
-                // String Ks = Arrays.toString(K);
-                // graph = ConstructGraph.cubeGraph(true, K);
-
-                // System.out.println("Graph: " + graph);
-
-                // HeuristicTest<V1, E1> ht = new HeuristicTest<V1, E1>();
-                HeuristicTest<Integer, String> ht = new HeuristicTest<Integer, String>();
-
-                // -XX:+UnlockDiagnosticVMOptions -XX:+AggressiveOpts -XX:InlineSmallCode=100k -XX:MaxInlineSize=100k
                 MISBackTrackTest.JITWarmUp();
                 ht.doHeuristic(graph);
 
