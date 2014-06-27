@@ -1,9 +1,8 @@
-package ng.control;
+package unfinished.ng.control;
 
 import control.ControlUtil;
-import ng.lib.SimpleGraph;
-import ng.lib.SimpleNode;
-import ng.lib.Util;
+import unfinished.ng.lib.SimpleGraph;
+import unfinished.ng.lib.Util;
 
 /**
  * Created by emh on 4/26/2014.

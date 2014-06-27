@@ -1,4 +1,4 @@
-package newstyle;
+package unfinished.newstyle;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -6,7 +6,6 @@ import javax.script.ScriptException;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -71,7 +70,7 @@ public class Approximation {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("nashorn");
 
-        String js = readFile("D:\\dev\\boolwidth\\java\\src\\newstyle\\test.js");
+        String js = readFile("D:\\dev\\boolwidth\\java\\src\\unfinished.newstyle\\test.js");
 
         try {
             engine.eval(js);
