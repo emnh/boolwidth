@@ -370,7 +370,9 @@ public class LocalSearchR<V, E> {
 		long minNewBoolwidth = Long.MAX_VALUE;
 
 		assert bag.getLeft().size() > 0;
+        int i = 0;
 		for (Vertex<V> v : bag.getLeft().vertices()) {
+            i++;
 			ArrayList<Vertex<V>> toswap = new ArrayList<Vertex<V>>(1);
 			toswap.add(v);
 			VertexSplit<V> swapSplit = this.decomposition.swapNodes(bag, toswap, null);
@@ -383,6 +385,7 @@ public class LocalSearchR<V, E> {
 				if (boolwidth < minNewBoolwidth) {
 					newsplit = swapSplit;
 					minNewBoolwidth = boolwidth;
+                    System.out.printf("switching greedy %d/%d, new min: %d\n", i, bag.getLeft().numVertices(), boolwidth);
 				} else if (newsplit == null) {
 					assert false;
 				}

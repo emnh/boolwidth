@@ -16,7 +16,7 @@ public class IndexGraph extends AdjacencyListGraph<IndexVertex, Integer, String>
         //IVertexFactory<IndexVertex, Integer> factory = ;
         super(new IndexVertex.Factory());
 
-        System.out.println("creating new indexgraph");
+        //System.out.println("creating new indexgraph");
 
         // add left and right vertices
         for (Vertex<Integer> v : graph.vertices()) {

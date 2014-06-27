@@ -177,7 +177,7 @@ public class HeuristicTest<V, E> {
             //String fileName = ControlUtil.GRAPHLIB + "protein/1a62_graph.dimacs";
             //String fileName  = ControlUtil.GRAPHLIB + "other/risk.dgf";
             //String fileName = null;
-            String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+            String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
 
             if (args.length > 0) {
                 fileName = args[0];
@@ -211,6 +211,8 @@ public class HeuristicTest<V, E> {
                 // HeuristicTest<V1, E1> ht = new HeuristicTest<V1, E1>();
                 HeuristicTest<Integer, String> ht = new HeuristicTest<Integer, String>();
 
+                // -XX:+UnlockDiagnosticVMOptions -XX:+AggressiveOpts -XX:InlineSmallCode=100k -XX:MaxInlineSize=100k
+                MISBackTrackTest.JITWarmUp();
                 ht.doHeuristic(graph);
 
                 if (ht.decomposition != null && graph.numVertices() < 100) {
@@ -263,6 +265,7 @@ public class HeuristicTest<V, E> {
 
         if (result.success) {
             this.decomposition = result.decomposition;
+            // get exact boolean width of this decomposition
             final int MAXBWBOUND = 1000000;
             this.bw = CutBool.booleanWidth(this.decomposition, MAXBWBOUND);
             if (this.bw != CutBool.BOUND_EXCEEDED) {

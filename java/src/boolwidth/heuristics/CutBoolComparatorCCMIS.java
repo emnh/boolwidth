@@ -46,7 +46,8 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 
             long cb;
 
-            /*int CUTOFF = 16;
+            /*
+            int CUTOFF = 16;
             if (cut.numLeftVertices() < CUTOFF || cut.numRightVertices() < CUTOFF) {
                 cb = CutBool.countNeighborhoods(cut, upper_bound);
                 //System.out.printf("cut: %d/%d, cb: %d\n", cut.numLeftVertices(), cut.numRightVertices(), cb);
@@ -54,25 +55,36 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
                 cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
             }*/
 
-
             long before, after;
-            before = System.currentTimeMillis();
-            cb = CutBool.countNeighborhoods(cut, upper_bound);
-            after = System.currentTimeMillis();
-            //System.out.printf("UNN time (v=%d/%d,CB=%d): %d\n",
-            //        cut.numLeftVertices(), cut.numRightVertices(), cb, after - before);
-            long unnDuration = after - before;
+            long UPPER_BOUND = 1000000; // should be a runtime (ms) perhaps
+            if (upper_bound < UPPER_BOUND) {
+                cb = CutBool.countNeighborhoods(cut, upper_bound);
+            } else {
+                before = System.currentTimeMillis();
+                cb = CutBool.countNeighborhoods(cut, UPPER_BOUND);
+                after = System.currentTimeMillis();
 
-            before = System.currentTimeMillis();
-            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
-//            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
-            after = System.currentTimeMillis();
-            System.out.printf("CCMIS time (v=%d/%d,CB=%d): %d\n",
-                    cut.numLeftVertices(), cut.numRightVertices(), cb, after - before);
+                long unnDuration = after - before;
 
-            long ccmisDuration = after - before;
-            System.out.printf("UNN time - CCMIS time (v=%d/%d,CB=%d): %d\n",
-                    cut.numLeftVertices(), cut.numRightVertices(), cb, unnDuration - ccmisDuration);
+                if (cb == CutBool.BOUND_EXCEEDED) {
+                    before = System.currentTimeMillis();
+                    cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
+                    after = System.currentTimeMillis();
+                    long ccmisDuration = after - before;
+                    //System.out.printf("UNN time (v=%d/%d,CB=%d): %d\n",
+                    //        cut.numLeftVertices(), cut.numRightVertices(), cb, after - before);
+                    //System.out.printf("UNN time - CCMIS time (v=%d/%d,CB=%d): %d - %d\n",
+                    //        cut.numLeftVertices(), cut.numRightVertices(), cb, unnDuration, ccmisDuration);
+                }
+            }
+
+            //cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
+
+
+
+
+
+
 
             //int cb = (int) MISBackTrack.countNeighborhoods(cut);
             if (cb == CutBool.BOUND_EXCEEDED) {

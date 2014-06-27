@@ -2,6 +2,8 @@ package control;
 
 import boolwidth.CutBool;
 import boolwidth.heuristics.cutbool.*;
+import boolwidth.heuristics.cutbool.sadia.CCMISRe;
+import boolwidth.heuristics.cutbool.sadia.IndexGraph;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Edge;
@@ -9,7 +11,6 @@ import graph.Vertex;
 import interfaces.IGraph;
 import io.DiskGraph;
 import sadiasrc.decomposition.CCMIS;
-import sadiasrc.graph.IndexGraph;
 import scala.testing.Benchmark;
 
 import java.io.OutputStream;
@@ -55,7 +56,8 @@ public class MISBackTrackTest {
     }
 
     protected static void JITWarmUp() {
-        String fileName = ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs"; //ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+        //String fileName = ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs"; //ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         AdjacencyListGraph<Vertex<Integer>, Integer, String> graph = new AdjacencyListGraph.D<Integer, String>();
         DiskGraph.readGraph(fileName, graph);
         ArrayList<Vertex<Integer>> lefts = new ArrayList<Vertex<Integer>>();
@@ -64,7 +66,8 @@ public class MISBackTrackTest {
         }
         BiGraph<Integer, String> bigraph = new BiGraph<>(lefts, graph);
 
-        for (int i = 0; i < 100000; i++) {
+        // default JIT compile threshold is 10000 on server, 1500 on client
+        for (int i = 0; i < 10000; i++) {
             CutBool.countNeighborhoods(bigraph);
             CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
         }
@@ -82,6 +85,19 @@ public class MISBackTrackTest {
 
         return sadiaBiGraph;
     }
+
+    /*public static IndexGraph convertIndexGraph(BiGraph<Integer, String> bigraph) {
+
+        IndexGraph sadiaBiGraph = new IndexGraph(bigraph.numVertices());
+
+        for (Edge<Vertex<Integer>, Integer, String> e : bigraph.edges()) {
+            int id1 = e.endVertices().get(0).id();
+            int id2 =  e.endVertices().get(1).id();
+            sadiaBiGraph.insertEdge(id1, id2);
+        }
+
+        return sadiaBiGraph;
+    }*/
 
     static class BenchmarkResult {
         public long duration;
@@ -130,15 +146,20 @@ public class MISBackTrackTest {
         final int sampleCount = 100;
         long bw = 0;
         long est;
-        boolean test = true;
+        boolean test = false;
 
         BenchmarkResult ret;
-        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
+        /*ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
         System.out.printf("UNN (bigraph) (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        */
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
-        System.out.printf("Sadia MIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
-        ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(bigraph), test);
-        System.out.printf("MIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        System.out.printf("Sadia CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        //ret = doBenchMark(() -> CCMISRe.BoolDimBranch(new IndexGraph(bigraph)), test);
+        //System.out.printf("Eivind CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        /*ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(bigraph), test);
+        System.out.printf("MIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);*/
 
         /*
         startTime = System.nanoTime();

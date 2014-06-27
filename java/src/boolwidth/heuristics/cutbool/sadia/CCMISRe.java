@@ -62,9 +62,13 @@ public class CCMISRe {
 	public static long boolDimBranch(IndexGraph G, VSubSet all,  VSubSet out, VSubSet rest)
 	{
 		//checking termination conditions
-		
-		System.out.printf("out: %s\n", out);
-		System.out.printf("rest: %s\n", rest);
+
+        if (!all.equals(out.union(rest))) {
+            System.out.printf("all: %s\n", all);
+            System.out.printf("out: %s\n", out);
+            System.out.printf("rest: %s\n", rest);
+            //System.out.printf("equals: %b\n", all.equals(out.union(rest)));
+        }
 		
 		//check if P and X are empty
 		if(rest.isEmpty())
@@ -78,7 +82,7 @@ public class CCMISRe {
 		//check to see if the graph is disconneced
 		Boolean con = BasicGraphAlgorithms.isConnected(G,all);
 
-        //con = true; // hack
+        con = true; // hack
 
 		//If not connected then call for components and multiply
 		if(!con)
@@ -95,7 +99,9 @@ public class CCMISRe {
 				nout.retainAll(out);
 				nrest.retainAll(rest);
 
-				total *= boolDimBranch(G,nall,nout,nrest);
+				long next = boolDimBranch(G,nall,nout,nrest);
+                if (next == 0) return 0;
+                total *= next;
 //				System.out.println("total = "+total);
 			}
 
@@ -105,8 +111,7 @@ public class CCMISRe {
 		//Find a vertex to branch on
 		
 		IndexVertex v = G.maxDegreeVertex(rest);
-        System.out.printf("maxvertex: %s, degree: %s, neighbhors: %s\n", v, G.degree(v), G.neighbours(v));
-		
+        //System.out.printf("maxvertex: %s, degree: %s, neighbhors: %s\n", v, G.degree(v), G.neighbours(v));
 
 		//if v is out
 		
@@ -132,6 +137,33 @@ public class CCMISRe {
 
 			for(IndexVertex w : all)
 			{
+                /*
+                boolean neighborInRest = rest.intersects(neighbourhoods.get(w.id()));
+                if (out.contains(w)) {
+                    // If w is in out,
+                    // one of its neighbors must be in this MIS,
+                    // otherwise we could add w, so it would not be maximal.
+                    if (neighborInRest) {
+                        IndexVertex u = rest.oneIntersectElement(neighbourhoods.get(w.id()));
+                        if(u!=null)
+                        {
+                            if(!toAdd.contains(u))
+                                toAdd.push(u);
+                        }
+                    } else {
+                        outValid=false;
+                        break;
+                    }
+                } else if (!neighborInRest) {
+                    // If w has no neighbor in rest, and is in rest (not out), it must be in this MIS,
+                    // because if we put it out, it would make outValid false.
+                    // It already has no neighbors in the MIS, because
+                    // we always remove all neighbors from rest and all when we put in a node.
+                    if(!toAdd.contains(w))
+                        toAdd.push(w);
+                }
+                */
+
 				if(!rest.intersects(neighbourhoods.get(w.id())))
 				{
 					if(out.contains(w)){
@@ -258,27 +290,25 @@ public class CCMISRe {
 		{
 			removed.get(0).add(v);
 			out.remove(v);
-			all.remove(v);
 		}
 		else if(rest.contains(v))
 		{
 			removed.get(1).add(v);
 			rest.remove(v);
-			all.remove(v);
 		}
 		for(IndexVertex w : g.neighbours(v))
 		{
+            all.remove(w);
 			if(out.contains(w))
 			{
 				removed.get(0).add(w);
 				out.remove(w);
-				all.remove(w);
+
 			}
 			else if(rest.contains(w))
 			{
 				removed.get(1).add(w);
 				rest.remove(w);
-				all.remove(w);
 			}
 		}
 		//System.out.println("after adding "+v);

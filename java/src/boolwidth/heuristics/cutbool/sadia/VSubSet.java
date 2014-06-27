@@ -29,10 +29,9 @@ public class VSubSet extends PosSubSet<IndexVertex> {
 
     public IndexVertex oneIntersectElement(VSubSet set) {
         PosSubSet<IndexVertex> intersection = this.intersection(set);
-        if (intersection.isEmpty()) {
-            return null;
-        } else {
+        if (intersection.size() == 1) {
             return intersection.first();
         }
+        return null;
     }
 }

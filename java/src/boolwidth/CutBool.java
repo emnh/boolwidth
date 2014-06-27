@@ -111,7 +111,7 @@ public class CutBool {
 	/** @return 2^Boolean-width of given decomposition. */
 	public static <TVertex extends DNode<TVertex, V>, V, E> int booleanWidth(
 			Decomposition<TVertex, V, E> decomp) {
-		return booleanWidth(decomp, BOUND_UNINITIALIZED);
+        return booleanWidth(decomp, BOUND_UNINITIALIZED);
 	}
 
 	/** @return 2^Boolean-width of given decomposition. */
