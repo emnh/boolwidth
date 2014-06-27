@@ -1,9 +1,7 @@
-package boolwidth.heuristics.cutbool.sadia;
+package boolwidth.cutbool.ccmis_trial;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Stack;
 
 //import util.IndexedSet;

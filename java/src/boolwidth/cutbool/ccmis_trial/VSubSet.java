@@ -1,7 +1,6 @@
-package boolwidth.heuristics.cutbool.sadia;
+package boolwidth.cutbool.ccmis_trial;
 
 import graph.PosSubSet;
-import graph.Vertex;
 import interfaces.IPosSet;
 
 /**

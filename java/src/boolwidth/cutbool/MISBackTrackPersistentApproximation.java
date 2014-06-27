@@ -1,12 +1,9 @@
-package boolwidth.heuristics.cutbool;
+package boolwidth.cutbool;
 
-import com.github.krukow.clj_ds.PersistentSet;
 import com.github.krukow.clj_lang.PersistentHashSet;
 import graph.AdjacencyListGraph;
-import graph.SubsetGraph;
 import graph.Vertex;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 

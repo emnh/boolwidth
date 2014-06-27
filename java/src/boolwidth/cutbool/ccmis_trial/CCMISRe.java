@@ -1,9 +1,5 @@
-package boolwidth.heuristics.cutbool.sadia;
+package boolwidth.cutbool.ccmis_trial;
 
-import boolwidth.heuristics.cutbool.sadia.BasicGraphAlgorithms;
-import graph.BiGraph;
-
-import graph.Vertex;
 /*
 import graph.IndexGraph;
 import graph.IndexVertex;

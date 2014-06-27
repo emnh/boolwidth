@@ -1,4 +1,4 @@
-package boolwidth.heuristics.cutbool;
+package boolwidth.cutbool;
 
 // TODO: connected components
 

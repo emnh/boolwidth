@@ -1,10 +1,8 @@
-package boolwidth.heuristics.cutbool.sadia;
+package boolwidth.cutbool.ccmis_trial;
 
 import graph.AdjacencyListGraph;
-import graph.BiGraph;
 import graph.Edge;
 import graph.Vertex;
-import interfaces.IVertexFactory;
 
 /**
  * Created by emh on 6/12/14.

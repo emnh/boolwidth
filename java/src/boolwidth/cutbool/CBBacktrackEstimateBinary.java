@@ -1,17 +1,15 @@
-package boolwidth.heuristics.cutbool;
+package boolwidth.cutbool;
 
 import graph.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.TreeSet;
 
 /**
  * Created by emh on 5/10/2014.
  */
 
-public class CBBacktrackBinary<V> {
+public class CBBacktrackEstimateBinary<V> {
 
     int rowCount;
     int colCount;
@@ -24,11 +22,11 @@ public class CBBacktrackBinary<V> {
     //PosSubSet<Vertex<V>> binSample = new PosSubSet<Vertex<V>>(state.groundSet);
     //PosSubSet<Vertex<V>> mask = new PosSubSet<Vertex<V>>(state.groundSet);
 
-    public CBBacktrackBinary() {
+    public CBBacktrackEstimateBinary() {
 
     }
 
-    public CBBacktrackBinary(CBBacktrackBinary b) {
+    public CBBacktrackEstimateBinary(CBBacktrackEstimateBinary b) {
         this.rowCount = b.rowCount;
         this.colCount = b.colCount;
         this.sample = b.sample;
@@ -40,7 +38,7 @@ public class CBBacktrackBinary<V> {
 
     static final int QVAL = -1; // question mark (free position in sample)
 
-    public static <V> int isPartialHood(CBBacktrackBinary<V> state, int[] sample) {
+    public static <V> int isPartialHood(CBBacktrackEstimateBinary<V> state, int[] sample) {
         int[][] subsetRows = new int[state.rowCount][];
         int subsetRowCount = 0;
 
@@ -75,7 +73,7 @@ public class CBBacktrackBinary<V> {
         System.out.println("");
     }
 
-    public static <V> long union_sample(CBBacktrackBinary<V> state) {
+    public static <V> long union_sample(CBBacktrackEstimateBinary<V> state) {
         // find question marks in sample
         int[] qpos = new int[state.sample.length];
         int qcount = 0;
@@ -107,13 +105,13 @@ public class CBBacktrackBinary<V> {
             //printSample(newsample1);
             int isPartialHood0 = isPartialHood(state, newsample0);
             int isPartialHood1 = isPartialHood(state, newsample1);
-            CBBacktrackBinary<V> newstate;
+            CBBacktrackEstimateBinary<V> newstate;
             switch(isPartialHood0 + isPartialHood1) {
                 case 0:
                     estimate = 1;
                     break;
                 case 1:
-                    newstate = new CBBacktrackBinary<V>(state);
+                    newstate = new CBBacktrackEstimateBinary<V>(state);
                     if (isPartialHood0 == 1) {
                         newstate.sample = newsample0;
                     } else {
@@ -122,25 +120,23 @@ public class CBBacktrackBinary<V> {
                     estimate = union_sample(newstate);
                     break;
                 case 2:
-                    newstate = new CBBacktrackBinary<V>(state);
-                    newstate.sample = newsample0;
-                    estimate = union_sample(newstate);
-                    newstate.sample = newsample1;
-                    estimate += union_sample(newstate);
+                    newstate = new CBBacktrackEstimateBinary<V>(state);
+                    int randval = (int) (Math.random() * 2);
+                    if (randval == 0) {
+                        newstate.sample = newsample0;
+                    } else {
+                        newstate.sample = newsample1;
+                    }
+                    estimate = union_sample(newstate) * 2;
                     break;
             }
         }
         return estimate;
     }
 
-    // essential operations:
-    // remove left node: remove all left nodes intersecting its neighborhood, that is, neighbors of neighbors
-    // include left node: remove just neighborhood
-    // is connected: check if bigraph is connected and split into two bigraphs otherwise
+    public static <V, E> long estimateNeighborhoods(BiGraph<V, E> g, int sampleCount) {
 
-    public static <V, E> long countNeighborhoods(BiGraph<V, E> g) {
-
-        CBBacktrackBinary<V> state = new CBBacktrackBinary<V>();
+        CBBacktrackEstimateBinary<V> state = new CBBacktrackEstimateBinary<V>();
         state.rowCount = g.numLeftVertices();
         state.colCount = g.numRightVertices();
         state.sample = new int[state.colCount];
@@ -153,6 +149,13 @@ public class CBBacktrackBinary<V> {
             }
         }
         Arrays.fill(state.sample, QVAL);
-        return union_sample(state);
+
+        long sum = 0;
+        for (int i = 0; i < sampleCount; i++) {
+            long est = union_sample(state);
+            sum += est;
+        }
+        long average = sum / sampleCount;
+        return average;
     }
 }

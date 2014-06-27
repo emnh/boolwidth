@@ -1,23 +1,16 @@
 package control;
 
 import boolwidth.CutBool;
-import boolwidth.heuristics.cutbool.*;
-import boolwidth.heuristics.cutbool.sadia.CCMISRe;
-import boolwidth.heuristics.cutbool.sadia.IndexGraph;
+import boolwidth.cutbool.*;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Edge;
 import graph.Vertex;
-import interfaces.IGraph;
 import io.DiskGraph;
 import sadiasrc.decomposition.CCMIS;
 import sadiasrc.decomposition.CCMISApprox;
-import scala.testing.Benchmark;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.function.Function;
 import java.util.function.LongSupplier;
 
 /**

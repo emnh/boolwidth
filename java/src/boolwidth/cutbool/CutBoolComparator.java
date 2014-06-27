@@ -1,36 +1,19 @@
-package boolwidth.heuristics;
+package boolwidth.cutbool;
 
-import boolwidth.CutBool;
+import boolwidth.heuristics.LSDecomposition;
+import boolwidth.heuristics.VertexSplit;
 import graph.BiGraph;
-import graph.Edge;
-import graph.Vertex;
 import interfaces.IDecomposition;
-import sadiasrc.decomposition.CCMIS;
 
 import java.util.Comparator;
 
-public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
+import boolwidth.CutBool;
+
+public class CutBoolComparator<V, E> implements Comparator<VertexSplit<V>> {
 
 	private final LSDecomposition<V, E> decomposition;
 
 	private long upper_bound;
-
-    public static <V, E> sadiasrc.graph.BiGraph convertSadiaBiGraph(BiGraph<V, E> bigraph) {
-        //long before = System.currentTimeMillis();
-
-        sadiasrc.graph.BiGraph sadiaBiGraph = new sadiasrc.graph.BiGraph(bigraph.numLeftVertices(), bigraph.numRightVertices());
-
-        for (Edge<Vertex<V>, V, E> e : bigraph.edges()) {
-            int id1 = e.endVertices().get(0).id();
-            int id2 =  e.endVertices().get(1).id();
-            sadiaBiGraph.insertEdge(id1, id2);
-        }
-
-        //long after = System.currentTimeMillis();
-        //System.out.printf("convertSadiaBiGraph time: %d\n", after - before);
-
-        return sadiaBiGraph;
-    }
 
 	public static <V, E> long getCutBool(IDecomposition<?, V, E> decomposition,
 			VertexSplit<V> node) {
@@ -43,50 +26,8 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 			return node.getCutBool();
 		} else {
 			BiGraph<V, E> cut = decomposition.getCut(node);
+			long cb = CutBool.countNeighborhoods(cut, upper_bound);
 
-            long cb;
-
-            /*
-            int CUTOFF = 16;
-            if (cut.numLeftVertices() < CUTOFF || cut.numRightVertices() < CUTOFF) {
-                cb = CutBool.countNeighborhoods(cut, upper_bound);
-                //System.out.printf("cut: %d/%d, cb: %d\n", cut.numLeftVertices(), cut.numRightVertices(), cb);
-            } else {
-                cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
-            }*/
-
-            long before, after;
-            long UPPER_BOUND = 1000000; // should be a runtime (ms) perhaps
-            if (upper_bound < UPPER_BOUND) {
-                cb = CutBool.countNeighborhoods(cut, upper_bound);
-            } else {
-                before = System.currentTimeMillis();
-                cb = CutBool.countNeighborhoods(cut, UPPER_BOUND);
-                after = System.currentTimeMillis();
-
-                long unnDuration = after - before;
-
-                if (cb == CutBool.BOUND_EXCEEDED) {
-                    before = System.currentTimeMillis();
-                    cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
-                    after = System.currentTimeMillis();
-                    long ccmisDuration = after - before;
-                    //System.out.printf("UNN time (v=%d/%d,CB=%d): %d\n",
-                    //        cut.numLeftVertices(), cut.numRightVertices(), cb, after - before);
-                    //System.out.printf("UNN time - CCMIS time (v=%d/%d,CB=%d): %d - %d\n",
-                    //        cut.numLeftVertices(), cut.numRightVertices(), cb, unnDuration, ccmisDuration);
-                }
-            }
-
-            //cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
-
-
-
-
-
-
-
-            //int cb = (int) MISBackTrack.countNeighborhoods(cut);
             if (cb == CutBool.BOUND_EXCEEDED) {
 				node.setCutBoolLowerBound(cb);
 			} else {
@@ -131,9 +72,8 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 		return retval;
 	}
 
-	public CutBoolComparatorCCMIS(LSDecomposition<V, E> decomposition) {
-        super(decomposition);
-        this.decomposition = decomposition;
+	public CutBoolComparator(LSDecomposition<V, E> decomposition) {
+		this.decomposition = decomposition;
 	}
 
 	/**
@@ -165,24 +105,6 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 		assert cb2 != CutBool.BOUND_EXCEEDED;
 
 		if (cb1 == cb2) {
-			// TODO: factor in time spent
-			// if (o1.subcuts_upper_bound == VertexSplit.SUBCUTS_INITVAL) {
-			// o1.subcuts_upper_bound = pdheuristic.runHeuristic(
-			// decomposition, o1, CutBool.BOUND_UNINITIALIZED);
-			// }
-			// int ubound1 = o1.subcuts_upper_bound;
-			// if (o2.subcuts_upper_bound == VertexSplit.SUBCUTS_INITVAL) {
-			// o2.subcuts_upper_bound = pdheuristic.runHeuristic(
-			// decomposition, o2, ubound1);
-			// }
-			// int ubound2 = o2.subcuts_upper_bound;
-			// if (ubound1 == ubound2) {
-			// return 0;
-			// } else if (ubound1 < ubound2) {
-			// return 1;
-			// } else {
-			// return -1;
-			// }
 			return EQUAL;
 		} else if (cb1 < cb2) {
 			return O1_LESS_THAN_O2;
@@ -206,7 +128,6 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
 	public long maxLeftRightCutBool(VertexSplit<V> node, long upper_bound) {
 		return maxLeftRightCutBool(this.decomposition, node, upper_bound);
 	}
-
 
 	public void setUpperBound(long upper_bound) {
 		this.upper_bound = upper_bound;

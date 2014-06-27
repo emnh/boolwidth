@@ -1,5 +1,8 @@
 package boolwidth.heuristics;
 
+import boolwidth.cutbool.CutBoolComparator;
+import boolwidth.cutbool.CutBoolComparatorApprox;
+import boolwidth.cutbool.CutBoolComparatorCCMIS;
 import graph.PosSet;
 import graph.PosSubSet;
 import graph.Vertex;

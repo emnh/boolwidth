@@ -1,4 +1,4 @@
-package boolwidth.heuristics.cutbool.sadia;
+package boolwidth.cutbool.ccmis_trial;
 
 /**
  * Created by emh on 6/12/14.

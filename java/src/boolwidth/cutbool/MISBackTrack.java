@@ -1,7 +1,5 @@
-package boolwidth.heuristics.cutbool;
+package boolwidth.cutbool;
 
-import com.github.krukow.clj_ds.PersistentSet;
-import com.github.krukow.clj_lang.PersistentHashSet;
 import graph.AdjacencyListGraph;
 import graph.SubsetGraph;
 import graph.Vertex;
@@ -9,28 +7,24 @@ import graph.Vertex;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-
 /**
  * Created by emh on 5/14/2014.
  */
-class PersistentMISState<V, E> {
+class MISState<V, E> {
     public AdjacencyListGraph<Vertex<V>, V, E> graph;
     //public HashSet<Vertex<V>> R_in;
     //public HashSet<Vertex<V>> P_tried;
+    public HashSet<Vertex<V>> P_any;
+    public HashSet<Vertex<V>> X_out;
 
-    public PersistentHashSet<Vertex<V>> P_any;
-    public PersistentHashSet<Vertex<V>> X_out;
-
-    public PersistentMISState(AdjacencyListGraph<Vertex<V>, V, E> graph) {
+    public MISState(AdjacencyListGraph<Vertex<V>, V, E> graph) {
         this.graph = graph;
         //R_in = new HashSet<>();
-        //P_any = PersistentHashSet.
-        P_any = PersistentHashSet.create(graph.verticesCollection());
-        //P_any = new PersistentHashSet<>(graph.verticesCollection());
-        X_out = PersistentHashSet.create();
+        P_any = new HashSet<>(graph.verticesCollection());
+        X_out = new HashSet<>();
     }
 
-    public PersistentMISState(PersistentMISState<V, E> b) {
+    public MISState(MISState<V, E> b) {
         graph = b.graph;
         //R_in = b.R_in;
         P_any = b.P_any;
@@ -38,14 +32,14 @@ class PersistentMISState<V, E> {
     }
 }
 
-public class MISBackTrackPersistent {
+public class MISBackTrack {
 
 
     /*public String fmtVList(Collection<Vertex<V>> vertices) {
         return "";
     }*/
 
-    public static <V, E> long unionIterate(PersistentMISState<V, E> state) {
+    public static <V, E> long unionIterate(MISState<V, E> state) {
         //System.out.println("P_any: " + state.P_any.toString());
         //System.out.println("X_out: " + state.X_out.toString());
 
@@ -73,22 +67,18 @@ public class MISBackTrackPersistent {
                 //System.out.printf("components: %d\n", components.size());
                 count = 1;
                 for (SubsetGraph<Vertex<V>, V, E> subgraph : components) {
-                    PersistentMISState<V, E> newState = new PersistentMISState<>(state);
+                    MISState<V, E> newState = new MISState<>(state);
                     newState.graph = subgraph.newGraph;
-                    newState.P_any = PersistentHashSet.EMPTY; // subgraph.newGraph.verticesCollection());
-                    newState.X_out = PersistentHashSet.EMPTY;
+                    newState.P_any = new HashSet<Vertex<V>>(); // subgraph.newGraph.verticesCollection());
+                    newState.X_out = new HashSet<Vertex<V>>();
 
                     for (Vertex<V> v : state.P_any) {
                         Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
-                        if (newV != null) {
-                            newState.P_any = newState.P_any.cons(newV);
-                        }
+                        if (newV != null) newState.P_any.add(newV);
                     }
                     for (Vertex<V> v : state.X_out) {
                         Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));
-                        if (newV != null) {
-                            newState.X_out = newState.X_out.cons(newV);
-                        }
+                        if (newV != null) newState.X_out.add(newV);
                     }
                     count *= unionIterate(newState);
                 }
@@ -104,40 +94,33 @@ public class MISBackTrackPersistent {
                 maxdegree = state.graph.degree(v2);
             }
         }
-        /*
-        try {
-            //v = state.P_any.iterator().next();
-        } catch (Exception e) {
-            System.out.println("hasnext: " + state.P_any.iterator().hasNext());
-            System.out.println("P_any: " + state.P_any.toString());
-            //System.out.println("X_out: " + state.X_out.toString());
-            throw e;
-        }*/
 
-        //System.out.printf("v: %s\n", v.toString());
+        //state.R_in.add(v);
+        HashSet<Vertex<V>> neighbors = new HashSet<>(state.graph.incidentVerticesCollection(v));
 
-        PersistentMISState<V, E> newState = new PersistentMISState<>(state);
-        newState.P_any = newState.P_any.disjoin(v);
-        newState.X_out = newState.X_out.disjoin(v);
-        for (Vertex<V> neighbor : state.graph.incidentVerticesCollection(v)) {
-            newState.P_any = newState.P_any.disjoin(neighbor);
-            newState.X_out = newState.X_out.disjoin(neighbor);
-        }
-
+        MISState<V, E> newState = new MISState<>(state);
+        newState.P_any = new HashSet<>(state.P_any);
+        newState.X_out = new HashSet<>(state.X_out);
+        newState.P_any.remove(v);
+        newState.X_out.remove(v);
+        newState.P_any.removeAll(neighbors);
+        newState.X_out.removeAll(neighbors);
         //System.out.println("v: " + v);
         //System.out.println("branching on NG(v)");
         count += unionIterate(newState);
 
-        PersistentMISState<V, E> newState2 = new PersistentMISState<>(state);
-        newState2.P_any = newState2.P_any.disjoin(v);
-        newState2.X_out = newState2.X_out.cons(v);
+        MISState<V, E> newState2 = new MISState<>(state);
+        newState2.P_any = new HashSet<>(state.P_any);
+        newState2.X_out = new HashSet<>(state.X_out);
+        newState2.P_any.remove(v);
+        newState2.X_out.add(v);
         count += unionIterate(newState2);
 
         return count;
     }
 
     public static <V, E> long countNeighborhoods(AdjacencyListGraph<Vertex<V>, V, E> g) {
-        PersistentMISState<V, E> state = new PersistentMISState<>(g);
+        MISState<V, E> state = new MISState<>(g);
         return unionIterate(state);
     }
 }

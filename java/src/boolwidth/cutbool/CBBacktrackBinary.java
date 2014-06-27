@@ -1,67 +1,68 @@
-package boolwidth.heuristics.cutbool;
+package boolwidth.cutbool;
 
-import graph.BiGraph;
-import graph.Edge;
-import graph.PosSet;
-import graph.Vertex;
+import graph.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * Created by emh on 5/10/2014.
  */
 
-class State {
+public class CBBacktrackBinary<V> {
+
     int rowCount;
     int colCount;
-    int[][] mat;
-    int[] sample;
     int estimate;
     int position;
+    int[] sample;
 
-    public State() {
+    PosSet<Vertex<V>> groundSet;
+    ArrayList<PosSubSet<Vertex<V>>> bmat;
+    //PosSubSet<Vertex<V>> binSample = new PosSubSet<Vertex<V>>(state.groundSet);
+    //PosSubSet<Vertex<V>> mask = new PosSubSet<Vertex<V>>(state.groundSet);
+
+    public CBBacktrackBinary() {
+
     }
 
-    public State(State b) {
+    public CBBacktrackBinary(CBBacktrackBinary b) {
         this.rowCount = b.rowCount;
         this.colCount = b.colCount;
-        this.mat = b.mat;
         this.sample = b.sample;
         this.estimate = b.estimate;
         this.position = b.position;
+        this.groundSet = b.groundSet;
+        this.bmat = b.bmat;
     }
-}
-
-public class CBBacktrackEstimate {
 
     static final int QVAL = -1; // question mark (free position in sample)
 
-    public static int isPartialHood(State state, int[] sample) {
+    public static <V> int isPartialHood(CBBacktrackBinary<V> state, int[] sample) {
         int[][] subsetRows = new int[state.rowCount][];
         int subsetRowCount = 0;
-        for (int rowIndex = 0; rowIndex < state.rowCount; rowIndex++) {
-            boolean allColsOK = true;
-            for (int colIndex = 0; colIndex < state.colCount; colIndex++) {
-                allColsOK = allColsOK && (sample[colIndex] == QVAL || state.mat[rowIndex][colIndex] <= sample[colIndex]);
-            }
-            if (allColsOK) {
-                subsetRows[subsetRowCount++] = state.mat[rowIndex];
-            }
-        }
-        int[] subsetUnion = new int[state.colCount];
+
+        // init binSample, TODO: maintain as part of recursion instead
+        PosSubSet<Vertex<V>> binSample = new PosSubSet<Vertex<V>>(state.groundSet);
+        PosSubSet<Vertex<V>> mask = new PosSubSet<Vertex<V>>(state.groundSet);
         for (int colIndex = 0; colIndex < state.colCount; colIndex++) {
-            subsetUnion[colIndex] = 0;
-        }
-        for (int rowIndex = 0; rowIndex < subsetRowCount; rowIndex++) {
-            for (int colIndex = 0; colIndex < state.colCount; colIndex++) {
-                subsetUnion[colIndex] = subsetUnion[colIndex] | subsetRows[rowIndex][colIndex];
+            mask.set(colIndex, sample[colIndex] != QVAL);
+            if (sample[colIndex] == QVAL) {
+                binSample.set(colIndex, false);
+            } else {
+                binSample.set(colIndex, sample[colIndex] == 1);
             }
         }
-        boolean subsetUnionEqualsSample = true;
-        for (int colIndex = 0; colIndex < state.colCount; colIndex++) {
-            subsetUnionEqualsSample = subsetUnionEqualsSample && (sample[colIndex] == QVAL || subsetUnion[colIndex] == sample[colIndex]);
+
+        PosSubSet<Vertex<V>> total = new PosSubSet<Vertex<V>>(state.groundSet);
+        for (int rowIndex = 0; rowIndex < state.bmat.size(); rowIndex++) {
+            PosSubSet<Vertex<V>> cur = state.bmat.get(rowIndex);
+
+            if (cur.intersect(mask).isSubset(binSample)) {
+                total = total.union(cur);
+            }
         }
+        boolean subsetUnionEqualsSample = total.intersect(mask).equals(binSample.intersect(mask));
         return subsetUnionEqualsSample ? 1 : 0;
     }
 
@@ -72,7 +73,7 @@ public class CBBacktrackEstimate {
         System.out.println("");
     }
 
-    public static long union_sample(State state) {
+    public static <V> long union_sample(CBBacktrackBinary<V> state) {
         // find question marks in sample
         int[] qpos = new int[state.sample.length];
         int qcount = 0;
@@ -104,13 +105,13 @@ public class CBBacktrackEstimate {
             //printSample(newsample1);
             int isPartialHood0 = isPartialHood(state, newsample0);
             int isPartialHood1 = isPartialHood(state, newsample1);
-            State newstate;
+            CBBacktrackBinary<V> newstate;
             switch(isPartialHood0 + isPartialHood1) {
                 case 0:
                     estimate = 1;
                     break;
                 case 1:
-                    newstate = new State(state);
+                    newstate = new CBBacktrackBinary<V>(state);
                     if (isPartialHood0 == 1) {
                         newstate.sample = newsample0;
                     } else {
@@ -119,36 +120,37 @@ public class CBBacktrackEstimate {
                     estimate = union_sample(newstate);
                     break;
                 case 2:
-                    newstate = new State(state);
-                    int randval = (int) (Math.random() * 2);
-                    if (randval == 0) {
-                        newstate.sample = newsample0;
-                    } else {
-                        newstate.sample = newsample1;
-                    }
-                    estimate = union_sample(newstate) * 2;
+                    newstate = new CBBacktrackBinary<V>(state);
+                    newstate.sample = newsample0;
+                    estimate = union_sample(newstate);
+                    newstate.sample = newsample1;
+                    estimate += union_sample(newstate);
                     break;
             }
         }
         return estimate;
     }
 
-    public static <V, E> long estimateNeighborhoods(BiGraph<V, E> g, int sampleCount) {
-        final PosSet<Vertex<V>> rights = new PosSet<Vertex<V>>(g.rightVertices());
+    // essential operations:
+    // remove left node: remove all left nodes intersecting its neighborhood, that is, neighbors of neighbors
+    // include left node: remove just neighborhood
+    // is connected: check if bigraph is connected and split into two bigraphs otherwise
 
-        State state = new State();
+    public static <V, E> long countNeighborhoods(BiGraph<V, E> g) {
+
+        CBBacktrackBinary<V> state = new CBBacktrackBinary<V>();
         state.rowCount = g.numLeftVertices();
         state.colCount = g.numRightVertices();
-        state.mat = g.getAdjacencyMatrix();
         state.sample = new int[state.colCount];
-        Arrays.fill(state.sample, QVAL);
-
-        long sum = 0;
-        for (int i = 0; i < sampleCount; i++) {
-            long est = union_sample(state);
-            sum += est;
+        state.groundSet = new PosSet<Vertex<V>>(g.rightVertices());
+        state.bmat = new ArrayList<PosSubSet<Vertex<V>>>();
+        for (Vertex<V> node : g.leftVertices()) {
+            PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(state.groundSet, g.incidentVertices(node));
+            if (neighbors.size() > 0) {
+                state.bmat.add(neighbors);
+            }
         }
-        long average = sum / sampleCount;
-        return average;
+        Arrays.fill(state.sample, QVAL);
+        return union_sample(state);
     }
 }

@@ -1,7 +1,7 @@
-package boolwidth.heuristics;
+package boolwidth.cutbool;
 
-import boolwidth.heuristics.cutbool.CBBacktrackEstimate;
-import boolwidth.heuristics.cutbool.CBBacktrackEstimateBinary;
+import boolwidth.heuristics.LSDecomposition;
+import boolwidth.heuristics.VertexSplit;
 import graph.BiGraph;
 import interfaces.IDecomposition;
 

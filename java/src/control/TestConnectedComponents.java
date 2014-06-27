@@ -1,9 +1,6 @@
 package control;
 
-import boolwidth.CutBool;
-import boolwidth.heuristics.cutbool.MISBackTrack;
 import graph.AdjacencyListGraph;
-import graph.BiGraph;
 import graph.SubsetGraph;
 import graph.Vertex;
 import io.DiskGraph;

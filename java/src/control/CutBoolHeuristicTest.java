@@ -1,11 +1,9 @@
 package control;
 
-import boolwidth.heuristics.cutbool.CBBacktrackEstimate;
-import boolwidth.heuristics.cutbool.MISBackTrack;
+import boolwidth.cutbool.CBBacktrackEstimate;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Vertex;
-import interfaces.IGraph;
 import io.ConstructGraph;
 
 import java.util.ArrayList;
@@ -14,8 +12,7 @@ import java.util.Formatter;
 import io.DiskGraph;
 import util.Util;
 import boolwidth.CutBool;
-import boolwidth.heuristics.cutbool.CBFirstCollision;
-import boolwidth.heuristics.cutbool.CBFirstCollisionPerm;
+import boolwidth.cutbool.CBFirstCollision;
 
 public class CutBoolHeuristicTest {
 
