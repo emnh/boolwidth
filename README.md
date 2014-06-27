@@ -25,6 +25,7 @@ Main:
     - Kari Ringdal (did coding for us as part of University course work)
     - Oliver Tynes (did coding for us as part of University course work)
     - Sadia Sharmin (Ph.D. student writing lots of new code after I finished my Master thesis)
+      - java/src/sadiasrc is her evolution of the main tree.
     - Eivind Magnus Hvidevold (me. did most of the project coding for my Master thesis)
 
 - java/clj: Clojure addons and rewrites os java/src.
