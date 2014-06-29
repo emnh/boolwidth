@@ -2,7 +2,10 @@ package boolwidth.cutbool.ccmis_trial;
 
 import graph.AdjacencyListGraph;
 import graph.Edge;
+import graph.PosSubSet;
 import graph.Vertex;
+
+import java.util.Collection;
 
 /**
  * Created by emh on 6/12/14.
@@ -35,24 +38,8 @@ public class IndexGraph extends AdjacencyListGraph<IndexVertex, Integer, String>
             IndexVertex va = this.vList.get(a);
             IndexVertex vb = this.vList.get(b);
             Edge<IndexVertex, Integer, String> ie = insertEdge(va, vb, e.element());
-            //System.out.printf("inserting %s\n", ie);
+            //System.out.printf("inserting %d-%d, %d-%d: %s\n", a, b, va.id(), vb.id(), ie);
         }
     }
 
-    public IndexVertex maxDegreeVertex(VSubSet rest) {
-        int max = 0;
-        IndexVertex maxVertex = null;
-        for (IndexVertex v : rest) {
-            int deg = this.degree(v);
-            if (deg >= max) {
-                max = deg;
-                maxVertex = v;
-            };
-        }
-        return maxVertex;
-    }
-
-    public Iterable<IndexVertex> neighbours(IndexVertex v) {
-        return incidentVertices(v);
-    }
 }

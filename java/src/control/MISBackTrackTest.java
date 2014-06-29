@@ -2,6 +2,8 @@ package control;
 
 import boolwidth.CutBool;
 import boolwidth.cutbool.*;
+import boolwidth.cutbool.ccmis_trial.CCMISRe;
+import boolwidth.cutbool.ccmis_trial.IndexGraph;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Edge;
@@ -9,6 +11,7 @@ import graph.Vertex;
 import io.DiskGraph;
 import sadiasrc.decomposition.CCMIS;
 import sadiasrc.decomposition.CCMISApprox;
+import sadiasrc.decomposition.CCMISStack;
 
 import java.util.ArrayList;
 import java.util.function.LongSupplier;
@@ -64,6 +67,7 @@ public class MISBackTrackTest {
         for (int i = 0; i < 10000; i++) {
             CutBool.countNeighborhoods(bigraph);
             CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
+            CCMISRe.BoolDimBranch(new IndexGraph(bigraph));
         }
     }
 
@@ -74,6 +78,7 @@ public class MISBackTrackTest {
         for (Edge<Vertex<Integer>, Integer, String> e : bigraph.edges()) {
             int id1 = e.endVertices().get(0).id();
             int id2 =  e.endVertices().get(1).id();
+            //System.out.printf("inserting edge %d-%d\n", id1, id2);
             sadiaBiGraph.insertEdge(id1, id2);
         }
 
@@ -143,59 +148,40 @@ public class MISBackTrackTest {
         boolean test = false;
 
         BenchmarkResult ret;
+
         /*ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
         System.out.printf("UNN (bigraph) (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(graph), test);
+        System.out.printf("MIS backtrack persistent (%dms): %d\n", ret.eachDuration(), ret.returnValue);
         */
+
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
+        ret = doBenchMark(() -> CCMISStack.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
+        System.out.printf("Explicit Stack CCMIS (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        ret = doBenchMark(() -> CCMISRe.BoolDimBranch(new IndexGraph(bigraph)), test);
+        System.out.printf("Eivind CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        /*
         ret = doBenchMark(() -> CCMISApprox.BoolDimBranch(convertSadiaBiGraph(bigraph), sampleCount), test);
         System.out.printf("Approx CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
         System.out.printf("Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
-        //ret = doBenchMark(() -> CCMISRe.BoolDimBranch(new IndexGraph(bigraph)), test);
-        //System.out.printf("Eivind CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
-
-        /*ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(bigraph), test);
-        System.out.printf("MIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);*/
-
-        /*
-        startTime = System.nanoTime();
         est = MISBackTrack.countNeighborhoods(bigraph);
-        endTime = System.nanoTime();
-        duration = (endTime - startTime) / 1000000;
         System.out.printf("MIS backtrack (%dms): %d\n", duration, est);
 
-        startTime = System.nanoTime();
-        est = MISBackTrackPersistent.countNeighborhoods(graph);
-        endTime = System.nanoTime();
-        duration = (endTime - startTime) / 1000000;
-        System.out.printf("MIS backtrack persistent (%dms): %d\n", duration, est);
-
-        startTime = System.nanoTime();
         est = MISBackTrackPersistentApproximation.countNeighborhoods(bigraph, sampleCount);
-        endTime = System.nanoTime();
-        duration = (endTime - startTime) / 1000000;
         System.out.printf("MIS approximation (%dms): %d\n", duration, est);
 
-        startTime = System.nanoTime();
         est = CBBacktrackBinary.countNeighborhoods(bigraph);
-        endTime = System.nanoTime();
-        duration = (endTime - startTime) / 1000000;
         System.out.printf("CB bactrack (%dms): %d\n", duration, est);
 
-        startTime = System.nanoTime();
-        est = CBBacktrackEstimate.estimateNeighborhoods(bigraph, sampleCount);
-        endTime = System.nanoTime();
-        duration = (endTime - startTime) / 1000000;
-        System.out.printf("CB bactrack approximation (%dms): %d\n", duration, est);
-
-        startTime = System.nanoTime();
         est = CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount);
-        endTime = System.nanoTime();
-        duration = (endTime - startTime) / 1000000;
         System.out.printf("CB bactrack bin approximation (%dms): %d\n", duration, est);
         */
 

@@ -38,9 +38,7 @@ public class CCMIS {
 		//rest =P
 		rest.addAll((Collection<? extends IndexVertex>) G.vertices());
 		//out =X
-		long t= boolDimBranch(G,all,out,rest);
-		
-		return t;
+		return boolDimBranch(G,all,out,rest);
 	}
 
 	/**
@@ -55,10 +53,11 @@ public class CCMIS {
 	public static long boolDimBranch(BiGraph G, VSubSet all, VSubSet out, VSubSet rest)
 	{
 		//checking termination conditions
-		
-//		System.out.println("out"+out);
-//		System.out.println("rest"+rest);
-		
+
+        //System.out.printf("all: %s\n", all);
+        //System.out.printf("out: %s\n", out);
+        //System.out.printf("rest: %s\n", rest);
+
 		//check if P and X are empty
 		if(rest.isEmpty())
 		{
@@ -117,6 +116,7 @@ public class CCMIS {
 		//Find a vertex to branch on
 		
 		IndexVertex v = G.maxDegreeVertex(rest);
+        //System.out.printf("maxvertex: %s, degree: %s, neighbours: %s\n\n", v, G.degree(v), G.neighbours(v));
 
 		//if v is out
 		
@@ -125,14 +125,14 @@ public class CCMIS {
 		boolean outValid = true;
 		boolean changed = true;
 		//0=from out 1=from rest
-		
-		//Moving v to out
-		rest.remove(v);
-		out.add(v);
 
         VSubSet oldAll = all.clone();
         VSubSet oldRest = rest.clone();
         VSubSet oldOut = out.clone();
+
+		//Moving v to out
+		rest.remove(v);
+		out.add(v);
 
 		Stack<IndexVertex> toAdd = new Stack<IndexVertex>();
 
@@ -162,6 +162,7 @@ public class CCMIS {
 					{
 						//IndexVertex u = rest.oneIntersectElement(neighbourhoods.get(w.id()));
                         IndexVertex u = intersection.first();
+                        //System.out.printf("first vertex: %d\n", u.id());
 						if(u!=null)
 						{
 							if(!toAdd.contains(u))
@@ -250,7 +251,7 @@ public class CCMIS {
 //			System.out.println("total = "+total);
 		}
 
-		//move vertices back
+		// move vertices back
         out.cloneInPlace(oldOut);
         all.cloneInPlace(oldAll);
         rest.cloneInPlace(oldRest);

@@ -3,6 +3,7 @@ package graph;
 import interfaces.IPosSet;
 import interfaces.ISetPosition;
 import interfaces.ISubSet;
+import sadiasrc.graph.IndexVertex;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -12,6 +13,42 @@ import java.util.Set;
 public class PosSubSet<TVertex extends ISetPosition> extends
 AbstractPosSet<TVertex> implements Cloneable, Iterable<TVertex>,
 ISubSet<PosSubSet<TVertex>, TVertex> {
+
+    // TODO: optimize bit search using Java BitSet methods
+    class BitSetIterator implements Iterator<TVertex> {
+
+        //for (int i = subset.nextSetBit(0); i >= 0; i = subset.nextSetBit(i+1)) {
+        private int i = 0;
+        private int size = groundSetSize();
+
+        public BitSetIterator() {
+            // Ready next one
+            while (!get(i) && i < size) {
+                i++;
+            }
+        }
+
+        public boolean hasNext() {
+            return i < size;
+        }
+
+        public TVertex next() {
+            TVertex ret = null;
+            if (get(i)) {
+                ret = groundSet.getVertex(i);
+                // Ready next one
+                do {
+                    i++;
+                } while (!get(i) && i < size);
+            }
+            return ret;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+    }
+
 
     // Just for serialization
     @Deprecated
@@ -69,7 +106,7 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 	@Override
 	public boolean add(TVertex v) {
 		this.modified = true;
-		return set(getPos(v), true);
+		return set(v.id(), true);
 	}
 
 	// set given bit to false;
@@ -80,13 +117,13 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 
 	@Override
 	public PosSubSet<TVertex> clone() {
-		return new PosSubSet<TVertex>(this.groundSet, this.words.clone());
+		return new PosSubSet<>(this.groundSet, this.words.clone());
 	}
 
-	//	@Override
-	//	protected PosSubSet<TVertex> clone() {
-	//		return new PosSubSet<TVertex>(this.groundSet, this.words.clone());
-	//	}
+    public void cloneInPlace(PosSubSet<TVertex> o) {
+        this.groundSet = o.groundSet;
+        this.words = o.words.clone();
+    }
 
 	public int compareTo(PosSubSet<TVertex> set) {
 		long[] sw = set.getWords();
@@ -216,12 +253,21 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 
 	@Override
 	public Iterator<TVertex> iterator() {
-		return getSubSet().iterator();
+        return new BitSetIterator();
+		//return getSubSet().iterator();
 	}
+
+    /*@Override
+    public boolean remove(Object v) {
+        if (v instanceof Vertex) {
+            return set(((TVertex) v).id(), false);
+        }
+        return false;
+    }*/
 
 	public boolean remove(TVertex v) {
 		this.modified = true;
-		return set(getPos(v), false);
+		return set(v.id(), false);
 	}
 
 	// set a bit to given value
@@ -311,6 +357,46 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 		return sb.append("\"").toString();
 	}
 
+    public PosSubSet<TVertex> subtract(PosSubSet<TVertex> set) {
+        if ((Set<?>) this.groundSet != set.getSet()) {
+            throw new IndexOutOfBoundsException(
+                    "Different ground sets can not be compared");
+        }
+
+        long[] oldWords = set.getWords();
+        long[] newWords = new long[this.words.length];
+
+        // Perform logical AND NOT on words
+        for (int i = 0; i < this.words.length; i++) {
+            newWords[i] = this.words[i] & ~oldWords[i];
+        }
+        return new PosSubSet<>(this.groundSet, newWords);
+    }
+
+    public void subtractInPlace(PosSubSet<TVertex> set) {
+        if ((Set<?>) this.groundSet != set.getSet()) {
+            throw new IndexOutOfBoundsException(
+                    "Different ground sets can not be compared");
+        }
+
+        long[] oldWords = set.getWords();
+
+        // Perform logical AND NOT on words
+        for (int i = 0; i < this.words.length; i++) {
+            this.words[i] &= ~oldWords[i];
+        }
+    }
+
+    public PosSubSet<TVertex> inverse() {
+        long[] newWords = new long[this.words.length];
+
+        // Perform logical NOT on words
+        for (int i = 0; i < this.words.length; i++) {
+            newWords[i] = ~this.words[i];
+        }
+        return new PosSubSet<>(this.groundSet, newWords);
+    }
+
 	public PosSubSet<TVertex> union(PosSubSet<TVertex> set) {
 		if ((Set<?>) this.groundSet != set.getSet()) {
 			throw new IndexOutOfBoundsException(
@@ -324,7 +410,7 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 		for (int i = 0; i < this.words.length; i++) {
 			newWords[i] = this.words[i] | oldWords[i];
 		}
-		return new PosSubSet<TVertex>(this.groundSet, newWords);
+		return new PosSubSet<>(this.groundSet, newWords);
 	}
 
     public PosSubSet<TVertex> intersection(PosSubSet<TVertex> set) {
@@ -374,6 +460,28 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 
     public boolean isSubset(PosSubSet<TVertex> set) {
         return this.intersect(set).equals(this);
+    }
+
+    @Override
+    public TVertex first() {
+        for (int i = 0; i < this.groundSet.size(); i++) {
+            if (get(i)) {
+                return this.groundSet.getVertex(i);
+            }
+        }
+        return null;
+    }
+
+    public boolean contains(TVertex v) {
+        return get(v.id());
+    }
+
+    @Override
+    public boolean contains(Object v) {
+        if (v instanceof Vertex) {
+            return get(((TVertex) v).id());
+        }
+        return false;
     }
 
 	/*public PosSubSet<TVertex> union(Set<TVertex> set) {

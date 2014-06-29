@@ -1,5 +1,10 @@
 package boolwidth.cutbool.ccmis_trial;
 
+import graph.AdjacencyListGraph;
+import graph.PosSubSet;
+import sadiasrc.graph.*;
+import sadiasrc.graph.VSubSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
@@ -14,7 +19,37 @@ public class BasicGraphAlgorithms {
 	 * @param G The bipartite graph of which we want to compute the boolean dimension
 	 * @param vs = (out union rest) P U X
 	 */
-	public static boolean isConnected(IndexGraph G, VSubSet vs)
+    public static boolean isConnected(AdjacencyListGraph<IndexVertex, Integer, String> G, PosSubSet<IndexVertex> vs, ArrayList<PosSubSet<IndexVertex>> neighbours)
+    {
+        if(vs.isEmpty())
+            return false;
+
+        PosSubSet<IndexVertex> vused = vs.inverse(); // new VSubSet(vs.getGroundSet());
+
+        Stack<IndexVertex> s = new Stack<IndexVertex>();
+        s.push(vs.first());
+        vused.add(s.peek());
+        //used[s.peek().id()] = true;
+        while(!s.isEmpty())
+        {
+            IndexVertex v = s.pop();
+            PosSubSet<IndexVertex> hood = neighbours.get(v.id());
+            hood = hood.subtract(vused);
+            for(IndexVertex n : hood)
+            {
+                s.push(n);
+                vused.add(n);
+            }
+        }
+        for(IndexVertex v : vs) {
+            if(!vused.contains(v)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+	public static boolean isConnected2(AdjacencyListGraph<IndexVertex, Integer, String> G, PosSubSet<IndexVertex> vs)
 	{
 		if(vs.isEmpty())
 			return false;
@@ -49,7 +84,7 @@ public class BasicGraphAlgorithms {
 	 * return list of components
 	 */
 	
-	public static Collection<ArrayList<IndexVertex>> connectedComponents(IndexGraph G, VSubSet vs)
+	public static Collection<ArrayList<IndexVertex>> connectedComponents(AdjacencyListGraph<IndexVertex, Integer, String> G, PosSubSet<IndexVertex> vs)
 	{
 		if(vs.isEmpty())
 			return null;

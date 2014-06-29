@@ -1,5 +1,6 @@
 package graph;
 
+import boolwidth.cutbool.ccmis_trial.IndexVertex;
 import exceptions.InvalidPositionException;
 import interfaces.IAttributeStorage;
 import interfaces.IGraph;
@@ -217,7 +218,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	 * Return an iterator over the vertices incident to a vertex. Running time:
 	 * O(n)
 	 */
-	public Iterable<TVertex> incidentVertices(TVertex v)
+	public Collection<TVertex> incidentVertices(TVertex v)
 	throws InvalidPositionException {
 		ArrayList<TVertex> vertices = new ArrayList<TVertex>();
 		for (Edge<TVertex, V, E> edge : incidentEdges(v)) {
@@ -542,6 +543,23 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 
     public Collection<TVertex> verticesCollection() {
         return this.vList;
+    }
+
+    public Collection<TVertex> neighbours(TVertex v) {
+        return incidentVertices(v);
+    }
+
+    public TVertex maxDegreeVertex(PosSubSet<TVertex> rest) {
+        int max = -1;
+        TVertex maxVertex = null;
+        for (TVertex v : rest) {
+            int deg = this.degree(v);
+            if (deg > max) {
+                max = deg;
+                maxVertex = v;
+            };
+        }
+        return maxVertex;
     }
 
 }

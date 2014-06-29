@@ -3,9 +3,15 @@ package boolwidth.cutbool.ccmis_trial;
 /*
 import graph.IndexGraph;
 import graph.IndexVertex;
-import graph.VSubSet;
+import graph.PosSubSet<IndexVertex>;
 import util.IndexedSet;
 */
+
+import graph.AdjacencyListGraph;
+import graph.PosSubSet;
+import graph.Vertex;
+import interfaces.IGraph;
+import sadiasrc.graph.*;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.util.ArrayList;
@@ -15,25 +21,24 @@ import java.util.Stack;
 public class CCMISRe {
 
 	//stores neighborhood in bitsets for faster intersection and union
-	private static ArrayList<VSubSet> neighbourhoods;
+	private static ArrayList<PosSubSet<IndexVertex>> neighbourhoods;
 	//groundset for bitset
 	private static IndexedSet<IndexVertex> groundSet;
 
-	public static long BoolDimBranch(IndexGraph G)
+	public static <V, E> long BoolDimBranch(AdjacencyListGraph<IndexVertex, Integer, String> G)
 	{
 //		System.out.println("Bigraph is");
 //		System.out.println(G);
-		neighbourhoods = new ArrayList<VSubSet>(G.numVertices());
+		neighbourhoods = new ArrayList<PosSubSet<IndexVertex>>(G.numVertices());
 		groundSet = new IndexedSet<IndexVertex>(G.vertices());
 		for(int i=0; i<G.numVertices(); i++)
 		{
-			neighbourhoods.add(new VSubSet(groundSet,G.neighbours(G.getVertex(i))));
+			neighbourhoods.add(new PosSubSet<IndexVertex>(groundSet,G.neighbours(G.getVertex(i))));
 		}
 
-		
-		VSubSet all = new VSubSet(groundSet);
-		VSubSet out = new VSubSet(groundSet);
-		VSubSet rest = new VSubSet(groundSet);
+		PosSubSet<IndexVertex> all = new PosSubSet<IndexVertex>(groundSet);
+		PosSubSet<IndexVertex> out = new PosSubSet<IndexVertex>(groundSet);
+		PosSubSet<IndexVertex> rest = new PosSubSet<IndexVertex>(groundSet);
 
 		//all=rest U out
 		all.addAll((Collection<? extends IndexVertex>) G.vertices());
@@ -55,16 +60,17 @@ public class CCMISRe {
 	 * @throws InvalidAlgorithmParameterException
 	 */
 
-	public static long boolDimBranch(IndexGraph G, VSubSet all,  VSubSet out, VSubSet rest)
+	public static long boolDimBranch(AdjacencyListGraph<IndexVertex, Integer, String> G,
+                                     PosSubSet<IndexVertex> all,  PosSubSet<IndexVertex> out, PosSubSet<IndexVertex> rest)
 	{
 		//checking termination conditions
 
-        if (!all.equals(out.union(rest))) {
-            System.out.printf("all: %s\n", all);
-            System.out.printf("out: %s\n", out);
-            System.out.printf("rest: %s\n", rest);
+        //if (!all.equals(out.union(rest))) {
+        //    System.out.printf("all: %s\n", all);
+        //    System.out.printf("out: %s\n", out);
+        //    System.out.printf("rest: %s\n", rest);
             //System.out.printf("equals: %b\n", all.equals(out.union(rest)));
-        }
+        //}
 		
 		//check if P and X are empty
 		if(rest.isEmpty())
@@ -76,9 +82,9 @@ public class CCMISRe {
 		}
 
 		//check to see if the graph is disconneced
-		Boolean con = BasicGraphAlgorithms.isConnected(G,all);
+		Boolean con = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
 
-        con = true; // hack
+        // con = true; // hack
 
 		//If not connected then call for components and multiply
 		if(!con)
@@ -88,12 +94,14 @@ public class CCMISRe {
 			//returns list of components
 			for(ArrayList<IndexVertex> vs : BasicGraphAlgorithms.connectedComponents(G,all))
 			{
-				VSubSet nall = new VSubSet(groundSet);
+				PosSubSet<IndexVertex> nall = new PosSubSet<IndexVertex>(groundSet);
 				nall.addAll(vs);
-				VSubSet nout = nall.clone();
-				VSubSet nrest = nall.clone();
+                PosSubSet<IndexVertex> nout = nall.intersection(out);
+                PosSubSet<IndexVertex> nrest = nall.intersection(rest);
+				/*PosSubSet<IndexVertex> nout = nall.clone();
+				PosSubSet<IndexVertex> nrest = nall.clone();
 				nout.retainAll(out);
-				nrest.retainAll(rest);
+				nrest.retainAll(rest);*/
 
 				long next = boolDimBranch(G,nall,nout,nrest);
                 if (next == 0) return 0;
@@ -107,7 +115,7 @@ public class CCMISRe {
 		//Find a vertex to branch on
 		
 		IndexVertex v = G.maxDegreeVertex(rest);
-        //System.out.printf("maxvertex: %s, degree: %s, neighbhors: %s\n", v, G.degree(v), G.neighbours(v));
+        //System.out.printf("maxvertex: %s, degree: %s, neighbours: %s\n\n", v, G.degree(v), G.neighbours(v));
 
 		//if v is out
 		
@@ -116,51 +124,26 @@ public class CCMISRe {
 		boolean outValid = true;
 		boolean changed = true;
 		//0=from out 1=from rest
-		
+
+        PosSubSet<IndexVertex> oldAll = all.clone();
+        PosSubSet<IndexVertex> oldRest = rest.clone();
+        PosSubSet<IndexVertex> oldOut = out.clone();
+
 		//Moving v to out
 		rest.remove(v);
 		out.add(v);
-		
-		ArrayList<ArrayList<IndexVertex>> removed = new ArrayList<ArrayList<IndexVertex>>(2);
-		removed.add(new ArrayList<IndexVertex>());
-		removed.add(new ArrayList<IndexVertex>());
+
 		Stack<IndexVertex> toAdd = new Stack<IndexVertex>();
 
-		//check if there will be a vertex that cannot be dominated if v is OUT then outvalid=false otherwise call 
+		// check if there will be a vertex that cannot be dominated if v is OUT then outvalid=false otherwise call
 		while(changed)
 		{
 			changed = false;
 
 			for(IndexVertex w : all)
 			{
-                /*
-                boolean neighborInRest = rest.intersects(neighbourhoods.get(w.id()));
-                if (out.contains(w)) {
-                    // If w is in out,
-                    // one of its neighbors must be in this MIS,
-                    // otherwise we could add w, so it would not be maximal.
-                    if (neighborInRest) {
-                        IndexVertex u = rest.oneIntersectElement(neighbourhoods.get(w.id()));
-                        if(u!=null)
-                        {
-                            if(!toAdd.contains(u))
-                                toAdd.push(u);
-                        }
-                    } else {
-                        outValid=false;
-                        break;
-                    }
-                } else if (!neighborInRest) {
-                    // If w has no neighbor in rest, and is in rest (not out), it must be in this MIS,
-                    // because if we put it out, it would make outValid false.
-                    // It already has no neighbors in the MIS, because
-                    // we always remove all neighbors from rest and all when we put in a node.
-                    if(!toAdd.contains(w))
-                        toAdd.push(w);
-                }
-                */
-
-				if(!rest.intersects(neighbourhoods.get(w.id())))
+                PosSubSet<IndexVertex> intersection = rest.intersection(neighbourhoods.get(w.id()));
+				if(intersection.isEmpty())
 				{
 					if(out.contains(w)){
 						outValid=false;
@@ -168,14 +151,22 @@ public class CCMISRe {
 					}
 					else
 					{
+                        // If w has no neighbor in rest, and is in rest (not out), it must be in this MIS,
+                        // because if we put it out, it would make outValid false.
+                        // It already has no neighbors in the MIS, because
+                        // we always remove all neighbors from rest and all when we put in a node.
 						if(!toAdd.contains(w))
 							toAdd.push(w);
 					}
 				}
 				else
-				{	if(out.contains(w) )
+                {
+                    // If w is in out,
+                    // one of its neighbors must be in this MIS,
+                    // otherwise we could add w, so it would not be maximal.
+                    if(out.contains(w) && intersection.size() == 1)
 					{
-						IndexVertex u = rest.oneIntersectElement(neighbourhoods.get(w.id()));
+						IndexVertex u = intersection.first();
 						if(u!=null)
 						{
 							if(!toAdd.contains(u))
@@ -188,7 +179,7 @@ public class CCMISRe {
 			{
 				IndexVertex x = toAdd.pop();
 				if(rest.contains(x))
-					putIn(removed, G, all, out, rest, x);
+					putIn(all, out, rest, x);
 				else
 					outValid=false;
 				changed=true;
@@ -203,31 +194,27 @@ public class CCMISRe {
 		}
 
 		//move vertices back
-		out.addAll(removed.get(0));
-		all.addAll(removed.get(0));
-		rest.addAll(removed.get(1));
-		all.addAll(removed.get(1));
-		out.remove(v);
-		rest.add(v);
+        out.cloneInPlace(oldOut);
+        all.cloneInPlace(oldAll);
+        rest.cloneInPlace(oldRest);
+        //System.out.printf("old all: %s\n", all);
+        //System.out.printf("old out: %s\n", out);
+        //System.out.printf("old rest: %s\n", rest);
 
 		//try v in
-		removed = new ArrayList<ArrayList<IndexVertex>>(2);
-		removed.add(new ArrayList<IndexVertex>());
-		removed.add(new ArrayList<IndexVertex>());
-
-		putIn(removed, G, all, out, rest, v);
+		putIn(all, out, rest, v);
 		toAdd = new Stack<IndexVertex>();
 		boolean inValid = true;
 		changed = true;
 
-		
 		//check if there will be a vertex that cannot be dominated if v is IN then invalid=false otherwise call 
 		while(changed)
 		{
 			changed = false;
 			for(IndexVertex w : all)
 			{
-				if(!rest.intersects(neighbourhoods.get(w.id())))
+                PosSubSet<IndexVertex> intersection = rest.intersection(neighbourhoods.get(w.id()));
+				if(intersection.isEmpty())
 				{
 					if(out.contains(w)){
 						inValid=false;
@@ -240,9 +227,10 @@ public class CCMISRe {
 					}
 				}
 				else
-				{	if(out.contains(w))
+				{	if(out.contains(w) && intersection.size() == 1)
 					{
-						IndexVertex u = rest.oneIntersectElement(neighbourhoods.get(w.id()));
+						IndexVertex u = intersection.first();
+                        //System.out.printf("first vertex: %d\n", u.id());
 						if(u!=null)
 						{
 							if(!toAdd.contains(u))
@@ -254,7 +242,7 @@ public class CCMISRe {
 			while(inValid && !toAdd.isEmpty())
 			{
 				if(rest.contains(toAdd.peek()))
-					putIn(removed, G, all, out, rest, toAdd.pop());
+					putIn(all, out, rest, toAdd.pop());
 				else
 					inValid = false;
 				changed=true;
@@ -267,49 +255,32 @@ public class CCMISRe {
 //			System.out.println("total = "+total);
 		}
 
-		//move vertices back
-		out.addAll(removed.get(0));
-		all.addAll(removed.get(0));
-		rest.addAll(removed.get(1));
-		all.addAll(removed.get(1));
+        // move vertices back
+        out.cloneInPlace(oldOut);
+        all.cloneInPlace(oldAll);
+        rest.cloneInPlace(oldRest);
+        //System.out.printf("old ret all: %s\n", all);
+        //System.out.printf("old ret out: %s\n", out);
+        //System.out.printf("old ret rest: %s\n", rest);
 
 		return total;
 
 	}
 	
-	private static void putIn(ArrayList<ArrayList<IndexVertex>> removed, IndexGraph g,VSubSet all,VSubSet out,VSubSet rest,IndexVertex v)
+	private static void putIn(PosSubSet<IndexVertex> all, PosSubSet<IndexVertex> out, PosSubSet<IndexVertex> rest, IndexVertex v)
 	{
 		//System.out.println("Before adding "+v);
 		//System.out.println(all+", "+out+", "+rest);
 		all.remove(v);
-		if(out.contains(v))
-		{
-			removed.get(0).add(v);
-			out.remove(v);
-		}
-		else if(rest.contains(v))
-		{
-			removed.get(1).add(v);
-			rest.remove(v);
-		}
-		for(IndexVertex w : g.neighbours(v))
-		{
-            all.remove(w);
-			if(out.contains(w))
-			{
-				removed.get(0).add(w);
-				out.remove(w);
+        out.remove(v);
+		rest.remove(v);
 
-			}
-			else if(rest.contains(w))
-			{
-				removed.get(1).add(w);
-				rest.remove(w);
-			}
-		}
+        PosSubSet<IndexVertex> hood = neighbourhoods.get(v.id());
+        all.subtractInPlace(hood);
+        rest.subtractInPlace(hood);
+        out.subtractInPlace(hood);
 		//System.out.println("after adding "+v);
 		//System.out.println(all+", "+out+", "+rest);
-
 	}
 
 }
