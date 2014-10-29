@@ -205,9 +205,9 @@ public class HeuristicTest<V, E> {
                 HeuristicTest<Integer, String> ht = new HeuristicTest<>();
 
                 MISBackTrackTest.JITWarmUp();
-                ht.doHeuristic(graph, "APX");
+                //ht.doHeuristic(graph, "APX");
                 ht.doHeuristic(graph, "CCMIS");
-                ht.doHeuristic(graph, "UNN");
+                //ht.doHeuristic(graph, "UNN");
 
                 if (ht.decomposition != null && graph.numVertices() < 100) {
                     GraphViz.saveGraphDecomposition(fileName, graph, ht.bw,

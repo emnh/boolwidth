@@ -33,6 +33,7 @@ public class LocalSearchR<V, E> {
 
     // static search state
     private CutBoolComparator<V, E> cmp;
+    private Greedy<V, E> greedy;
     private static Random rnd;
 
 	// === Algorithm configuration parameters
@@ -58,12 +59,7 @@ public class LocalSearchR<V, E> {
 	// set one side full, other empty, and move node by node greedy until the cut is balanced
     private final boolean useInitDegreeHeuristic = false;
 	private final boolean useInitGreedy = true;
-	private final boolean useInitGreedyExitEarly = false;
-
-	// use lists of active cuts to investigate instead of just one
-	private final boolean useActives = false;
-	// use size of list for inner search steps
-	private final boolean useActivesInner = false;
+	private final boolean useInitGreedyExitEarly = true;
 
 	// accept any new cut that is below the graph upper bound,
 	// instead of just cuts smaller than current
@@ -85,18 +81,6 @@ public class LocalSearchR<V, E> {
 	public class Result {
 		public LSDecomposition.D<V, E> decomposition;
 		public boolean success = false;
-	}
-
-	public boolean addActiveIfGood(VertexSplit<V> parent, VertexSplit<V> active, int depth) {
-		boolean ret = false;
-		if (this.useActives &&
-				SwapConstraints.isValid(active) && beatsGraphUpperBound(active)) {
-			ret = parent.addActiveIfGood(active);
-			if (ret && parent.activeCuts.size() % 100 == 0) {
-				System.out.printf("depth: %d, actives: %d\n", depth, parent.activeCuts.size());
-			}
-		}
-		return ret;
 	}
 
 	public boolean beatsGraphUpperBound(VertexSplit<V> bag) {
@@ -126,7 +110,7 @@ public class LocalSearchR<V, E> {
             split.copyChildren(initDegree(split, depth == 0));
         }
         else if (this.useInitGreedy) {
-			split.copyChildren(initGreedy(split, depth == 0));
+			split.copyChildren(this.greedy.initGreedy(split, depth == 0));
 		} else {
             // split randomly at first
 			this.decomposition.splitRandom(split, left_size_initial);
@@ -203,70 +187,6 @@ public class LocalSearchR<V, E> {
         return newsplit;
     }
 
-	// TODO: use graph upper bound
-	public VertexSplit<V> initGreedy(VertexSplit<V> bag, boolean toplevel) {
-		ArrayList<VertexSplit<V>> newSplit = new ArrayList<>(1);
-		newSplit.add(null);
-
-		long[] minNewBoolwidth = { Long.MAX_VALUE };
-
-        // it's smart to use "allover" true, because it's faster to move nodes over
-        // with small cuts than it is to count potential large cuts resulting from random
-		boolean allover = true; //this.useActives;
-
-		if (allover || toplevel) {
-			bag.setLeft(this.decomposition.createVertex(bag.vertices(), this.decomposition.getNextID()));
-			bag.setRight(
-					this.decomposition.createVertex(
-							new PosSubSet<Vertex<V>>(bag.vertices().getSet()), this.decomposition.getNextID()));
-		} else {
-			this.decomposition.splitRandom(bag, (bag.size() + 1) / 2);
-			assert bag.checkNode() : String.format("BAG=\"%s\"\n", bag.toString());
-		}
-
-		VertexSplit<V> swapSplit = bag;
-
-		assert bag.getLeft().size() > 0;
-
-		for (int i = 0; i < bag.getLeft().size(); i++) {
-			if (initGreedyCheck(bag, swapSplit, newSplit, minNewBoolwidth)) {
-				if (this.useInitGreedyExitEarly) {
-					return newSplit.get(0);
-				}
-			}
-            System.out.printf("Greedy init: %d/%d\n", i, bag.getLeft().size());
-			swapSplit = swapGreedyLeft(swapSplit);
-		}
-		initGreedyCheck(bag, swapSplit, newSplit, minNewBoolwidth);
-
-		assert newSplit.get(0) != null;
-
-		return newSplit.get(0);
-	}
-
-	/**
-	 * Check if we want to use this cut
-	 * @param bag
-	 * @param swapSplit
-	 * @return
-	 */
-	public boolean initGreedyCheck(VertexSplit<V> bag, VertexSplit<V> swapSplit,
-			ArrayList<VertexSplit<V>> newSplit, long[] minNewBoolwidth) {
-		if (SwapConstraints.isValid(swapSplit)) {
-			addActiveIfGood(bag, swapSplit.clone(), -1);
-			long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth[0]);
-			//int boolwidth = this.cmp.maxLeftRightCutBool(swapSplit);
-			if (boolwidth != CutBool.BOUND_EXCEEDED) {
-				if (boolwidth < minNewBoolwidth[0]) {
-					newSplit.set(0, swapSplit);
-					minNewBoolwidth[0] = boolwidth;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	public boolean keepCut(VertexSplit<V> split, VertexSplit<V> newsplit, int depth) {
 		boolean useNewCut = false;
 		Comparator<VertexSplit<V>> valuecmp = this.cmp;
@@ -320,9 +240,12 @@ public class LocalSearchR<V, E> {
 	public Result localSearch(IGraph<Vertex<V>, V, E> g, IDecomposition<?, ?, ?> oldBestDecomposition) {
 
 		// initialize
-		this.decomposition = new LSDecomposition.D<V, E>(g);
+		this.decomposition = new LSDecomposition.D<>(g);
 
         initCutBoolComparator();
+        if (useInitGreedy) {
+            this.greedy = new Greedy<>(this.decomposition, cmp, useInitGreedyExitEarly);
+        }
 
 		rnd = new Random();
 
@@ -371,69 +294,6 @@ public class LocalSearchR<V, E> {
 	}
 
 	/**
-	 * Try all 1-node swaps and pick best one
-	 * @param bag
-	 * @return
-	 */
-	public VertexSplit<V> swapGreedyLeft(VertexSplit<V> bag) {
-		VertexSplit<V> newsplit = null;
-		long minNewBoolwidth = Long.MAX_VALUE;
-
-		assert bag.getLeft().size() > 0;
-        int i = 0;
-		for (Vertex<V> v : bag.getLeft().vertices()) {
-            i++;
-			ArrayList<Vertex<V>> toswap = new ArrayList<Vertex<V>>(1);
-			toswap.add(v);
-			VertexSplit<V> swapSplit = this.decomposition.swapNodes(bag, toswap, null);
-
-			// experimental
-			addActiveIfGood(bag, swapSplit.clone(), -1);
-
-			long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
-			if (boolwidth != CutBool.BOUND_EXCEEDED) {
-				if (boolwidth < minNewBoolwidth) {
-					newsplit = swapSplit;
-					minNewBoolwidth = boolwidth;
-                    System.out.printf("switching greedy %d/%d, new min: %d\n", i, bag.getLeft().numVertices(), boolwidth);
-				} else if (newsplit == null) {
-					assert false;
-				}
-			}
-		}
-		assert newsplit != null;
-		assert newsplit.checkNode();
-		return newsplit;
-	}
-
-	/**
-	 * Try all 1-node swaps and pick best one
-	 * @param bag
-	 * @return
-	 */
-	public VertexSplit<V> swapGreedyRight(VertexSplit<V> bag) {
-		VertexSplit<V> newsplit = null;
-		long minNewBoolwidth = Long.MAX_VALUE;
-
-		assert bag.getRight().size() > 0;
-		for (Vertex<V> v : bag.getRight().vertices()) {
-			ArrayList<Vertex<V>> toswap = new ArrayList<Vertex<V>>(1);
-			toswap.add(v);
-			VertexSplit<V> swapSplit = this.decomposition.swapNodes(bag, null, toswap);
-			long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
-			if (boolwidth != CutBool.BOUND_EXCEEDED) {
-				if (boolwidth < minNewBoolwidth) {
-					newsplit = swapSplit;
-					minNewBoolwidth = boolwidth;
-				} else if (newsplit == null) {
-					assert false;
-				}
-			}
-		}
-		return newsplit;
-	}
-
-	/**
 	 * Makes a new split from split and if the new cut was better, it returns
 	 * the new cut, else it returns the old cut.
 	 * 
@@ -445,49 +305,25 @@ public class LocalSearchR<V, E> {
 	public ArrayList<VertexSplit<V>> tryToImproveCut(VertexSplit<V> split,
 			Comparator<VertexSplit<V>> valuecmp, long lower_bound, int depth) {
 
-		// System.out.printf("initial: cutbool=%d, left=%s, right=%s\n", cmp
-		// .getCutBool(split), split.getLeft(), split.getRight());
-
 		int fromleft = rnd.nextInt(SwapConstraints.maxFromLeft(split) + 1);
 		int fromright = rnd.nextInt(SwapConstraints.maxFromRight(split) + 1);
-		//		int maxfrom = Math.min(split.getLeft().size() - fromleft,
-		//				split.getRight().size() - fromright);
-		//		int addboth = rnd.nextInt(maxfrom + 1);
-		//		fromleft += addboth;
-		//		fromright += addboth;
 
-		// fromleft = rnd.nextInt(Math.min(SwapConstraints.maxFromLeft(split),
-		// 1) + 1);
-		// fromright = rnd.nextInt(Math.min(SwapConstraints.maxFromRight(split),
-		// 1) + 1);
 		if (fromleft == 0 && fromright == 0) {
 			fromleft = 1;
 			fromright = 1;
 		}
-		//		fromleft = 1;
-		//		fromright = 1;
-		// System.out.printf("from: %d/%d\n", fromleft, fromright);
 
-		// VertexSplit<V> newsplit = swapNodes(split);
 		ArrayList<VertexSplit<V>> newsplits = new ArrayList<VertexSplit<V>>();
 		newsplits.add(this.decomposition.swapRandomNodes(split, fromleft,
 				fromright));
 
-		//this.cmp.compare(newsplit2, newsplit) <=
-
 		// completely re-randomize
 		if (!this.localSwaps) {
-			int newleftsize = rnd.nextInt(split.size() / 2 - split.size() / 3
-					+ 1)
-					+ split.size() / 3;
-			newleftsize = split.size() / 2;
+			int newleftsize = split.size() / 2;
 			newleftsize = Math.max(newleftsize, SwapConstraints
 					.minSplitSize(split));
 			newsplits.add(this.decomposition.splitRandomNew(split, newleftsize));
 		}
-
-		// System.out.println(newbg.leftVertices());
-		// CutBool.countNeighborhoods(newbg, cutbool);
 
 		for (int i = 0; i < newsplits.size(); i++) {
 			VertexSplit<V> newsplit = newsplits.get(i);
@@ -495,22 +331,8 @@ public class LocalSearchR<V, E> {
 			newsplit.getCached(this.rootset, this.foundsplits);
 
 			if (keepCut(split, newsplit, depth)) {
-				// System.out.printf("lb: %d, old->new cb=%d->%d sz=%d/%d -> %d/%d\n",
-				// lower_bound, cmp.maxLeftRightCutBool(split), cmp
-				// .maxLeftRightCutBool(newsplit), split.getLeft()
-				// .size(), split.getRight().size(), newsplit
-				// .getLeft().size(), newsplit.getRight().size());
-				// TODO: put back assertion
-				// assert cmp.maxLeftRightCutBool(newsplit) <= cmp
-				// .maxLeftRightCutBool(split);
-				// System.out.printf("%s -> %s\n", split, newsplit);
-
 				split.setCached(this.rootset, this.foundsplits);
 				newsplit.setCached(this.rootset, this.foundsplits);
-				//			if (this.cmp.maxLeftRightCutBool(newsplit) < getGraphBoolwidthUpperBound()) {
-				//				newsplit.setCached(this.rootset, this.foundsplits);
-				//			}
-				//split.setCached(this.rootset, this.foundsplits);
 
 				split = newsplit;
 			} else {
@@ -557,18 +379,9 @@ public class LocalSearchR<V, E> {
 		long next_lower_bound = Math.max(decomposition_bw_lower_bound, this.cmp
 				.getCutBool(split));
 
-		//for (int i = 0; i < Math.max(searchsteps, split.activeCuts.size()); i++) {
-		int beforesize;
-		if (this.useActivesInner) {
-			beforesize = split.activeCuts.size();
-		} else {
-			beforesize = searchsteps;
-		}
-		for (int i = 0; i < beforesize; i++) {
+		for (int i = 0; i < searchsteps; i++) {
 			split.steps++;
 
-			// System.out.printf("outer loop: %d\n", i);
-			// System.out.printf("searchsteps: %d\n", searchsteps);
 			this.cmp.setUpperBound(decomposition_bw_lower_bound);
 
 			ArrayList<VertexSplit<V>> newsplits = tryToImproveCut(split, this.cmp,
@@ -584,74 +397,20 @@ public class LocalSearchR<V, E> {
 				VertexSplit<V> newsplit = newsplits.get(j);
 				if (split.getLeft() != newsplit.getLeft()
 						&& split.getLeft() != newsplit.getRight()) {
+
 					// for downward search above bound to work
-					if (!this.useActives || newsplit.activeCuts.size() <= 1) {
-						split.setLeft(newsplit.getLeft());
-						split.setRight(newsplit.getRight());
-					}
-
-					// add to actives
-					if (addActiveIfGood(split, newsplit, depth)) {
-						// try to improve even more
-						//							if (newsplit.getLeft().size() > SwapConstraints.minSplitSize(newsplit)) {
-						//								VertexSplit<V> newsplit2 = swapGreedyLeft(newsplit);
-						//								if (this.cmp.maxLeftRightCutBool(newsplit2,
-						//										getGraphBoolwidthUpperBound()) == CutBool.BOUND_EXCEEDED &&
-						//										!split.activeCuts.contains(newsplit2)) {
-						//									split.activeCuts.add(newsplit2);
-						//								}
-						//							}
-						//							if (newsplit.getRight().size() > SwapConstraints.minSplitSize(newsplit)) {
-						//								VertexSplit<V> newsplit2 = swapGreedyRight(newsplit);
-						//								if (this.cmp.maxLeftRightCutBool(newsplit2,
-						//										getGraphBoolwidthUpperBound()) == CutBool.BOUND_EXCEEDED &&
-						//										!split.activeCuts.contains(newsplit2)) {
-						//									split.activeCuts.add(newsplit2);
-						//								}
-						//							}
-					}
-				} else {
-					//assert false;
-				}
-			}
-
-			// switch between actives below the bound
-			if (this.useActives &&
-					this.cmp.maxLeftRightCutBool(split, getGraphBoolwidthUpperBound())
-					!= CutBool.BOUND_EXCEEDED) {
-				VertexSplit<V> newsplit = null;
-				while (newsplit == null && split.activeCuts.size() > 1) {
-					int oldActive = split.activeCut;
-					split.activeCut = (split.activeCut + 1) % split.activeCuts.size();
-					newsplit = split.activeCuts.get(split.activeCut);
-					if (this.cmp.maxLeftRightCutBool(newsplit, getGraphBoolwidthUpperBound())
-							== CutBool.BOUND_EXCEEDED
-					) {
-						split.activeCuts.remove(split.activeCut);
-						split.activeCut = oldActive;
-						newsplit = null;
-						System.out.println("removed obsolete cut");
-					} else {
-						//						System.out.printf("switching to %d < bound(%d): %s\n",
-						//								this.cmp.maxLeftRightCutBool(newsplit),
-						//								getGraphBoolwidthUpperBound(),
-						//								newsplit);
-					}
-				}
-				if (newsplit != null) {
 					split.setLeft(newsplit.getLeft());
 					split.setRight(newsplit.getRight());
-					split.updateCached(this.rootset, this.foundsplits);
+
+				} else {
+					//assert false;
 				}
 			}
 
 			// this cut may be closer to our goal, but won't improve the
 			// graph_boolwidth_upper_bound so there's no use splitting it
 			// further
-			if (CutBoolComparator
-					.maxLeftRightCutBool(this.decomposition, split) >= getGraphBoolwidthUpperBound()) {
-				// split.updateSubTreeUpperBound(CutBool.bestGeneralUpperBound(split.size(),
-				// false));
+			if (CutBoolComparator.maxLeftRightCutBool(this.decomposition, split) >= getGraphBoolwidthUpperBound()) {
 				continue;
 			}
 
@@ -667,28 +426,19 @@ public class LocalSearchR<V, E> {
 			}
 
 			tryToImproveSubTree(first, searchsteps, next_lower_bound, depth + 1);
-			// it's the max of all computed cuts so far on this particular
-			// decomposition
+			// it's the max of all computed cuts so far on this particular decomposition
 			long lower_bound_for_other_side = next_lower_bound;
 			lower_bound_for_other_side = Math.max(lower_bound_for_other_side,
 					first.getSubTreeUpperBound());
 			tryToImproveSubTree(second, searchsteps, lower_bound_for_other_side, depth + 1);
-			if (split.updateSubTreeUpperBound()) {
-				// System.out.println("jolly good!");
-			}
+			split.updateSubTreeUpperBound();
 
 			// if we can't improve further we're done with this cut.
-			// if we're not the bottleneck, postpone splitting it until a later
-			// time.
-			if (split.isOptimalSubTree()
-					|| split.getSubTreeUpperBound() < decomposition_bw_lower_bound) {
-				// System.out.println("OPTIMUS PRIME break dance :) !");
+			// if we're not the bottleneck, postpone splitting it until a later time.
+			if (split.isOptimalSubTree() || split.getSubTreeUpperBound() < decomposition_bw_lower_bound) {
 				break;
 			}
 		}
-		// if (split.updateSubTreeUpperBound()) {
-		// //System.out.println("jolly good!");
-		// }
 	}
 
 	public boolean updateGraphBoolwidthUpperBound(long graph_boolw_upper_bound) {

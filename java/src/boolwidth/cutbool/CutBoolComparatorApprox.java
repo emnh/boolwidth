@@ -43,7 +43,7 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
                         cbExactDebug);
             }*/
 
-            if (cbApproximation < CAN_AFFORD_EXACT) {
+            /*if (cbApproximation < CAN_AFFORD_EXACT) {
                 long cbExact = CutBool.countNeighborhoods(cut, CAN_AFFORD_EXACT);
 
                 if (cbExact == CutBool.BOUND_EXCEEDED) {
@@ -52,7 +52,7 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
                     node.setCutBool(cbExact);
                     return cbExact;
                 }
-            }
+            }*/
             node.setCutBool(cbApproximation);
             return cbApproximation;
         }
