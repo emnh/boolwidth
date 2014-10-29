@@ -87,13 +87,14 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 	}
 
 	public PosSubSet(IPosSet<TVertex> set) {
-		this.words = new long[(set.size() - 1 >> 6) + 1];
+		this.words = new long[(set.size() - 1) >> 64 + 1];
 		this.groundSet = set;
 	}
 
 	public PosSubSet(IPosSet<TVertex> set, Iterable<TVertex> subset) {
 		this(set);
 		for (TVertex v : subset) {
+            assert set.contains(v) : "not a subset";
 			add(v);
 		}
 	}
@@ -479,7 +480,7 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
     @Override
     public boolean contains(Object v) {
         if (v instanceof Vertex) {
-            return get(((TVertex) v).id());
+            return get(((Vertex) v).id());
         }
         return false;
     }

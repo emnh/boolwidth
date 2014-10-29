@@ -140,7 +140,7 @@ public class CBBacktrackEstimateBinary<V> {
         state.rowCount = g.numLeftVertices();
         state.colCount = g.numRightVertices();
         state.sample = new int[state.colCount];
-        state.groundSet = new PosSet<Vertex<V>>(g.rightVertices());
+        state.groundSet = new PosSet<Vertex<V>>(g.vertices());
         state.bmat = new ArrayList<PosSubSet<Vertex<V>>>();
         for (Vertex<V> node : g.leftVertices()) {
             PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(state.groundSet, g.incidentVertices(node));

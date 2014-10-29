@@ -66,7 +66,7 @@ public class DecompositionTest {
 			if (decomp.numVertices() < 8) {
 				continue;
 			}
-			int bw = CutBool.booleanWidth(decomp, minbw);
+			long bw = CutBool.booleanWidth(decomp, minbw);
 			// System.out.println("count: "+bw);
 			if (bw != CutBool.BOUND_EXCEEDED && bw < minbw) {
 				System.out.printf("i: %d, bw: %d\n", i, bw);

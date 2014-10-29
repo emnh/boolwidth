@@ -149,9 +149,9 @@ public class MISBackTrackTest {
 
         BenchmarkResult ret;
 
-        /*ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
+        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
         System.out.printf("UNN (bigraph) (%dms): %d\n", ret.eachDuration(), ret.returnValue);
-
+        /*
         ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(graph), test);
         System.out.printf("MIS backtrack persistent (%dms): %d\n", ret.eachDuration(), ret.returnValue);
         */

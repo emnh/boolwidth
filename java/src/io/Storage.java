@@ -112,7 +112,7 @@ public class Storage {
 	 */
 	public boolean updateBestDecomposition(IDecomposition<?, ?, ?> candidate) {
 		boolean updated = false;
-		int newBw = BooleanDecomposition.getBoolWidth(candidate);
+		long newBw = BooleanDecomposition.getBoolWidth(candidate);
 		if (this.bestDecomposition == null ||
 				newBw < BooleanDecomposition.getBoolWidth(this.bestDecomposition)) {
 			this.setBestDecomposition(candidate);

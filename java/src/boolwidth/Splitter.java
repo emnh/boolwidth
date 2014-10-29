@@ -120,10 +120,10 @@ public class Splitter {
 		decomp.addLeft(decomp.root().getRight(), ts2);
 		decomp.addRight(decomp.root().getRight(), ts3);
 
-		int bound = Integer.MAX_VALUE;
+		long bound = Integer.MAX_VALUE;
 		boolean improve = true;
 		while (improve) {
-			int count = CutBool.booleanWidth(decomp, bound);
+			long count = CutBool.booleanWidth(decomp, bound);
 			if (count < bound) {
 				bound = count;
 			}
@@ -132,14 +132,14 @@ public class Splitter {
 		Stack<DNode.D<Integer>> s = new Stack<DNode.D<Integer>>();
 
 		// RandomSplitter.evenSplit(decomp, s);
-		int maxN = CutBool.booleanWidth(decomp);
+		long maxN = CutBool.booleanWidth(decomp);
 		// System.out.println("maxN = "+maxN);
 		searchSplit(decomp, s, maxN);
 		return decomp;
 	}
 
 	public static void searchSplit(Decomposition.D<Integer, String> decomp,
-			Stack<boolwidth.DNode.D<Integer>> s, int maxN) {
+			Stack<boolwidth.DNode.D<Integer>> s, long maxN) {
 		while (!s.isEmpty()) {
 			DNode.D<Integer> root = s.pop();
 			System.out.println("Deep Searching bag " + root.id());

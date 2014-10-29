@@ -1,6 +1,8 @@
 package boolwidth;
 
+import boolwidth.cutbool.CutBoolComparatorCCMIS;
 import graph.*;
+import sadiasrc.decomposition.CCMIS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,16 +111,16 @@ public class CutBool {
 	}
 
 	/** @return 2^Boolean-width of given decomposition. */
-	public static <TVertex extends DNode<TVertex, V>, V, E> int booleanWidth(
+	public static <TVertex extends DNode<TVertex, V>, V, E> long booleanWidth(
 			Decomposition<TVertex, V, E> decomp) {
         return booleanWidth(decomp, BOUND_UNINITIALIZED);
 	}
 
 	/** @return 2^Boolean-width of given decomposition. */
-	public static <TVertex extends DNode<TVertex, V>, V, E> int booleanWidth(
+	public static <TVertex extends DNode<TVertex, V>, V, E> long booleanWidth(
 			Decomposition<TVertex, V, E> decomposition, long upper_bound) {
 		// int n = decomp.graph.numVertices();
-		int hoods = 0;
+		long hoods = 0;
 		int bw = 1;
 		boolean nice = decomposition.hasRight(decomposition.root())
 		&& decomposition.hasLeft(decomposition.root());
@@ -134,7 +136,9 @@ public class CutBool {
 			// decompositions
 			// with one node
 			// if (dn.element().size() > bw && (n - dn.element().size()) > bw) {
-			int thisHoods = countNeighborhoods(decomposition.getCut(dn), upper_bound);
+			//int thisHoods = countNeighborhoods(decomposition.getCut(dn), upper_bound);
+            long thisHoods = CCMIS.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(decomposition.getCut(dn)));
+
 			// dn.setAttr("hoods", thisHoods);
 
 			// dn.setCutBool(thisHoods);
@@ -234,8 +238,9 @@ public class CutBool {
 			long upper_bound) {
 
 		// set of right,left nodes
-		final PosSet<Vertex<V>> rights = new PosSet<>(g.rightVertices());
-		final PosSet<Vertex<V>> lefts = new PosSet<>(g.leftVertices());
+		//final PosSet<Vertex<V>> rights = new PosSet<>(g.rightVertices());
+		//final PosSet<Vertex<V>> lefts = new PosSet<>(g.leftVertices());
+        final PosSet<Vertex<V>> all = new PosSet<>(g.vertices());
 
 		TreeSet<PosSubSet<Vertex<V>>> initialhoods;
 
@@ -247,13 +252,15 @@ public class CutBool {
 
 		// initialize all neighborhood sets of 1 left node
 		for (Vertex<V> node : g.leftVertices()) {
-			PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(rights, g.incidentVertices(node));
+            // must use full vertex set as ground set, because IDs are not translated
+			PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(all, g.incidentVertices(node));
 			if (neighbors.size() > 0) {
 				leftnodes.add(neighbors);
 			}
 		}
 		for (Vertex<V> node : g.rightVertices()) {
-			PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(lefts, g.incidentVertices(node));
+            // must use full vertex set as ground set, because IDs are not translated
+			PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(all, g.incidentVertices(node));
 			if (neighbors.size() > 0) {
 				rightnodes.add(neighbors);
 			}
@@ -263,12 +270,12 @@ public class CutBool {
 		// choose the smallest neighborhood set
 		// if (rights.size() - right_twin_count > lefts.size() - left_twin_count) {
 		if (rightnodes.size() > leftnodes.size()) {
-			// adds empty set, subset of rights
-			hoods.add(new PosSubSet<>(rights));
+			// adds empty set, subset of all
+			hoods.add(new PosSubSet<>(all));
 			initialhoods = leftnodes;
 		} else {
-			// adds empty set, subset of lefts
-			hoods.add(new PosSubSet<>(lefts));
+			// adds empty set, subset of all
+			hoods.add(new PosSubSet<>(all));
 			initialhoods = rightnodes;
 		}
 

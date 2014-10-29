@@ -58,6 +58,8 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
             }*/
 
             long before, after;
+            cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
+            /*
             long UPPER_BOUND = 1000000; // should be a runtime (ms) perhaps
             if (upper_bound < UPPER_BOUND) {
                 cb = CutBool.countNeighborhoods(cut, upper_bound);
@@ -78,7 +80,7 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
                     //System.out.printf("UNN time - CCMIS time (v=%d/%d,CB=%d): %d - %d\n",
                     //        cut.numLeftVertices(), cut.numRightVertices(), cb, unnDuration, ccmisDuration);
                 }
-            }
+            }*/
 
             //cb = CCMIS.BoolDimBranch(convertSadiaBiGraph(cut));
 

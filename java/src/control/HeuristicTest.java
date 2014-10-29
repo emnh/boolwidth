@@ -77,7 +77,7 @@ public class HeuristicTest<V, E> {
                 // look for decomposition
                 if (graph.numVertices() > 0 && graph.numVertices() < 64) {
                     HeuristicTest<V, E> ht = new HeuristicTest<V, E>();
-                    ht.doHeuristic(graph);
+                    ht.doHeuristic(graph, "UNN");
                 }
             } finally {
                 if (fl != null) {
@@ -178,6 +178,8 @@ public class HeuristicTest<V, E> {
             //String fileName  = ControlUtil.GRAPHLIB + "other/risk.dgf";
             //String fileName = null;
             String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "coloring/mulsol.i.5.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "delauney/pr152.tsp.dgf";
 
             if (args.length > 0) {
                 fileName = args[0];
@@ -203,7 +205,9 @@ public class HeuristicTest<V, E> {
                 HeuristicTest<Integer, String> ht = new HeuristicTest<>();
 
                 MISBackTrackTest.JITWarmUp();
-                ht.doHeuristic(graph);
+                ht.doHeuristic(graph, "APX");
+                ht.doHeuristic(graph, "CCMIS");
+                ht.doHeuristic(graph, "UNN");
 
                 if (ht.decomposition != null && graph.numVertices() < 100) {
                     GraphViz.saveGraphDecomposition(fileName, graph, ht.bw,
@@ -220,7 +224,7 @@ public class HeuristicTest<V, E> {
     }
 
     public <TVertex extends Vertex<V>> void doHeuristic(
-            IGraph<Vertex<V>, V, E> graph) {
+            IGraph<Vertex<V>, V, E> graph, String comparatorImplementation) {
         long start = System.currentTimeMillis();
 
         String fileName = DiskGraph.getFileName(graph);
@@ -245,6 +249,7 @@ public class HeuristicTest<V, E> {
         }
 
         LocalSearchR<V, E> lsr = new LocalSearchR<V, E>();
+        lsr.comparatorImplementation = comparatorImplementation;
 
         // for logging
         lsr.graphName = fileName;

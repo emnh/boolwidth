@@ -78,7 +78,7 @@ public class RandomSplitter {
 		s.add(decomp.right(dn));
 		s.add(decomp.left(dn));
 		// evenSplit(decomp, s);
-		int bw = CutBool.booleanWidth(decomp, minbw);
+		long bw = CutBool.booleanWidth(decomp, minbw);
 		if (bw == CutBool.BOUND_EXCEEDED) {
 			return decomp;// TODO:optimize by returning null?
 		}
@@ -94,7 +94,7 @@ public class RandomSplitter {
 	 * Running time: O(n log n)
 	 */
 	public static <V, E> Decomposition.D<V, E> randomSplitGeneral(
-			IGraph<Vertex<V>, V, E> g, int minbw) {
+			IGraph<Vertex<V>, V, E> g, long minbw) {
 		// creating a Decomposition
 		Decomposition.D<V, E> decomp = new Decomposition.D<V, E>(g);
 
@@ -118,7 +118,7 @@ public class RandomSplitter {
 		s.add(decomp.right(dn));
 		s.add(decomp.left(dn));
 		// evenSplit(decomp, s);
-		int bw = CutBool.booleanWidth(decomp, minbw);
+		long bw = CutBool.booleanWidth(decomp, minbw);
 		if (bw == CutBool.BOUND_EXCEEDED) {
 			return decomp;// TODO:optimize by returning null?
 		}

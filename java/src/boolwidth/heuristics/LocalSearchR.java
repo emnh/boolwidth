@@ -36,8 +36,9 @@ public class LocalSearchR<V, E> {
     private static Random rnd;
 
 	// === Algorithm configuration parameters
-    private final String comparatorImplementation = "CCMIS";
+    public String comparatorImplementation = "UNN";
     private void initCutBoolComparator() {
+        System.out.println("Using " + comparatorImplementation + " for counting neighborhoods.");
         switch (comparatorImplementation) {
             case "UNN":
                 this.cmp = new CutBoolComparator<>(this.decomposition);
@@ -55,6 +56,7 @@ public class LocalSearchR<V, E> {
 	private final boolean localSwaps = true;
 
 	// set one side full, other empty, and move node by node greedy until the cut is balanced
+    private final boolean useInitDegreeHeuristic = false;
 	private final boolean useInitGreedy = true;
 	private final boolean useInitGreedyExitEarly = false;
 
@@ -120,10 +122,13 @@ public class LocalSearchR<V, E> {
 			left_size_initial = split.element().size() / 2;
 		}
 
-		// split randomly at first
-		if (this.useInitGreedy) {
+		if (this.useInitDegreeHeuristic) {
+            split.copyChildren(initDegree(split, depth == 0));
+        }
+        else if (this.useInitGreedy) {
 			split.copyChildren(initGreedy(split, depth == 0));
 		} else {
+            // split randomly at first
 			this.decomposition.splitRandom(split, left_size_initial);
 		}
 
@@ -144,14 +149,70 @@ public class LocalSearchR<V, E> {
 		split.initialized = true;
 	}
 
+    public VertexSplit<V> initDegree(VertexSplit<V> bag, boolean toplevel) {
+        ArrayList<VertexSplit<V>> newSplit = new ArrayList<>(1);
+        newSplit.add(null);
+
+        long[] minNewBoolwidth = { Long.MAX_VALUE };
+
+        VertexSplit<V> swapSplit = bag;
+
+        for (int i = 0; i < bag.getLeft().size(); i++) {
+            System.out.printf("Degree init: %d/%d\n", i, bag.getLeft().size());
+            swapSplit = swapDegreeLeft(swapSplit);
+        }
+
+        assert newSplit.get(0) != null;
+
+        return newSplit.get(0);
+    }
+
+    /**
+     * Try all 1-node swaps and pick best one
+     * @param bag
+     * @return
+     */
+    public VertexSplit<V> swapDegreeLeft(VertexSplit<V> bag) {
+        VertexSplit<V> newsplit = null;
+        long minNewBoolwidth = Long.MAX_VALUE;
+
+        assert bag.getLeft().size() > 0;
+        int i = 0;
+        for (Vertex<V> v : bag.getLeft().vertices()) {
+            i++;
+            ArrayList<Vertex<V>> toswap = new ArrayList<>(1);
+            toswap.add(v);
+            VertexSplit<V> swapSplit = this.decomposition.swapNodes(bag, toswap, null);
+
+            // compute
+            //swapSplit.getLeft()
+
+            long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
+            if (boolwidth != CutBool.BOUND_EXCEEDED) {
+                if (boolwidth < minNewBoolwidth) {
+                    newsplit = swapSplit;
+                    minNewBoolwidth = boolwidth;
+                    System.out.printf("switching greedy %d/%d, new min: %d\n", i, bag.getLeft().numVertices(), boolwidth);
+                } else if (newsplit == null) {
+                    assert false;
+                }
+            }
+        }
+        assert newsplit != null;
+        assert newsplit.checkNode();
+        return newsplit;
+    }
+
 	// TODO: use graph upper bound
 	public VertexSplit<V> initGreedy(VertexSplit<V> bag, boolean toplevel) {
-		ArrayList<VertexSplit<V>> newSplit = new ArrayList<VertexSplit<V>>(1);
+		ArrayList<VertexSplit<V>> newSplit = new ArrayList<>(1);
 		newSplit.add(null);
 
 		long[] minNewBoolwidth = { Long.MAX_VALUE };
 
-		boolean allover = this.useActives;
+        // it's smart to use "allover" true, because it's faster to move nodes over
+        // with small cuts than it is to count potential large cuts resulting from random
+		boolean allover = true; //this.useActives;
 
 		if (allover || toplevel) {
 			bag.setLeft(this.decomposition.createVertex(bag.vertices(), this.decomposition.getNextID()));
@@ -267,7 +328,7 @@ public class LocalSearchR<V, E> {
 
         this.rootset = new PosSet<Vertex<V>>(this.decomposition.root().element());
 		if (oldBestDecomposition != null) {
-			int oldbw = BooleanDecomposition.getBoolWidth(oldBestDecomposition);
+			long oldbw = BooleanDecomposition.getBoolWidth(oldBestDecomposition);
 			setGraphBoolwidthUpperBound(oldbw);
 		} else {
 			setGraphBoolwidthUpperBound(CutBool.bestGeneralUpperBound(

@@ -33,7 +33,7 @@ public class CutBoolComparatorApprox<V, E> extends CutBoolComparator<V, E> imple
             final long CAN_AFFORD_EXACT = 100000;
 
             long cbApproximation = CBBacktrackEstimateBinary.estimateNeighborhoods(cut, sampleCount);
-            long cbApproximation2 = CCMISApprox.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(cut), sampleCount);
+            //long cbApproximation2 = CCMISApprox.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(cut), sampleCount);
 
             /*long cbExactDebug = CutBool.countNeighborhoods(cut, CAN_AFFORD_EXACT);
             if (cbExactDebug > 10000) {
