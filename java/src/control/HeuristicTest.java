@@ -228,7 +228,7 @@ public class HeuristicTest<V, E> {
         long start = System.currentTimeMillis();
 
         String fileName = DiskGraph.getFileName(graph);
-        System.out.printf("{ time: %d, graph: \"%s\", v: %d, e: %d }\n",
+        System.out.printf("{ \"time\": %d, \"graph\": \"%s\", \"v\": %d, \"e\": %d }\n",
                 System.currentTimeMillis(),
                 fileName, graph.numVertices(), graph.numEdges());
         assert (fileName != null);
@@ -261,13 +261,8 @@ public class HeuristicTest<V, E> {
         if (result.success) {
             this.decomposition = result.decomposition;
             // get exact boolean width of this decomposition
-            final int MAXBWBOUND = 1000000;
-            this.bw = CutBool.booleanWidth(this.decomposition, MAXBWBOUND);
-            if (this.bw != CutBool.BOUND_EXCEEDED) {
-                st.updateBestDecomposition(this.decomposition);
-            } else {
-                System.out.printf("exact decomposition bw exceeded bound: %d\n", MAXBWBOUND);
-            }
+            this.bw = CutBool.booleanWidth(this.decomposition);
+            st.updateBestDecomposition(this.decomposition);
         } else {
             System.out.println("failed to meet bound");
             return;
@@ -282,7 +277,7 @@ public class HeuristicTest<V, E> {
                     + st.getBestDecomposition().toString());
 
             long bw = BooleanDecomposition.getBoolWidth(st.getBestDecomposition());
-            System.out.printf("{ time: %d, graph: \"%s\", v: %d, e: %d, CB: %d, BW: %.2f }\n",
+            System.out.printf("{ \"time\": %d, \"graph\": \"%s\", \"v\": %d, \"e\": %d, \"CB\": %d, \"BW\": %.2f }\n",
                     System.currentTimeMillis(),
                     fileName,
                     graph.numVertices(),

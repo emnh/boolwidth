@@ -34,6 +34,7 @@ public class LocalSearchR<V, E> {
     // static search state
     private CutBoolComparator<V, E> cmp;
     private Greedy<V, E> greedy;
+    private GreedyDegree<V, E> greedyDegree;
     private static Random rnd;
 
 	// === Algorithm configuration parameters
@@ -65,8 +66,9 @@ public class LocalSearchR<V, E> {
 	// instead of just cuts smaller than current
 	private final boolean allowEverythingBelowGraphUpperBound = false;
 
-    // search time in seconds
-    public static final int SEARCHTIME = 10;
+    // search time in milliseconds
+    public static final int SEARCH_TIME = 10 * 1000;
+    public static final int SEARCH_PRINT_INTERVAL = 1000;
 
     public static final int INNER_SEARCHSTEPS = 1;
 
@@ -107,9 +109,8 @@ public class LocalSearchR<V, E> {
 		}
 
 		if (this.useInitDegreeHeuristic) {
-            split.copyChildren(initDegree(split, depth == 0));
-        }
-        else if (this.useInitGreedy) {
+            split.copyChildren(this.greedyDegree.initGreedy(split, depth == 0));
+        } else if (this.useInitGreedy) {
 			split.copyChildren(this.greedy.initGreedy(split, depth == 0));
 		} else {
             // split randomly at first
@@ -132,60 +133,6 @@ public class LocalSearchR<V, E> {
 
 		split.initialized = true;
 	}
-
-    public VertexSplit<V> initDegree(VertexSplit<V> bag, boolean toplevel) {
-        ArrayList<VertexSplit<V>> newSplit = new ArrayList<>(1);
-        newSplit.add(null);
-
-        long[] minNewBoolwidth = { Long.MAX_VALUE };
-
-        VertexSplit<V> swapSplit = bag;
-
-        for (int i = 0; i < bag.getLeft().size(); i++) {
-            System.out.printf("Degree init: %d/%d\n", i, bag.getLeft().size());
-            swapSplit = swapDegreeLeft(swapSplit);
-        }
-
-        assert newSplit.get(0) != null;
-
-        return newSplit.get(0);
-    }
-
-    /**
-     * Try all 1-node swaps and pick best one
-     * @param bag
-     * @return
-     */
-    public VertexSplit<V> swapDegreeLeft(VertexSplit<V> bag) {
-        VertexSplit<V> newsplit = null;
-        long minNewBoolwidth = Long.MAX_VALUE;
-
-        assert bag.getLeft().size() > 0;
-        int i = 0;
-        for (Vertex<V> v : bag.getLeft().vertices()) {
-            i++;
-            ArrayList<Vertex<V>> toswap = new ArrayList<>(1);
-            toswap.add(v);
-            VertexSplit<V> swapSplit = this.decomposition.swapNodes(bag, toswap, null);
-
-            // compute
-            //swapSplit.getLeft()
-
-            long boolwidth = this.cmp.maxLeftRightCutBool(swapSplit, minNewBoolwidth);
-            if (boolwidth != CutBool.BOUND_EXCEEDED) {
-                if (boolwidth < minNewBoolwidth) {
-                    newsplit = swapSplit;
-                    minNewBoolwidth = boolwidth;
-                    System.out.printf("switching greedy %d/%d, new min: %d\n", i, bag.getLeft().numVertices(), boolwidth);
-                } else if (newsplit == null) {
-                    assert false;
-                }
-            }
-        }
-        assert newsplit != null;
-        assert newsplit.checkNode();
-        return newsplit;
-    }
 
 	public boolean keepCut(VertexSplit<V> split, VertexSplit<V> newsplit, int depth) {
 		boolean useNewCut = false;
@@ -243,7 +190,10 @@ public class LocalSearchR<V, E> {
 		this.decomposition = new LSDecomposition.D<>(g);
 
         initCutBoolComparator();
-        if (useInitGreedy) {
+        if (useInitDegreeHeuristic) {
+            this.greedyDegree = new GreedyDegree<>(this.decomposition, cmp, useInitGreedyExitEarly);
+        }
+        else if (useInitGreedy) {
             this.greedy = new Greedy<>(this.decomposition, cmp, useInitGreedyExitEarly);
         }
 
@@ -260,8 +210,9 @@ public class LocalSearchR<V, E> {
 
 		Result result = new Result();
 		long start = System.currentTimeMillis();
+        long oldPrintTime = start - SEARCH_PRINT_INTERVAL;
 
-		for (int i = 0; System.currentTimeMillis() - start < SEARCHTIME * 1000; i++) {
+		for (int i = 0; System.currentTimeMillis() - start < SEARCH_TIME; i++) {
 			// greedy = (i % 20 != 0);
 			tryToImproveSubTree(this.decomposition.root(), INNER_SEARCHSTEPS, 1, 0);
 			assert this.decomposition.root().size() == this.decomposition.numGraphVertices();
@@ -271,12 +222,15 @@ public class LocalSearchR<V, E> {
 				System.out.println("iteration:" + i);
 				this.has_valid_best_decomposition = true;
 			}
-			if (i % 10 == 0) {
-				System.out.printf("iteration: %d, foundsplits: %d, UB: %d, log2UB: %.2f\n", i,
+			if (System.currentTimeMillis() - oldPrintTime > SEARCH_PRINT_INTERVAL) {
+                oldPrintTime = System.currentTimeMillis();
+				System.out.printf("{ \"search time\": %d, \"cut fails\": %d, \"cut tries\": %d, \"iteration\": %d, \"foundsplits\": %d, \"UB\": %d, \"log2UB\": %.2f }\n",
+                        oldPrintTime - start,
+                        this.failsToImproveCut, this.triesToImproveCut,
+                        i,
 						this.foundsplits.size(),
                         getGraphBoolwidthUpperBound(),
                         Math.log(getGraphBoolwidthUpperBound()) / Math.log(2));
-				System.out.printf("cut fails/tries: %d/%d\n", this.failsToImproveCut, this.triesToImproveCut);
 			}
 		}
 		result.success = true;
@@ -445,7 +399,7 @@ public class LocalSearchR<V, E> {
 		boolean updated = false;
 		if (graph_boolw_upper_bound < this.graph_boolwidth_upper_bound) {
             long time = System.currentTimeMillis();
-			System.out.printf("{ time: %d, graph: \"%s\", oldCB: %d, oldBW: %.2f, newCB: %d, newBW: %.2f }\n",
+			System.out.printf("{ \"time\": %d, \"graph\": \"%s\", \"oldCB\": %d, \"oldBW\": %.2f, \"newCB\": %d, \"newBW\": %.2f }\n",
                     time,
                     this.graphName,
 					this.graph_boolwidth_upper_bound,
