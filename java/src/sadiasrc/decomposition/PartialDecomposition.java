@@ -6,6 +6,7 @@ import sadiasrc.graph.IEdge;
 import sadiasrc.graph.IForest;
 import sadiasrc.graph.IVertex;
 
+/*
 public abstract class PartialDecomposition<V extends IVertex, E extends IEdge<? extends V>> implements IForest<V,E>{
 
 	@Override
@@ -167,3 +168,4 @@ public abstract class PartialDecomposition<V extends IVertex, E extends IEdge<? 
 	}
 
 }
+*/

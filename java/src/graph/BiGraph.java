@@ -1,6 +1,7 @@
 package graph;
 
 import exceptions.InvalidPositionException;
+import graph.subsets.PosSet;
 import interfaces.IBiGraph;
 import interfaces.IGraph;
 
@@ -174,7 +175,6 @@ IBiGraph<V, E> {
 	/**
 	 * O(1)
 	 */
-	@Deprecated
 	public Vertex<V> insertLeft(V o) {
 		Vertex<V> v = super.insertVertex(o);
 		this.isLeft.add(true);
@@ -195,7 +195,6 @@ IBiGraph<V, E> {
 	/**
 	 * O(1)
 	 */
-	@Deprecated
 	public Vertex<V> insertRight(V o) {
 		Vertex<V> v = super.insertVertex(o);
 		this.isLeft.add(false);

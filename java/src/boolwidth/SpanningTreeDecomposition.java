@@ -6,7 +6,7 @@ import exceptions.NonEmptyTreeException;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Edge;
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 import interfaces.IBinaryTree;
 import interfaces.IDecomposition;

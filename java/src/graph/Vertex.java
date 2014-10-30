@@ -1,5 +1,6 @@
 package graph;
 
+import graph.subsets.Position;
 import interfaces.IAttributeStorage;
 import interfaces.IVertexFactory;
 

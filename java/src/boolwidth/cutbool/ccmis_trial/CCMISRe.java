@@ -3,15 +3,12 @@ package boolwidth.cutbool.ccmis_trial;
 /*
 import graph.IndexGraph;
 import graph.IndexVertex;
-import graph.PosSubSet<IndexVertex>;
+import graph.subsets.PosSubSet<IndexVertex>;
 import util.IndexedSet;
 */
 
 import graph.AdjacencyListGraph;
-import graph.PosSubSet;
-import graph.Vertex;
-import interfaces.IGraph;
-import sadiasrc.graph.*;
+import graph.subsets.PosSubSet;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.util.ArrayList;

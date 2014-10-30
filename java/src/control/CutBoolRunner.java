@@ -3,7 +3,7 @@ package control;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.IntegerGraph;
-import graph.PosSet;
+import graph.subsets.PosSet;
 import graph.Vertex;
 import io.ConstructGraph;
 
@@ -89,7 +89,7 @@ public class CutBoolRunner {
 
 	public static void testEmpty() {
 		AdjacencyListGraph.D<String, String> graph = new AdjacencyListGraph.D<String, String>();
-		graph.insertVertex("1");
+        graph.insertVertex("1");
 		PosSet<Vertex<String>> lefts = new PosSet<Vertex<String>>();
 		BiGraph<String, String> bg = new BiGraph<String, String>(lefts, graph);
 		assert 1 == CutBool.countNeighborhoods(bg);

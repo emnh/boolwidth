@@ -1,7 +1,7 @@
 package boolwidth.cutbool;
 
 import graph.BiGraph;
-import graph.PosSet;
+import graph.subsets.PosSet;
 import graph.Vertex;
 
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package graph;
+package graph.subsets;
 
 import interfaces.IPosSet;
 import interfaces.ISetPosition;

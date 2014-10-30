@@ -1,7 +1,7 @@
 package control;
 
 import graph.Edge;
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 import interfaces.IGraph;
 

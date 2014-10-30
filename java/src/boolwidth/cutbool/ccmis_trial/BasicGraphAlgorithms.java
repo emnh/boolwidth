@@ -1,9 +1,7 @@
 package boolwidth.cutbool.ccmis_trial;
 
 import graph.AdjacencyListGraph;
-import graph.PosSubSet;
-import sadiasrc.graph.*;
-import sadiasrc.graph.VSubSet;
+import graph.subsets.PosSubSet;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -79,12 +79,13 @@ public class SubSet<E> extends AbstractSet<E> implements Set<E>, Comparable<SubS
 	}
 
 	@Override
+    @SuppressWarnings("unchecked")
 	public boolean equals(Object o) {
-		if(o instanceof SubSet)
+		if (o instanceof SubSet)
 		{
 			//System.out.println("comparing");
-			SubSet<E> ss = (SubSet<E>)o;
-			if(ss.getGroundSet()!=groundSet)
+			SubSet<E> ss = (SubSet<E>) o;
+			if (ss.getGroundSet() != groundSet)
 				return false;
 			return ss.subset.equals(subset);
 		}

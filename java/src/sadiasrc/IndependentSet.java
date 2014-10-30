@@ -9,6 +9,7 @@ import sadiasrc.graph.VertexSet;
 
 public class IndependentSet {
 
+    @SuppressWarnings("unchecked")
 	public static int linIS(IndexGraph g, List<IndexVertex> order)
 	{
 		Map<VertexSet<IndexVertex>,Integer> sizes = new HashMap<VertexSet<IndexVertex>, Integer>();

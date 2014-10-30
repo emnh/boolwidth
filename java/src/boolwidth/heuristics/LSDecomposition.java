@@ -1,7 +1,7 @@
 package boolwidth.heuristics;
 
 import boolwidth.cutbool.CutBoolComparator;
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 import interfaces.IGraph;
 import interfaces.IVertexFactory;

@@ -1,6 +1,7 @@
 package graph;
 
 import exceptions.InvalidPositionException;
+import graph.subsets.Position;
 
 import java.util.ArrayList;
 

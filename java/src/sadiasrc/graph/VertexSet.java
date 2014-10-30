@@ -64,7 +64,9 @@ public class VertexSet<V extends IndexVertex> extends IndexedSet<V> implements C
 		if(map.entrySet().size()!=list.size())
 			System.out.println("Warning! Flawed set.");
 	}
-	@Override
+
+    @Override
+    @SuppressWarnings("unchecked")
     public Object clone() {
         return new VertexSet<IndexVertex>((Iterable)this);
     } 

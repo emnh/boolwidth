@@ -1,8 +1,8 @@
 package boolwidth;
 
 import graph.IntegerGraph;
-import graph.PosSet;
-import graph.PosSubSet;
+import graph.subsets.PosSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 
 import java.util.Arrays;

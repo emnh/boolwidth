@@ -25,7 +25,7 @@ class PersistentMISStateApproximation<V, E> {
         //P_any = PersistentHashSet.
         P_any = PersistentHashSet.create(graph.verticesCollection());
         //P_any = new PersistentHashSet<>(graph.verticesCollection());
-        X_out = PersistentHashSet.create();
+        X_out = PersistentHashSet.emptySet();
     }
 
     public PersistentMISStateApproximation(PersistentMISStateApproximation<V, E> b) {

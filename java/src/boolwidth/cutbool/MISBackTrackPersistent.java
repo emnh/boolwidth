@@ -26,7 +26,7 @@ class PersistentMISState<V, E> {
         //P_any = PersistentHashSet.
         P_any = PersistentHashSet.create(graph.verticesCollection());
         //P_any = new PersistentHashSet<>(graph.verticesCollection());
-        X_out = PersistentHashSet.create();
+        X_out = PersistentHashSet.emptySet();
     }
 
     public PersistentMISState(PersistentMISState<V, E> b) {
@@ -66,7 +66,7 @@ public class MISBackTrackPersistent {
             ArrayList<Vertex<V>> component = new ArrayList<Vertex<V>>();
             component.addAll(state.P_any);
             component.addAll(state.X_out);
-            SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph(state.graph, component);
+            SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph<>(state.graph, component);
             ArrayList<SubsetGraph<Vertex<V>, V, E>> components = graph.newGraph.connectedComponents();
             if (components.size() > 1) {
                 //System.out.printf("components: %d\n", components.size());
@@ -74,8 +74,8 @@ public class MISBackTrackPersistent {
                 for (SubsetGraph<Vertex<V>, V, E> subgraph : components) {
                     PersistentMISState<V, E> newState = new PersistentMISState<>(state);
                     newState.graph = subgraph.newGraph;
-                    newState.P_any = PersistentHashSet.EMPTY; // subgraph.newGraph.verticesCollection());
-                    newState.X_out = PersistentHashSet.EMPTY;
+                    newState.P_any = PersistentHashSet.emptySet(); // subgraph.newGraph.verticesCollection());
+                    newState.X_out = PersistentHashSet.emptySet();
 
                     for (Vertex<V> v : state.P_any) {
                         Vertex<V> newV = subgraph.mapVertex(graph.mapVertex(v));

@@ -2,7 +2,7 @@ package interfaces;
 
 import exceptions.InvalidPositionException;
 import graph.BiGraph;
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 import boolwidth.DNode;
 

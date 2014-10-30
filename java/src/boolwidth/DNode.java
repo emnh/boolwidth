@@ -1,7 +1,7 @@
 package boolwidth;
 
 import graph.BinNode;
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 import interfaces.IVertexFactory;
 

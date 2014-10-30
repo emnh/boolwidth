@@ -2,10 +2,7 @@ package boolwidth.cutbool.ccmis_trial;
 
 import graph.AdjacencyListGraph;
 import graph.Edge;
-import graph.PosSubSet;
 import graph.Vertex;
-
-import java.util.Collection;
 
 /**
  * Created by emh on 6/12/14.

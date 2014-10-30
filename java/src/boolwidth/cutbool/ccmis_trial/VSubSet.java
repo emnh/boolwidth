@@ -1,6 +1,6 @@
 package boolwidth.cutbool.ccmis_trial;
 
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import interfaces.IPosSet;
 
 /**

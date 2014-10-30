@@ -1,7 +1,7 @@
 package graph;
 
-import boolwidth.cutbool.ccmis_trial.IndexVertex;
 import exceptions.InvalidPositionException;
+import graph.subsets.PosSubSet;
 import interfaces.IAttributeStorage;
 import interfaces.IGraph;
 import interfaces.IPosition;
@@ -142,7 +142,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	public Iterable<E> edgeElements() {
 		ArrayList<E> al = new ArrayList<E>(this.vList.size());
 		for (Edge<TVertex, V, E> e : this.eList) {
-			al.add(e.elem);
+			al.add(e.element());
 		}
 		return al;
 	}
@@ -250,8 +250,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	throws InvalidPositionException {
 		checkVertex(v);
 		checkVertex(w);
-		Edge<TVertex, V, E> ee = new Edge<TVertex, V, E>(o, v, w, this.eList
-				.size());
+		Edge<TVertex, V, E> ee = new Edge<>(o, v, w, this.eList.size());
 		this.adjacencyList.get(v.id()).add(ee);
 		this.adjacencyList.get(w.id()).add(ee);
 		this.eList.add(ee);
@@ -271,7 +270,6 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	/**
 	 * Insert and return a new vertex with a given element. Running time: O(1)
 	 */
-	@Deprecated // Why?
 	public TVertex insertVertex(V v) {
 		// TVertex vv = new TVertex(v, vList.size());
 		TVertex vv = createVertex(v, this.vList.size());
@@ -446,7 +444,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
                 ArrayList<TVertex> component = new ArrayList<TVertex>();
                 depthFirstComponent(v, component, components);
 
-                SubsetGraph<TVertex, V, E> graph = new SubsetGraph(this, component);
+                SubsetGraph<TVertex, V, E> graph = new SubsetGraph<>(this, component);
                 graphComponents.add(graph);
             }
         }
@@ -530,7 +528,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	public Iterable<V> vertexElements() {
 		ArrayList<V> al = new ArrayList<V>(this.vList.size());
 		for (TVertex e : this.vList) {
-			al.add(e.elem);
+			al.add(e.element());
 		}
 		return al;
 

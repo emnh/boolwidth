@@ -1,6 +1,6 @@
 package graph.algorithms;
 
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 
 import java.util.ArrayList;

@@ -17,6 +17,7 @@ public class ListSelect<T> extends JScrollPane {
 	final EventListModel<T> graphListModel;
 	final SelectAction<T> selectaction;
 
+    @SuppressWarnings("unchecked")
 	public ListSelect(EventList<T> graphEventList,
 			final SelectAction<T> selectaction) {
 		// create scrollable list

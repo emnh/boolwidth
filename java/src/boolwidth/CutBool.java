@@ -2,6 +2,8 @@ package boolwidth;
 
 import boolwidth.cutbool.CutBoolComparatorCCMIS;
 import graph.*;
+import graph.subsets.PosSet;
+import graph.subsets.PosSubSet;
 import sadiasrc.decomposition.CCMIS;
 
 import java.util.ArrayList;

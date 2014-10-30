@@ -47,7 +47,7 @@ public class Approximation {
     }
 
     public static String readFile(String file) {
-        try(Stream lines = Files.lines(FileSystems.getDefault().getPath(file))) {
+        try(Stream<String> lines = Files.lines(FileSystems.getDefault().getPath(file))) {
             StringBuilder sb = new StringBuilder();
             lines.forEach((line) -> sb.append((line + System.lineSeparator())));
             String everything = sb.toString();

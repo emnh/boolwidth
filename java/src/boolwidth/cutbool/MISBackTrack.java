@@ -61,7 +61,7 @@ public class MISBackTrack {
             ArrayList<Vertex<V>> component = new ArrayList<Vertex<V>>();
             component.addAll(state.P_any);
             component.addAll(state.X_out);
-            SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph(state.graph, component);
+            SubsetGraph<Vertex<V>, V, E> graph = new SubsetGraph<>(state.graph, component);
             ArrayList<SubsetGraph<Vertex<V>, V, E>> components = graph.newGraph.connectedComponents();
             if (components.size() > 1) {
                 //System.out.printf("components: %d\n", components.size());

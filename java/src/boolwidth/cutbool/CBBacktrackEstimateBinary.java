@@ -1,6 +1,8 @@
 package boolwidth.cutbool;
 
 import graph.*;
+import graph.subsets.PosSet;
+import graph.subsets.PosSubSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +28,7 @@ public class CBBacktrackEstimateBinary<V> {
 
     }
 
-    public CBBacktrackEstimateBinary(CBBacktrackEstimateBinary b) {
+    public CBBacktrackEstimateBinary(CBBacktrackEstimateBinary<V> b) {
         this.rowCount = b.rowCount;
         this.colCount = b.colCount;
         this.sample = b.sample;

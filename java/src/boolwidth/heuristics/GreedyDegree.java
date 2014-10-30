@@ -2,7 +2,7 @@ package boolwidth.heuristics;
 
 import boolwidth.CutBool;
 import boolwidth.cutbool.CutBoolComparator;
-import graph.PosSubSet;
+import graph.subsets.PosSubSet;
 import graph.Vertex;
 
 import java.util.ArrayList;

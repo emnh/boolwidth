@@ -17,6 +17,7 @@ import sadiasrc.graph.VertexSet;
 
 public class IndependentSet {
 
+    @SuppressWarnings("unchecked")
 	public static int linIS(IndexGraph g, List<IndexVertex> order)
 	{
 		// sizes is a list which for each neighbourhood stores the optimal size of an independent Set
