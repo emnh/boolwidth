@@ -218,6 +218,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 	 * Return an iterator over the vertices incident to a vertex. Running time:
 	 * O(n)
 	 */
+    @Override
 	public Collection<TVertex> incidentVertices(TVertex v)
 	throws InvalidPositionException {
 		ArrayList<TVertex> vertices = new ArrayList<TVertex>();

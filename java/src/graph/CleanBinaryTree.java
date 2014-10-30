@@ -8,10 +8,7 @@ import interfaces.IBinaryTree;
 import interfaces.IGraph;
 import interfaces.IVertexFactory;
 
-import java.util.AbstractSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * A realization of a binary tree, _not_ as an extension of an adjacency list
@@ -25,6 +22,11 @@ public class CleanBinaryTree<TVertex extends BinNode<TVertex, V>, V, E> extends
     @Deprecated
     public CleanBinaryTree()
     {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
     }
 
     @Override
@@ -664,7 +666,13 @@ public class CleanBinaryTree<TVertex extends BinNode<TVertex, V>, V, E> extends
 		return depthFirst();
 	}
 
-	// //TODO: isn't this just the default for iterables? remove?
+    @Override
+    public Collection<TVertex> incidentVertices(TVertex v) throws InvalidPositionException {
+        throw new UnsupportedOperationException(
+                "The method IGraph<TVertex,V,E>.incidentVertices is not yet implemented");
+    }
+
+    // //TODO: isn't this just the default for iterables? remove?
 	// private String print(N element) {
 	// String s = "";
 	// if (element instanceof Iterable<?>) {

@@ -5,6 +5,7 @@ import graph.Edge;
 import graph.Vertex;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * An interface for a graph.
@@ -88,4 +89,7 @@ public interface IGraph<TVertex extends Vertex<V>, V, E> extends
 
 	/** Returns the vertices of the graph as an iterable collection */
 	public Iterable<TVertex> vertices();
+
+    /** Returns neighbours **/
+    public Collection<TVertex> incidentVertices(TVertex v) throws InvalidPositionException;
 }

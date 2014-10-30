@@ -97,6 +97,39 @@ IBiGraph<V, E> {
 	}
 
     /**
+     * TODO: Doesn't preserve edge elements.
+     * @param left
+     * @param right
+     * @param graph
+     */
+    public BiGraph(Collection<Vertex<V>> left, Collection<Vertex<V>> right, IGraph<Vertex<V>, V, E> graph) {
+        this(left.size(), Math.max(0, graph.numVertices() - left.size()));
+
+        // add left and right vertices
+        for (Vertex<V> v : graph.vertices()) {
+            if (left.contains(v)) {
+                insertLeft(v);
+            } else {
+                insertRight(v);
+            }
+        }
+
+        // add edges going between left and right
+        for (Vertex<V> v : left) {
+            for (Vertex<V> v2 : graph.incidentVertices(v)) {
+                if (right.contains(v2)) {
+                    int a = v.id();
+                    int b = v2.id();
+                    Vertex<V> va = this.vList.get(a);
+                    Vertex<V> vb = this.vList.get(b);
+                    insertEdge(va, vb, null);
+                    insertEdge(vb, va, null);
+                }
+            }
+        }
+    }
+
+    /**
      * Convert graph to bigraph.
      * Just uses methods in parent, but is not a real bigraph.
      * Algorithms will fail on this graph if BiGraph methods are used.

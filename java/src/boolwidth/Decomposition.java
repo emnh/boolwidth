@@ -15,10 +15,7 @@ import interfaces.IVertexFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Formatter;
-import java.util.Iterator;
+import java.util.*;
 
 import util.Util.Pair;
 
@@ -486,4 +483,9 @@ public class Decomposition<TVertex extends DNode<TVertex, V>, V, E> extends
 		}
 	}
 
+    @Override
+    public Collection<TVertex> incidentVertices(TVertex v) throws InvalidPositionException {
+        throw new UnsupportedOperationException(
+                "The method IGraph<TVertex,V,E>.incidentVertices is not yet implemented");
+    }
 }
