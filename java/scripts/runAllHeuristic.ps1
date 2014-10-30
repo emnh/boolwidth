@@ -1,4 +1,6 @@
 $out = "out-logs"
+$lower = $args[0]
+$upper = $args[1]
 $currentPath = (Resolve-Path .)
 $graphs = (gci -recurse .\data\graphLib\* -include *.dgf, *.dimacs |
   select-string "p edges? ([0-9]+) ([0-9]+)" | 
@@ -10,7 +12,7 @@ $graphs = (gci -recurse .\data\graphLib\* -include *.dgf, *.dimacs |
     } 
   } |
   sort Nodes |
-  where { $_.Nodes -gt 0 } )
+  where { $_.Nodes -ge $lower -and $_.Nodes -lt $upper } )
 
 $graphs | % { 
   $Path = (Join-Path $out (Split-Path $_.FileName)) 
@@ -18,6 +20,8 @@ $graphs | % {
     New-Item -ItemType Directory -Path $Path
   }
 }
+
+Write-Output "Starting run for graphs with nodes in range [$lower, $upper>"
 
 $graphs | % {
   $FileName = $_.FileName
@@ -27,7 +31,7 @@ $graphs | % {
     cd $currentPath
     ./scripts/runHeuristic.ps1 $FileName 2>&1 > $LogName
   }
-  Write-Output "Starting job on $($_.FileName)"
+  Write-Output "Starting job on $($_.FileName) with $($_.Nodes) nodes"
   $job = Start-Job -ScriptBlock $Run -ArgumentList $currentPath,$FileName,$LogName
   Write-Output "Waiting for job $($job.Id)"
   Wait-Job -Timeout 3600 $job
