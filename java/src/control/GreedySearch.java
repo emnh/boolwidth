@@ -377,64 +377,32 @@ class GreedyDecomposition {
     public ImmutableBinaryTree trickle(ImmutableBinaryTree ibt, SimpleNode parent, SimpleNode currentNode, Vertex<Integer> v) {
 
         ArrayList<SimpleNode> neighbours = new ArrayList<SimpleNode>(ibt.getNeighbours(currentNode));
-        if (parent != null) neighbours.remove(parent);
-        SimpleNode left = null;
-        SimpleNode right = null;
-        /*if (neighbours.size() < 2) {
+        if (neighbours.size() < 3) {
             ibt = ibt.addChild(currentNode, v.id());
             return ibt;
-        }*/
-        if (neighbours.size() > 0) left = neighbours.get(0);
-        if (neighbours.size() > 1) right = neighbours.get(1);
+        }
+        if (parent != null) neighbours.remove(parent);
 
-        HashSet<Integer> neighbours2 = new HashSet<>();
+        long minFBCool = Long.MAX_VALUE;
+        SimpleNode minFBNode = null;
+
         for (SimpleNode n : neighbours) {
-            neighbours2.add(n.getTreeID());
-        }
-        HashSet<Integer> lefts = new HashSet<>(ibt.getChildren(currentNode, left));
-        HashSet<Integer> rights = new HashSet<>(ibt.getChildren(currentNode, right));
-
-        /*System.out.println("neighbours: " + neighbours2);
-        System.out.printf("parent/left/right: %s/%s/%s\n", parent, left, right);
-        System.out.println("lefts: " + lefts);
-        System.out.println("rights: " + rights);
-        final ImmutableBinaryTree ibt2 = ibt;
-        ibt2.dfs((newparent, node) ->
-            System.out.printf("%s (parent=%s): %s\n", node, newparent, ibt2.getChildren(newparent, node))
-        );*/
-
-        long leftCB = getFunkyCutBool(ibt, lefts);
-        long rightCB = getFunkyCutBool(ibt, rights);
-
-        /*
-        System.out.printf("%d CB=(%d:%d)/(%d:%d)\n", currentNode.getTreeID(),
-                //getCutBool(ibt.getChildren(left)),
-                0,
-                leftCB,
-                0,
-                //getCutBool(ibt.getChildren(right)),
-                rightCB);
-                */
-
-        if (leftCB < rightCB) {
-            if (left == null) {
-                ibt = ibt.addChild(currentNode, v.id());
-            } else {
-                ibt = trickle(ibt, currentNode, left, v);
-            }
-        } else {
-            if (right == null) {
-                ibt = ibt.addChild(currentNode, v.id());
-            } else {
-                ibt = trickle(ibt, currentNode, right, v);
+            HashSet<Integer> lefts = new HashSet<>(ibt.getChildren(currentNode, n));
+            lefts.add(v.id());
+            long fbcool = getFunkyCutBool(ibt, lefts);
+            if (fbcool < minFBCool) {
+                minFBCool = fbcool;
+                minFBNode = n;
             }
         }
-        if (parent == null) {
+        ibt = trickle(ibt, currentNode, minFBNode, v);
+
+        /*if (parent == null) {
             SimpleNode maxCut = getFunkyMaxCut(ibt);
             assert maxCut != null;
             System.out.printf("rerooting: %s\n", maxCut != ibt.getRoot());
             ibt = ibt.reRoot(maxCut);
-        }
+        }*/
         return ibt;
     }
 
@@ -463,16 +431,57 @@ class GreedyDecomposition {
         return ibt;
     }
 
+    public ImmutableBinaryTree decomposeTopCut() {
+        HashSet<Vertex<Integer>> remaining = new HashSet<>();
+        long totalsize = 0;
+        for (Vertex<Integer> v : graph.vertices()) {
+            totalsize++;
+            remaining.add(v);
+        }
+
+        long start = System.currentTimeMillis();
+        PersistentVector<Vertex<Integer>> lefts = PersistentVector.EMPTY;
+        while (!remaining.isEmpty()) {
+            long minmove = Long.MAX_VALUE;
+            Vertex<Integer> tomove = null;
+
+            for (Vertex<Integer> v : remaining) {
+                PersistentVector<Vertex<Integer>> newlefts = lefts.cons(v);
+                HashSet<Integer> vertexIDs = new HashSet<>();
+                for (Vertex<Integer> v2 : newlefts) {
+                    vertexIDs.add(v2.id());
+                }
+                long cb = getCutBool(vertexIDs);
+                if (cb < minmove) {
+                    minmove = cb;
+                    tomove = v;
+                }
+
+            }
+            System.out.printf("time: %d, sz: %d/%d, bw: %.2f, 2^bw: %d, lefts: %s\n",
+                    System.currentTimeMillis() - start,
+                    lefts.size(), totalsize,
+                    getLogBooleanWidth(minmove), minmove, lefts);
+            lefts = lefts.cons(tomove);
+            remaining.remove(tomove);
+        }
+        ArrayList<Vertex<Integer>> list = new ArrayList<>();
+        lefts.forEach((node) -> list.add(node));
+        return decompose(list);
+    }
+
     public ImmutableBinaryTree decompose() {
+        ArrayList<Vertex<Integer>> list = new ArrayList<>();
+        graph.vertices().forEach((node) -> list.add(node));
+        return decompose(list);
+    }
+
+    public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
 
-        ArrayList<Vertex<Integer>> vertices = new ArrayList<>();
-        for (Vertex<Integer> v : graph.vertices()) {
-            vertices.add(v);
-        }
         // doesn't seem to have much impact, leave out while debugging for deterministic results
-        Collections.shuffle(vertices);
+        // Collections.shuffle(vertices);
 
         TreeMap<Double, Vertex<Integer>> troubleMakers = new TreeMap<>();
 
@@ -491,7 +500,7 @@ class GreedyDecomposition {
             bw = getFunkyBooleanWidth(ibt);
             ratio = (double) bw / oldbw;
             oldbw = bw;
-            troubleMakers.put(ratio, v);
+            //troubleMakers.put(ratio, v);
 
             final ImmutableBinaryTree ibt2 = ibt;
             //if (System.currentTimeMillis() - oldPrint > PRINT_INTERVAL) {
@@ -517,17 +526,22 @@ class GreedyDecomposition {
             //    oldPrint = System.currentTimeMillis();
             //}
 
-            int retid = troubleMakers.firstEntry().getValue().id();
+            /*int retid = troubleMakers.firstEntry().getValue().id();
             troubleMakers.remove(troubleMakers.firstEntry().getKey());
             ibt = retrickleGiven(ibt, retid);
             bw = getFunkyBooleanWidth(ibt);
             ratio = (double) bw / oldbw;
             oldbw = bw;
             troubleMakers.put(ratio, graph.getVertex(retid));
+            */
+            for (int j = 0; j < 2; j++) {
+                ibt = retrickleRandom(ibt);
+            }
+            //bw = getFunkyBooleanWidth(ibt);
 
-            System.out.printf("retrickling id=%d, %d/%d, funky bw: %.2f, 2^bw: %d, ratio: %f\n",
+            /*System.out.printf("retrickling id=%d, %d/%d, funky bw: %.2f, 2^bw: %d, ratio: %f\n",
                     v.id(), i, graph.numVertices(),
-                    getLogBooleanWidth(bw), bw, ratio);
+                    getLogBooleanWidth(bw), bw, ratio);*/
 
         }
 
@@ -632,7 +646,12 @@ public class GreedySearch {
         graph = ControlUtil.getTestGraph(fileName);
 
         GreedyDecomposition gd = new GreedyDecomposition(graph);
+
+        //gd.decomposeTopCut();
+        //System.exit(-1);
+
         long decomposeStart = System.currentTimeMillis();
+        //final ImmutableBinaryTree ibt = gd.decomposeTopCut();
         final ImmutableBinaryTree ibt = gd.decompose();
 
         long decomposeEnd = System.currentTimeMillis();
