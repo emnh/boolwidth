@@ -10,9 +10,9 @@ import java.util.HashSet;
 /**
  * Created by emh on 11/2/2014.
  */
-public class ThreeWayDecomposition extends BaseDecomposition {
+public class ThreeWayDecompose extends BaseDecompose {
 
-    public ThreeWayDecomposition(IGraph<Vertex<Integer>, Integer, String> graph) {
+    public ThreeWayDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
     }
 

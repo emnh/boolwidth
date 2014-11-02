@@ -1,5 +1,6 @@
 package boolwidth.greedysearch;
 
+import boolwidth.CutBool;
 import boolwidth.cutbool.CutBoolComparatorCCMIS;
 import com.github.krukow.clj_lang.PersistentVector;
 import graph.BiGraph;
@@ -8,11 +9,12 @@ import interfaces.IGraph;
 import sadiasrc.decomposition.CCMIS;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by emh on 11/2/2014.
  */
-public class BaseDecomposition {
+public class BaseDecompose {
 
     private IGraph<Vertex<Integer>, Integer, String> graph;
     private HashMap<HashSet<Integer>, Long> cache = new HashMap<>();
@@ -23,10 +25,14 @@ public class BaseDecomposition {
     long oldPrint;
     static final int PRINT_INTERVAL = 1000;
 
-    public BaseDecomposition(IGraph<Vertex<Integer>, Integer, String> graph) {
+    public BaseDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         this.graph = graph;
         start = System.currentTimeMillis();
         oldPrint = start - PRINT_INTERVAL;
+    }
+
+    public long getStart() {
+        return start;
     }
 
     public IGraph<Vertex<Integer>, Integer, String> getGraph() {
@@ -49,7 +55,8 @@ public class BaseDecomposition {
             rights.add(graph.getVertex(id));
         }
         BiGraph<Integer, String> bg = new BiGraph<Integer, String>(lefts, rights, graph);
-        long cb = CCMIS.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(bg));
+        //long cb = CCMIS.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(bg));
+        long cb = CutBool.countNeighborhoods(bg);
         return cb;
     }
 
@@ -221,6 +228,14 @@ public class BaseDecomposition {
         return decompose(list);
     }
 
+    public void rateLimitedPrint(Consumer<Long> print) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - oldPrint > PRINT_INTERVAL) {
+            print.accept(System.currentTimeMillis() - getStart());
+            oldPrint = System.currentTimeMillis();
+        }
+    }
+
     public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
@@ -242,46 +257,28 @@ public class BaseDecomposition {
             ratio = (double) bw / oldbw;
             oldbw = bw;
 
-            final ImmutableBinaryTree ibt2 = ibt;
-            if (System.currentTimeMillis() - oldPrint > PRINT_INTERVAL) {
-                System.out.printf("trickling id=%d, %d/%d, funky bw: %.2f, 2^bw: %d, ratio: %f\n",
-                        v.id(), i, graph.numVertices(),
-                        getLogBooleanWidth(bw), bw, ratio);
-                oldPrint = System.currentTimeMillis();
-            }
+            final int print_i = i;
+            final long print_bw = bw;
+            final double print_ratio = ratio;
+            rateLimitedPrint((time) ->
+                System.out.printf("time: %d, trickling id=%d, %d/%d, funky bw: %.2f, 2^bw: %d, ratio: %f\n",
+                        time, v.id(), print_i, graph.numVertices(),
+                        getLogBooleanWidth(print_bw), print_bw, print_ratio));
 
             for (int j = 0; j < ibt.getAllChildren().size() / 10; j++) {
                 ibt = retrickleRandom(ibt);
             }
             bw = getBooleanWidth(ibt);
-            if (System.currentTimeMillis() - oldPrint > PRINT_INTERVAL) {
-                System.out.printf("retrickling id=%d, %d/%d, funky bw: %.2f, 2^bw: %d, ratio: %f\n",
-                        v.id(), i, graph.numVertices(),
-                        getLogBooleanWidth(bw), bw, ratio);
-                oldPrint = System.currentTimeMillis();
-            }
+            ratio = (double) bw / oldbw;
+            oldbw = bw;
+
+            final long print_bw2 = bw;
+            final double print_ratio2 = ratio;
+            rateLimitedPrint((time) ->
+                System.out.printf("time: %d, retrickling id=%d, %d/%d, funky bw: %.2f, 2^bw: %d, ratio: %f\n",
+                        time, v.id(), print_i, graph.numVertices(),
+                        getLogBooleanWidth(print_bw2), print_bw2, print_ratio2));
         }
-
-        /*i = 0;
-        ibt = new ImmutableBinaryTree();
-        ibt = ibt.addRoot();
-        for (Map.Entry<Double, Vertex<Integer>> v : troubleMakers.entrySet()) {
-            i++;
-            System.out.printf("retrickling vertex %f %d, %d/%d\n", v.getKey(), v.getValue().id(), i, graph.numVertices());
-            System.out.printf("bw: %d\n", getBooleanWidth(ibt));
-            ibt = trickle(ibt, ibt.getRoot(), v.getValue());
-        }*/
-
-        /*
-        i = 0;
-        for (Map.Entry<Double, Vertex<Integer>> v : troubleMakers.descendingMap().entrySet()) {
-            i++;
-            System.out.printf("retrickling vertex %f %d, %d/%d\n", v.getKey(), v.getValue().id(), i, graph.numVertices());
-            bw = getBooleanWidth(ibt);
-            System.out.printf("bw: %.2f, 2^bw: %d\n", getLogBooleanWidth(bw), bw);
-            ibt = retrickleGiven(ibt, v.getValue().id());
-        }*/
-
         return ibt;
     }
 

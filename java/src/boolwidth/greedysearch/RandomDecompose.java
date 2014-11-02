@@ -9,9 +9,9 @@ import java.util.HashSet;
 /**
  * Created by emh on 11/2/2014.
  */
-public class RandomDecomposition extends BaseDecomposition {
+public class RandomDecompose extends BaseDecompose {
 
-    public RandomDecomposition(IGraph<Vertex<Integer>, Integer, String> graph) {
+    public RandomDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
     }
 

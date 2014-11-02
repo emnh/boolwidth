@@ -37,7 +37,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen6_6.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
 
         //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.1.dgf";
@@ -46,17 +46,30 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "freq/graph04-pp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "freq/graph07-pp.dgf";
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
-        String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
         if (args.length > 0) {
             fileName = args[0];
         }
         IGraph<Vertex<Integer>, Integer, String> graph;
         graph = ControlUtil.getTestGraph(fileName);
 
-        //BaseDecomposition gd = new BaseDecomposition(graph);
-        //BaseDecomposition gd = new TwoWayDecomposition(graph);
-        BaseDecomposition gd = new ThreeWayDecomposition(graph);
-        //BaseDecomposition gd = new RandomDecomposition(graph);
+        BaseDecompose gd = null;
+
+        switch (2) {
+            case 0:
+                gd = new BaseDecompose(graph);
+                break;
+            case 1:
+                gd = new RandomDecompose(graph);
+                break;
+            case 2:
+                gd = new TwoWayDecompose(graph);
+                break;
+            case 3:
+                gd = new ThreeWayDecompose(graph);
+                break;
+        }
 
         long decomposeStart = System.currentTimeMillis();
         final ImmutableBinaryTree ibt = gd.decompose();
@@ -73,11 +86,12 @@ public class GreedySearch {
         result.put("cache hits", (double) gd.cacheHits / gd.cutboolTotalCalls);
         result.put("decompose time", decomposeEnd - decomposeStart);
         result.put("compute width time", computeWidthEnd - computeWidthStart);
-        result.put("boolean-width", BaseDecomposition.getLogBooleanWidth(bw));
+        result.put("boolean-width", BaseDecompose.getLogBooleanWidth(bw));
         result.put("2^boolean-width", bw);
+        final BaseDecompose gd2 = gd;
         String jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
             if (node != ibt.getRoot()) {
-                obj.put("cutbool", gd.getCutBool(ibt.getChildren(parent, node)));
+                obj.put("cutbool", gd2.getCutBool(ibt.getChildren(parent, node)));
             }
         }).toString();
 
