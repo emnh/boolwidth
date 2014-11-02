@@ -61,6 +61,7 @@ pom.xml
 # Project
 /java/output
 /java/.idea/workspace.xml
+/java/.settings
 
 # Vim Temp Windows
 *~
