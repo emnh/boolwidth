@@ -1,6 +1,7 @@
 package control;
 
 import boolwidth.greedysearch.*;
+import control.http.HTTPResultsServer;
 import graph.Vertex;
 import interfaces.IGraph;
 import com.cedarsoftware.util.io.JsonWriter;
@@ -37,7 +38,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen6_6.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
 
         //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.1.dgf";
@@ -89,13 +90,17 @@ public class GreedySearch {
         result.put("boolean-width", BaseDecompose.getLogBooleanWidth(bw));
         result.put("2^boolean-width", bw);
         final BaseDecompose gd2 = gd;
-        String jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
+        JSONObject jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
             if (node != ibt.getRoot()) {
                 obj.put("cutbool", gd2.getCutBool(ibt.getChildren(parent, node)));
             }
-        }).toString();
+        });
 
-        System.out.println(JsonWriter.formatJson(jsonDecomposition));
+        System.out.println(JsonWriter.formatJson(jsonDecomposition.toString()));
         System.out.println(JsonWriter.formatJson(result.toString()));
+
+        HTTPResultsServer hrServer = new HTTPResultsServer();
+        hrServer.addResult("decomposition", jsonDecomposition);
+        hrServer.addResult("result", result);
     }
 }

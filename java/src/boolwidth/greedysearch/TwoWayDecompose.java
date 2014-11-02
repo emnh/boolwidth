@@ -28,6 +28,7 @@ public class TwoWayDecompose extends BaseDecompose {
         //Split childSplit = new Split(1, this);
         children.put(split, new ArrayList<>());
         children.get(split).add(new Split(1, this));
+        SimpleNode last = ibt.getRoot();
         while (!split.done()) {
             final Split oldsplit = split;
             //final Split childSplit2 = childSplit;
@@ -40,6 +41,9 @@ public class TwoWayDecompose extends BaseDecompose {
                         */
                 return cb2; //Math.max(cb1, cb2);
             });
+
+            ibt = ibt.addChild(last, split.getLastMoved().id());
+            last = ibt.getReference();
 
             if (split != oldsplit) {
                 ArrayList<Split> newParent = new ArrayList<Split>();
@@ -58,6 +62,7 @@ public class TwoWayDecompose extends BaseDecompose {
                     children.get(split).add(childSplit);
                 }
             }
+
             //ibt = trickle(ibt, null, ibt.getRoot(), split.getLastMoved());
         }
         return ibt;
