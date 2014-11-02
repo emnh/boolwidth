@@ -4,6 +4,7 @@ import boolwidth.CutBool;
 import boolwidth.cutbool.CutBoolComparator;
 import graph.subsets.PosSubSet;
 import graph.Vertex;
+import util.Util;
 
 import java.util.ArrayList;
 
@@ -51,7 +52,16 @@ public class Greedy<V, E> {
 
         for (int i = 0; i < bag.getLeft().size(); i++) {
             if (initGreedyCheck(bag, swapSplit, newSplit, minNewBoolwidth)) {
-                if (this.useInitGreedyExitEarly) {
+                /*int minsize2 = 0;
+                if (toplevel) {
+                    minsize2 = Math.max(Util.divRoundUp(swapSplit.size(), 3), 1);
+                } else {
+                    minsize2 = Math.max(swapSplit.size() / 2, 1);
+                }*/
+                if (this.useInitGreedyExitEarly
+                        //swapSplit.getLeft().size() >= minsize2 &&
+                        //swapSplit.getRight().size() >= minsize2
+                        ) {
                     return newSplit.get(0);
                 }
             }

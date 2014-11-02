@@ -338,40 +338,44 @@ public class LocalSearchR<V, E> {
 
 			this.cmp.setUpperBound(decomposition_bw_lower_bound);
 
-			ArrayList<VertexSplit<V>> newsplits = tryToImproveCut(split, this.cmp,
-					getGraphBoolwidthUpperBound(), depth);
-			this.triesToImproveCut++;
+            // only if i > 0 so we can set INNER_SEARCHSTEPS to 1 to disable local search
+            if (i > 0) {
+                ArrayList<VertexSplit<V>> newsplits = tryToImproveCut(split, this.cmp,
+                        getGraphBoolwidthUpperBound(), depth);
+                this.triesToImproveCut++;
 
-			if (newsplits.isEmpty()) {
-				this.failsToImproveCut++;
-			}
+                if (newsplits.isEmpty()) {
+                    this.failsToImproveCut++;
+                }
 
-			// update current cut if the new one is different
-			for (int j = 0; j < newsplits.size(); j++) {
-				VertexSplit<V> newsplit = newsplits.get(j);
-				if (split.getLeft() != newsplit.getLeft()
-						&& split.getLeft() != newsplit.getRight()) {
+                // update current cut if the new one is different
+                for (int j = 0; j < newsplits.size(); j++) {
+                    VertexSplit<V> newsplit = newsplits.get(j);
+                    if (split.getLeft() != newsplit.getLeft()
+                            && split.getLeft() != newsplit.getRight()) {
 
-					// for downward search above bound to work
-					split.setLeft(newsplit.getLeft());
-					split.setRight(newsplit.getRight());
+                        // for downward search above bound to work
+                        split.setLeft(newsplit.getLeft());
+                        split.setRight(newsplit.getRight());
 
-				} else {
-					//assert false;
-				}
-			}
+                    } else {
+                        //assert false;
+                    }
+                }
 
-			// this cut may be closer to our goal, but won't improve the
-			// graph_boolwidth_upper_bound so there's no use splitting it
-			// further
-			if (CutBoolComparator.maxLeftRightCutBool(this.decomposition, split) >= getGraphBoolwidthUpperBound()) {
-				continue;
-			}
+                // this cut may be closer to our goal, but won't improve the
+                // graph_boolwidth_upper_bound so there's no use splitting it
+                // further
+                if (CutBoolComparator.maxLeftRightCutBool(this.decomposition, split) >= getGraphBoolwidthUpperBound()) {
+                    continue;
+                }
+            }
 
 			// choose who goes first. probably doesn't matter? select by size?
 			VertexSplit<V> first;
 			VertexSplit<V> second;
-			if (rnd.nextBoolean()) {
+            if (true) {
+            //if (rnd.nextBoolean()) {
 				first = split.getRight();
 				second = split.getLeft();
 			} else {
