@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.json.simple.JSONObject;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -14,9 +15,9 @@ import java.net.URISyntaxException;
  */
 public class HTTPResultsServer {
     HttpServer server = null;
+    int port = 8000;
 
     public HTTPResultsServer() {
-        int port = 8000;
         while (server == null || port > 8050) {
             try {
                 server = HttpServer.create(new InetSocketAddress(port), 0);
@@ -28,10 +29,15 @@ public class HTTPResultsServer {
         JSONObject test = new JSONObject();
         test.put("hello", "world");
         server.createContext("/", new HTTPResultsHandler(test));
+        String staticRelative = "/static";
+        File root = new File("..", "explorer");
+        server.createContext(staticRelative, new StaticFilesHandler(staticRelative, root));
         server.setExecutor(null); // creates a default executor
         server.start();
+    }
 
-        String url = String.format("http://localhost:%d/", port);
+    public void openBrowser(String page) {
+        String url = String.format("http://localhost:%d/%s", port, page);
         System.out.printf("Opening results server on %s\n", url);
         try {
             Desktop.getDesktop().browse(new URI(url));

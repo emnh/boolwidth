@@ -38,8 +38,9 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen6_6.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
 
         //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.1.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob/link.dgf";
@@ -57,7 +58,7 @@ public class GreedySearch {
 
         BaseDecompose gd = null;
 
-        switch (2) {
+        switch (3) {
             case 0:
                 gd = new BaseDecompose(graph);
                 break;
@@ -102,5 +103,6 @@ public class GreedySearch {
         HTTPResultsServer hrServer = new HTTPResultsServer();
         hrServer.addResult("decomposition", jsonDecomposition);
         hrServer.addResult("result", result);
+        hrServer.openBrowser("static/decomposition.html");
     }
 }
