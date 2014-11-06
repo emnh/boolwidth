@@ -86,7 +86,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen10_10.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/myciel7.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
 
@@ -99,7 +99,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/pr439.tsp.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
         if (args.length > 0) {
             fileName = args[0];
@@ -109,7 +109,7 @@ public class GreedySearch {
 
         BaseDecompose gd = null;
 
-        switch (6) {
+        switch (2) {
             case 0:
                 gd = new BaseDecompose(graph);
                 break;

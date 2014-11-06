@@ -297,9 +297,6 @@ public class CutBool {
 			}
 			// System.out.println("Number of neighbourhoods found so far: "+hoods.size());
 		}
-		for (PosSubSet<Vertex<V>> hood : hoods) {
-			System.out.printf("hood: %s\n", hood);
-		}
 		return hoods.size();
 	}
 

@@ -87,7 +87,7 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
 	}
 
 	public PosSubSet(IPosSet<TVertex> set) {
-		this.words = new long[(set.size() - 1) >> 64 + 1];
+		this.words = new long[(set.size() / Long.SIZE) + 1];
 		this.groundSet = set;
 	}
 

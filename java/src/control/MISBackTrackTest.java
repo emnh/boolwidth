@@ -4,6 +4,7 @@ import boolwidth.CutBool;
 import boolwidth.cutbool.*;
 import boolwidth.cutbool.ccmis_trial.CCMISRe;
 import boolwidth.cutbool.ccmis_trial.IndexGraph;
+import boolwidth.opencl.OpenCLCutBoolComputer;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Edge;
@@ -35,9 +36,9 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/jean.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
-        fileNames.clear();
+        fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf");
         //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
-        fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-3x3.dimacs");
+        //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
 
         //fileNames.clear();
         //fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf");
@@ -144,7 +145,7 @@ public class MISBackTrackTest {
 
         BiGraph<Integer, String> bigraphdup = new BiGraph<>(graph);
 
-        final int sampleCount = 10000;
+        final int sampleCount = 1024;
         long bw = 0;
         long est;
         boolean test = true;
@@ -169,11 +170,15 @@ public class MISBackTrackTest {
         System.out.printf("Eivind CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 */
 
-        ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
+        /*ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
         System.out.printf("Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         ret = doBenchMark(() -> CBBackTrackEstimateBinaryFast.estimateNeighborhoods(bigraph, sampleCount), test);
-        System.out.printf("Fast Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        System.out.printf("Fast Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);*/
+
+        OpenCLCutBoolComputer.initialize();
+        ret = doBenchMark(() -> OpenCLCutBoolComputer.estimateNeighbourHoods(bigraph, sampleCount), test);
+        System.out.printf("OpenCL Approx CB (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         /*
         ret = doBenchMark(() -> CCMISApprox.BoolDimBranch(convertSadiaBiGraph(bigraph), sampleCount), test);

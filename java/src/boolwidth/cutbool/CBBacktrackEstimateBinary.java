@@ -139,12 +139,12 @@ public class CBBacktrackEstimateBinary<V> {
     public static <V, E> long estimateNeighborhoods(BiGraph<V, E> g, int sampleCount) {
 
         CBBacktrackEstimateBinary<V> state = new CBBacktrackEstimateBinary<V>();
-        state.rowCount = g.numLeftVertices();
-        state.colCount = g.numRightVertices();
+        state.rowCount = g.numRightVertices();
+        state.colCount = g.numLeftVertices();
         state.sample = new int[state.colCount];
-        state.groundSet = new PosSet<Vertex<V>>(g.rightVertices());
+        state.groundSet = new PosSet<Vertex<V>>(g.leftVertices());
         state.bmat = new ArrayList<PosSubSet<Vertex<V>>>();
-        for (Vertex<V> node : g.leftVertices()) {
+        for (Vertex<V> node : g.rightVertices()) {
             PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(state.groundSet, g.incidentVertices(node));
             if (neighbors.size() > 0) {
                 state.bmat.add(neighbors);
