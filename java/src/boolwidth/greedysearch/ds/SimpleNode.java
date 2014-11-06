@@ -1,4 +1,4 @@
-package boolwidth.greedysearch;
+package boolwidth.greedysearch.ds;
 
 /**
  * Created by emh on 10/30/2014.

@@ -20,7 +20,10 @@ $graphs | % {
   if (!(Test-Path $LogName)) {
     Write-Output "not done: $FileName"
   } else {
-    $timeline = gc $LogName | select-string '{ "time.*"BW":'
+    $timeline = & {
+      gc $LogName | select-string '{ "time.*"BW":'
+      gc $LogName | select-string '^time:'
+      }
     if ($timeline.length -eq 0) {
       #Write-Output "failed graph: $FileName"
     } else {

@@ -31,7 +31,9 @@ public class VSubSet extends SubSet<IndexVertex> implements IVSet {
         }
 
         public void remove() {
-            throw new UnsupportedOperationException("remove");
+            //System.out.printf("removing: %d\n", i);
+            if (i >= 0) subset.clear(i);
+            //throw new UnsupportedOperationException("remove");
         }
     }
 

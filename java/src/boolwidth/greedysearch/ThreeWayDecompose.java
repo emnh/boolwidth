@@ -1,5 +1,6 @@
 package boolwidth.greedysearch;
 
+import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import com.github.krukow.clj_lang.PersistentVector;
 import graph.Vertex;
 import interfaces.IGraph;

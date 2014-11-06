@@ -142,7 +142,7 @@ public class CBBacktrackEstimateBinary<V> {
         state.rowCount = g.numLeftVertices();
         state.colCount = g.numRightVertices();
         state.sample = new int[state.colCount];
-        state.groundSet = new PosSet<Vertex<V>>(g.vertices());
+        state.groundSet = new PosSet<Vertex<V>>(g.rightVertices());
         state.bmat = new ArrayList<PosSubSet<Vertex<V>>>();
         for (Vertex<V> node : g.leftVertices()) {
             PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(state.groundSet, g.incidentVertices(node));
@@ -155,6 +155,7 @@ public class CBBacktrackEstimateBinary<V> {
         long sum = 0;
         for (int i = 0; i < sampleCount; i++) {
             long est = union_sample(state);
+            //System.out.printf("est: %d\n", est);
             sum += est;
         }
         long average = sum / sampleCount;

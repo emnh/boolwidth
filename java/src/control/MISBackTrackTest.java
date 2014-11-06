@@ -35,13 +35,15 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/jean.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
-        //fileNames.clear();
-        fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
+        fileNames.clear();
+        //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
+        fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-3x3.dimacs");
 
         //fileNames.clear();
+        //fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf");
         //fileNames.add(ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs");
 
-        JITWarmUp();
+        //JITWarmUp();
 
         for (String file : fileNames) {
             System.out.println(file);
@@ -142,10 +144,10 @@ public class MISBackTrackTest {
 
         BiGraph<Integer, String> bigraphdup = new BiGraph<>(graph);
 
-        final int sampleCount = 100;
+        final int sampleCount = 10000;
         long bw = 0;
         long est;
-        boolean test = false;
+        boolean test = true;
 
         BenchmarkResult ret;
 
@@ -159,18 +161,23 @@ public class MISBackTrackTest {
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
+        /*
         ret = doBenchMark(() -> CCMISStack.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Explicit Stack CCMIS (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         ret = doBenchMark(() -> CCMISRe.BoolDimBranch(new IndexGraph(bigraph)), test);
         System.out.printf("Eivind CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+*/
+
+        ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
+        System.out.printf("Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        ret = doBenchMark(() -> CBBackTrackEstimateBinaryFast.estimateNeighborhoods(bigraph, sampleCount), test);
+        System.out.printf("Fast Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         /*
         ret = doBenchMark(() -> CCMISApprox.BoolDimBranch(convertSadiaBiGraph(bigraph), sampleCount), test);
         System.out.printf("Approx CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
-
-        ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
-        System.out.printf("Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 
         est = MISBackTrack.countNeighborhoods(bigraph);
         System.out.printf("MIS backtrack (%dms): %d\n", duration, est);

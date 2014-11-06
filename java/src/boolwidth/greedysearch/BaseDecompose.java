@@ -1,8 +1,10 @@
 package boolwidth.greedysearch;
 
 import boolwidth.CutBool;
+import boolwidth.cutbool.CBBacktrackEstimateBinary;
 import boolwidth.cutbool.CutBoolComparatorCCMIS;
-import com.github.krukow.clj_lang.PersistentVector;
+import boolwidth.greedysearch.ds.ImmutableBinaryTree;
+import boolwidth.greedysearch.ds.SimpleNode;
 import graph.BiGraph;
 import graph.Vertex;
 import interfaces.IGraph;
@@ -10,6 +12,7 @@ import sadiasrc.decomposition.CCMIS;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.ToLongFunction;
 
 /**
  * Created by emh on 11/2/2014.
@@ -24,6 +27,7 @@ public class BaseDecompose {
     long start;
     long oldPrint;
     static final int PRINT_INTERVAL = 1000;
+    static final int SAMPLE_COUNT = 10;
 
     public BaseDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         this.graph = graph;
@@ -60,6 +64,14 @@ public class BaseDecompose {
         return cb;
     }
 
+    public HashSet<Integer> verticesToInts(Collection<Vertex<Integer>> vertices) {
+        HashSet<Integer> set = new HashSet<>();
+        for (Vertex<Integer> vertex : vertices) {
+            set.add(vertex.id());
+        }
+        return set;
+    }
+
     public long getCutBool(Collection<Vertex<Integer>> vertices, boolean signature_flag) {
         HashSet<Integer> set = new HashSet<>();
         for (Vertex<Integer> vertex : vertices) {
@@ -89,12 +101,22 @@ public class BaseDecompose {
         return cb;
     }
 
-    public long getFunkyBooleanWidth(ImmutableBinaryTree ibt) {
+    public long getApproximateCutBool(Collection<Integer> vertexIDs) {
+        ArrayList<Vertex<Integer>> lefts = new ArrayList<>();
+        for (Integer id : vertexIDs) {
+            lefts.add(graph.getVertex(id));
+        }
+        BiGraph<Integer, String> bg = new BiGraph<>(lefts, graph);
+        long cb = CBBacktrackEstimateBinary.estimateNeighborhoods(bg, SAMPLE_COUNT);
+        return cb;
+    }
+
+    public long getBooleanWidth(ImmutableBinaryTree ibt, ToLongFunction<HashSet<Integer>> fgetCutBool) {
         final long[] maxCutBool = {0};
 
         ibt.dfs((parent, node) -> {
-            HashSet<Integer> lefts = new HashSet<>(ibt.getChildren(parent, node));
-            long cutbool = getFunkyCutBool(ibt, lefts);
+            HashSet<Integer> vertexIDs = new HashSet<>(ibt.getChildren(parent, node));
+            long cutbool = fgetCutBool.applyAsLong(vertexIDs);
             if (cutbool > maxCutBool[0]) {
                 maxCutBool[0] = cutbool;
             }
@@ -103,18 +125,16 @@ public class BaseDecompose {
         return maxCutBool[0];
     }
 
+    public long getFunkyBooleanWidth(ImmutableBinaryTree ibt) {
+        return getBooleanWidth(ibt, (lefts) -> getFunkyCutBool(ibt, lefts));
+    }
+
     public long getBooleanWidth(ImmutableBinaryTree ibt) {
-        final long[] maxCutBool = {0};
+        return getBooleanWidth(ibt, (lefts) -> getCutBool(lefts));
+    }
 
-        ibt.dfs((parent, node) -> {
-            HashSet<Integer> vertexIDs = new HashSet<>(ibt.getChildren(parent, node));
-            long cutbool = getCutBool(vertexIDs);
-            if (cutbool > maxCutBool[0]) {
-                maxCutBool[0] = cutbool;
-            }
-        });
-
-        return maxCutBool[0];
+    public long getApproximateBooleanWidth(ImmutableBinaryTree ibt) {
+        return getBooleanWidth(ibt, (lefts) -> getApproximateCutBool(lefts));
     }
 
     public static double getLogBooleanWidth(long bw) {

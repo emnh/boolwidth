@@ -1,5 +1,7 @@
 package boolwidth.greedysearch;
 
+import boolwidth.greedysearch.ds.ImmutableBinaryTree;
+import boolwidth.greedysearch.ds.SimpleNode;
 import graph.Vertex;
 import interfaces.IGraph;
 

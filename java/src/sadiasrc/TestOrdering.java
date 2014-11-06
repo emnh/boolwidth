@@ -29,11 +29,19 @@ import sadiasrc.decomposition.Caterpiller;
 
 public class TestOrdering {
 
+    public static String logBW(long bw) {
+        return String.format("%.2f", Math.log(bw)/Math.log(2.0));
+    }
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String fileName =  ControlInput.GRAPHLIB+"delauney/pr299.tsp-pp.dgf";
+		//String fileName =  ControlInput.GRAPHLIB+"delauney/pr299.tsp-pp.dgf";
+        //String fileName =  ControlInput.GRAPHLIB+"coloring/queen10_10.dgf";
+        //String fileName =  ControlInput.GRAPHLIB+"coloring/david.dgf";
+        String fileName =  ControlInput.GRAPHLIB+"coloring/myciel7.dgf";
+        //String fileName =  ControlInput.GRAPHLIB+"coloring/homer.dgf";
 	
 		//String fileName =  ControlInput.GRAPHLIB+"p_hat/p_hat1500-1.graph.mis.sadia";
 		//String fileName =  ControlInput.GRAPHLIB+"DIMACS_PP/gen200_p01.graph.mis.sadia";
@@ -108,26 +116,28 @@ public class TestOrdering {
 		
 			IChooser chooser;
 		
-		/*	start1=System.currentTimeMillis();
+			start1=System.currentTimeMillis();
 			chooser = new Symmdiff(G);
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);
 			System.out.println("Ordered Sequence: "+OrderedSequence);	
 			end1=System.currentTimeMillis();
 			System.out.println("Time taken: "+ (end1-start1)+ " ms");
-			
+
+
 		//	result += "Symdiff "+ " "+ (end1-start1)+ " ";
 			
-			start=System.currentTimeMillis();
+/*			start=System.currentTimeMillis();
 			maxis =IndependentSet.linIS(G, OrderedSequence);
 			end=System.currentTimeMillis();
 			System.out.println("Independent Set : "+ maxis+ " time taken : "+ (end-start)+ " ms");
 			
 			result += "MIS"+ " "+ (maxis+taken_in_MIS)+" "+(end-start)+ " ";
-			
+			*/
+
 			start=System.currentTimeMillis();
 			UBfromCP=caterpiller.getLinearBooleanWidth(OrderedSequence, G);
 			end=System.currentTimeMillis();
-			System.out.println("UB : "+UBfromCP+" from SymmDiff Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from SymmDiff Time taken: "+ (end-start)+ " ms");
 			
 			result +=  "Without Start "+UBfromCP;//+ " "+ (end-start)+ " ";
 			
@@ -145,14 +155,14 @@ public class TestOrdering {
 			start=System.currentTimeMillis();
 			UBfromCP=caterpiller.getLinearBooleanWidth(OrderedSequence, G);
 			end=System.currentTimeMillis();
-			System.out.println("UB : "+UBfromCP+" from SymmDiff Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from SymmDiff Time taken: "+ (end-start)+ " ms");
 			
 			result += "  With Sv mindeg "+ UBfromCP ;//+ " "+ (end-start)+ " ";*/
 			
 			
 			
 			
-		/*	start1=System.currentTimeMillis();
+			start1=System.currentTimeMillis();
 			chooser = new GrowNeighborhood(G);
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);
 			System.out.println("Ordered Sequence: "+OrderedSequence);	
@@ -164,7 +174,7 @@ public class TestOrdering {
 			start=System.currentTimeMillis();
 			UBfromCP=caterpiller.getLinearBooleanWidth(OrderedSequence, G);
 			end=System.currentTimeMillis();
-			System.out.println("UB : "+UBfromCP+" from GrowNeighbourhood Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from GrowNeighbourhood Time taken: "+ (end-start)+ " ms");
 			
 			result += UBfromCP+ " "+ (end-start)+ " ";
 			start1=System.currentTimeMillis();
@@ -172,16 +182,16 @@ public class TestOrdering {
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);
 			System.out.println("Ordered Sequence: "+OrderedSequence);	
 			end1=System.currentTimeMillis();
-			System.out.println("Time taken: "+ (end1-start1)+ " ms");*/
+			System.out.println("Time taken: "+ (end1-start1)+ " ms");
 			
 			//result += "Grwnghbr "+ " "+ (end1-start1)+ " ";
 			
-	/*		start=System.currentTimeMillis();
+			start=System.currentTimeMillis();
 			UBfromCP=caterpiller.getLinearBooleanWidth(OrderedSequence, G);
 			end=System.currentTimeMillis();
-			System.out.println("UB : "+UBfromCP+" from GrowNeighbourhood Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from GrowNeighbourhood Time taken: "+ (end-start)+ " ms");
 			
-			result += UBfromCP+ " "+ (end-start)+ " ";*/
+			result += UBfromCP+ " "+ (end-start)+ " ";
 			
 			
 			/*start=System.currentTimeMillis();
@@ -203,7 +213,7 @@ public class TestOrdering {
 		
 			
 			
-		/*	start=System.currentTimeMillis();
+			start=System.currentTimeMillis();
 			chooser = new GreeedyInit(G);
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);
 			System.out.println("Ordered Sequence: "+OrderedSequence);	
@@ -212,7 +222,7 @@ public class TestOrdering {
 			
 			result += "Greedy "+ " "+ (end-start)+ " ";
 			UBfromCP=chooser.getUB();
-			System.out.println("UB : "+UBfromCP+" from GreedyInit Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from GreedyInit Time taken: "+ (end-start)+ " ms");
 			
 			result += UBfromCP;
 			
@@ -226,9 +236,9 @@ public class TestOrdering {
 			
 			result += "Greedy "+ " "+ (end-start)+ " ";
 			UBfromCP=chooser.getUB();
-			System.out.println("UB : "+UBfromCP+" from GreedyInit Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from GreedyInit Time taken: "+ (end-start)+ " ms");
 			
-			result += UBfromCP;*/
+			result += UBfromCP;
 		
 			
 		/*	start=System.currentTimeMillis();
@@ -252,7 +262,7 @@ public class TestOrdering {
 			start=System.currentTimeMillis();
 			UBfromCP=caterpiller.getLinearBooleanWidth(OrderedSequence, G);
 			end=System.currentTimeMillis();
-			System.out.println("UB : "+df.format(Math.log(UBfromCP/(Math.log(2))))+" from runtimeOrder Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from runtimeOrder Time taken: "+ (end-start)+ " ms");
 			
 			result += UBfromCP+ " "+ (end-start)+ " ";
 			

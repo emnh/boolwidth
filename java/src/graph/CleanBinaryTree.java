@@ -672,6 +672,11 @@ public class CleanBinaryTree<TVertex extends BinNode<TVertex, V>, V, E> extends
                 "The method IGraph<TVertex,V,E>.incidentVertices is not yet implemented");
     }
 
+    @Override
+    public int degree(TVertex v) {
+        throw new UnsupportedOperationException();
+    }
+
     // //TODO: isn't this just the default for iterables? remove?
 	// private String print(N element) {
 	// String s = "";

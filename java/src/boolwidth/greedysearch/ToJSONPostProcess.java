@@ -1,5 +1,6 @@
 package boolwidth.greedysearch;
 
+import boolwidth.greedysearch.ds.SimpleNode;
 import org.json.simple.JSONObject;
 
 /**

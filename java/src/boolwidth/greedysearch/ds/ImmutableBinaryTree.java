@@ -1,5 +1,7 @@
-package boolwidth.greedysearch;
+package boolwidth.greedysearch.ds;
 
+import boolwidth.greedysearch.ToJSONPostProcess;
+import boolwidth.greedysearch.Util;
 import com.github.krukow.clj_lang.PersistentHashSet;
 import com.github.krukow.clj_lang.PersistentVector;
 import org.json.simple.JSONObject;

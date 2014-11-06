@@ -92,4 +92,7 @@ public interface IGraph<TVertex extends Vertex<V>, V, E> extends
 
     /** Returns neighbours **/
     public Collection<TVertex> incidentVertices(TVertex v) throws InvalidPositionException;
+
+    /** Return the degree of a given vertex. Running time: O(1) */
+    public int degree(TVertex v);
 }

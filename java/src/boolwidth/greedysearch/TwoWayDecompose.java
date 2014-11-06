@@ -1,5 +1,7 @@
 package boolwidth.greedysearch;
 
+import boolwidth.greedysearch.ds.ImmutableBinaryTree;
+import boolwidth.greedysearch.ds.SimpleNode;
 import graph.Vertex;
 import interfaces.IGraph;
 
@@ -9,6 +11,7 @@ import java.util.HashMap;
 /**
  * Created by emh on 11/2/2014.
  */
+
 public class TwoWayDecompose extends BaseDecompose {
 
     public TwoWayDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {

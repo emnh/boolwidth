@@ -488,4 +488,9 @@ public class Decomposition<TVertex extends DNode<TVertex, V>, V, E> extends
         throw new UnsupportedOperationException(
                 "The method IGraph<TVertex,V,E>.incidentVertices is not yet implemented");
     }
+
+    @Override
+    public int degree(TVertex v) {
+        throw new UnsupportedOperationException();
+    }
 }

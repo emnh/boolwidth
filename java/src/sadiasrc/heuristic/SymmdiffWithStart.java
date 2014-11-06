@@ -26,9 +26,9 @@ public class SymmdiffWithStart extends AbstractChooser implements IChooser{
 		if(N_LEFT.isEmpty())
 		{
 		    System.out.println("Start vertex chosen ");
-//			choosen = BasicGraphAlgorithms.BFS(G,RIGHT.iterator().next());
-//			choosen = BasicGraphAlgorithms.BFS(G,choosen);
-		    choosen= G.MinDegreeVertex(RIGHT);
+			choosen = BasicGraphAlgorithms.BFS(G,RIGHT.iterator().next());
+			choosen = BasicGraphAlgorithms.BFS(G,choosen);
+		    //choosen= G.MinDegreeVertex(RIGHT);
 			return choosen;
 		}
 
