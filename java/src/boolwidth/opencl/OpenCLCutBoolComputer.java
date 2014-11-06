@@ -19,26 +19,24 @@ import static org.bridj.Pointer.*;
 
 public class OpenCLCutBoolComputer {
 
-    CLContext context = JavaCL.createBestContext();
-    CLQueue queue = context.createDefaultQueue();
-    ByteOrder byteOrder = context.getByteOrder();
+    static OpenCLCutBoolComputer cache = null;
+    String src = null;
+    CLContext context;
+    ByteOrder byteOrder;
     CLProgram program;
     CLKernel addFloatsKernel;
-    static OpenCLCutBoolComputer cache = null;
-
 
     public OpenCLCutBoolComputer() {
         // Read the program sources and compile them :
-        String src = null;
         try {
             src = IOUtils.readText(OpenCLCutBoolComputer.class.getResource("TutorialKernels.cl"));
         } catch (IOException e) {
             System.out.println("failed to locate OpenCL kernel TutorialKernels.cl");
             System.exit(-1);
         }
-        program = context.createProgram(src);
-
-        // Get and call the kernel :
+        context = JavaCL.createBestContext();
+        byteOrder = context.getByteOrder();
+        program = context.createProgram(src).build();
         addFloatsKernel = program.createKernel("count_hoods");
     }
 
@@ -56,7 +54,7 @@ public class OpenCLCutBoolComputer {
     public <V, E> long estimateNeighbourHoods2(BiGraph<V, E> bigraph, int sampleCount) {
         // prepare data
         ArrayList<PosSubSet<Vertex<V>>> bmat = new ArrayList<>();
-        PosSet<Vertex<V>> groundSet = new PosSet<>(bigraph.leftVertices());
+        PosSet<Vertex<V>> groundSet = new PosSet<>(bigraph.vertices()); // TODO: highly inefficient, but must be so to deal with cumbersome bigraph ids
         for (Vertex<V> node : bigraph.rightVertices()) {
             PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(groundSet, bigraph.incidentVertices(node));
             bmat.add(neighbors);
@@ -64,13 +62,13 @@ public class OpenCLCutBoolComputer {
 
         // OpenCL stuff
         int rowCount = bigraph.numRightVertices();
-        int colCount = bigraph.numLeftVertices();
+        int colCount = bigraph.numVertices(); // TODO: highly inefficient, but must be so to deal with cumbersome bigraph ids
         if (rowCount == 0 || colCount == 0) return 1;
         //int colWordCount = (colCount / Long.SIZE) + 1;
         int colWordCount = bmat.get(0).getWords().length;
         Pointer<Long> mat = allocateLongs(rowCount * colWordCount).order(byteOrder);
         Pointer<Long> randoms = allocateLongs(sampleCount * colWordCount).order(byteOrder);
-        //Pointer<Integer> randomShuffles = allocateInts(sampleCount * colCount).order(byteOrder);
+        Pointer<Integer> randomShuffles = allocateInts(sampleCount * colCount).order(byteOrder);
         Pointer<Long> outPtrPre = allocateLongs(sampleCount).order(byteOrder);
         Pointer<Long> resultsPtrPre = allocateLongs(2).order(byteOrder);
         int i = 0;
@@ -97,17 +95,17 @@ public class OpenCLCutBoolComputer {
         for (int j = 0; j < colCount; j++) {
             base.add(j);
         }
-        /*for (i = 0; i < sampleCount; i++) {
+        for (i = 0; i < sampleCount; i++) {
             Collections.shuffle(base);
             for (int j = 0; j < colCount; j++) {
                 randomShuffles.set(i * colCount + j, base.get(j));
             }
-        }*/
+        }
 
         // Create OpenCL input buffers (using the native memory pointers aPtr and bPtr) :
         CLBuffer<Long> bufmat = context.createBuffer(CLMem.Usage.Input, mat);
         CLBuffer<Long> bufrandoms = context.createBuffer(CLMem.Usage.Input, randoms);
-        //CLBuffer<Integer> bufrandomShuffles = context.createBuffer(CLMem.Usage.Input, randomShuffles);
+        CLBuffer<Integer> bufrandomShuffles = context.createBuffer(CLMem.Usage.Input, randomShuffles);
 
         // Create an OpenCL output buffer :
         CLBuffer<Long> out = context.createBuffer(CLMem.Usage.Output, outPtrPre);
@@ -115,13 +113,28 @@ public class OpenCLCutBoolComputer {
 
         long start = System.currentTimeMillis();
         addFloatsKernel.setArgs(
-                bufrandoms, bufmat, colCount, rowCount, colWordCount, out, resultsBuffer,
+                bufrandoms, bufrandomShuffles, bufmat, colCount, rowCount, colWordCount, out, resultsBuffer,
                 sampleCount,
                 LocalSize.ofLongArray(colWordCount), LocalSize.ofLongArray(colWordCount), LocalSize.ofLongArray(colWordCount));
+
+        CLQueue queue = context.createDefaultQueue();
         CLEvent addEvt = addFloatsKernel.enqueueNDRange(queue, new int[]{sampleCount}, new int[]{1});
 
         ReductionUtils.Reductor<Long> reductor = ReductionUtils.createReductor(context, ReductionUtils.Operation.Add, OpenCLType.Long, 1);
         long estimate = reductor.reduce(queue, out).get();
+
+        queue.finish();
+        queue.release();
+        bufmat.release();
+        bufrandoms.release();
+        bufrandomShuffles.release();
+        out.release();
+        resultsBuffer.release();
+        addEvt.release();
+
+        /*addFloatsKernel.release();
+        program.release();
+        context.release();*/
 
         //Pointer<Long> outPtr = out.read(queue, addEvt); // blocks until add_floats finished
         //Pointer<Long> resultsPtr = resultsBuffer.read(queue, addEvt); // blocks until add_floats finished

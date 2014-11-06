@@ -1,5 +1,7 @@
 package boolwidth.cutbool;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import graph.*;
 import graph.subsets.PosSet;
 import graph.subsets.PosSubSet;
@@ -18,6 +20,7 @@ public class CBBacktrackEstimateBinary<V> {
     int estimate;
     int position;
     int[] sample;
+    //BiMap<Integer, Vertex<V>> leftIDMap;
 
     PosSet<Vertex<V>> groundSet;
     ArrayList<PosSubSet<Vertex<V>>> bmat;
@@ -36,6 +39,7 @@ public class CBBacktrackEstimateBinary<V> {
         this.position = b.position;
         this.groundSet = b.groundSet;
         this.bmat = b.bmat;
+        //this.leftIDMap = b.leftIDMap;
     }
 
     static final int QVAL = -1; // question mark (free position in sample)
@@ -140,12 +144,18 @@ public class CBBacktrackEstimateBinary<V> {
 
         CBBacktrackEstimateBinary<V> state = new CBBacktrackEstimateBinary<V>();
         state.rowCount = g.numRightVertices();
-        state.colCount = g.numLeftVertices();
+        state.colCount = g.numVertices(); // TODO: highly inefficient, but must be so to deal with cumbersome bigraph ids
         state.sample = new int[state.colCount];
-        state.groundSet = new PosSet<Vertex<V>>(g.leftVertices());
+        //state.leftIDMap = HashBiMap.create(g.numLeftVertices());
+        state.groundSet = new PosSet<Vertex<V>>(g.vertices());
         state.bmat = new ArrayList<PosSubSet<Vertex<V>>>();
+        //int i = 0;
+        /*for (Vertex<V> node : g.leftVertices()) {
+            state.leftIDMap.put(i, node);
+        }*/
         for (Vertex<V> node : g.rightVertices()) {
-            PosSubSet<Vertex<V>> neighbors = new PosSubSet<Vertex<V>>(state.groundSet, g.incidentVertices(node));
+            //System.out.printf("incident: %s\n", g.incidentVertices(node));
+            PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(state.groundSet, g.incidentVertices(node));
             if (neighbors.size() > 0) {
                 state.bmat.add(neighbors);
             }

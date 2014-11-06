@@ -36,6 +36,7 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/jean.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
+        fileNames.clear();
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf");
         //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
         //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
@@ -138,9 +139,13 @@ public class MISBackTrackTest {
         AdjacencyListGraph<Vertex<Integer>, Integer, String> graph = new AdjacencyListGraph.D<Integer, String>();
         DiskGraph.readGraph(fileName, graph);
         ArrayList<Vertex<Integer>> lefts = new ArrayList<Vertex<Integer>>();
-        for (int i = 0; i < graph.numVertices() / 2; i++) {
+        int[] queen88a = new int[] {0,32,1,4,36,37,6,38,7,8,9,43,12,14,46,47,48,17,50,19,51,20,21,25,26,58,27,61,31};
+        for (int i : queen88a) {
             lefts.add(graph.getVertex(i));
         }
+        /*for (int i = 0; i < graph.numVertices() / 2; i++) {
+            lefts.add(graph.getVertex(i));
+        }*/
         BiGraph<Integer, String> bigraph = new BiGraph<>(lefts, graph);
 
         BiGraph<Integer, String> bigraphdup = new BiGraph<>(graph);
@@ -148,19 +153,19 @@ public class MISBackTrackTest {
         final int sampleCount = 1024;
         long bw = 0;
         long est;
-        boolean test = true;
+        boolean test = false;
 
         BenchmarkResult ret;
 
         ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
-        System.out.printf("UNN (bigraph) (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        System.out.printf("UNN (bigraph) (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
         /*
         ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(graph), test);
         System.out.printf("MIS backtrack persistent (%dms): %d\n", ret.eachDuration(), ret.returnValue);
         */
 
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
-        System.out.printf("Sadia CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         /*
         ret = doBenchMark(() -> CCMISStack.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
@@ -170,15 +175,15 @@ public class MISBackTrackTest {
         System.out.printf("Eivind CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
 */
 
-        /*ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
-        System.out.printf("Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        ret = doBenchMark(() -> CBBacktrackEstimateBinary.estimateNeighborhoods(bigraph, sampleCount), test);
+        System.out.printf("Approx CB backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         ret = doBenchMark(() -> CBBackTrackEstimateBinaryFast.estimateNeighborhoods(bigraph, sampleCount), test);
-        System.out.printf("Fast Approx CB backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);*/
+        System.out.printf("Fast Approx CB backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         OpenCLCutBoolComputer.initialize();
         ret = doBenchMark(() -> OpenCLCutBoolComputer.estimateNeighbourHoods(bigraph, sampleCount), test);
-        System.out.printf("OpenCL Approx CB (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+        System.out.printf("OpenCL Approx CB (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         /*
         ret = doBenchMark(() -> CCMISApprox.BoolDimBranch(convertSadiaBiGraph(bigraph), sampleCount), test);

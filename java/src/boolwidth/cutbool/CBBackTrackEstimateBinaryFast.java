@@ -43,8 +43,8 @@ public class CBBackTrackEstimateBinaryFast<V, E> {
     Random rnd;
 
     PosSet<Vertex<V>> groundSet;
-    ArrayList<PosSubSet<Vertex<V>>> neighboursOfRight;
-    ArrayList<PosSubSet<Vertex<V>>> neighboursOfLeft;
+    HashMap<Vertex<V>, PosSubSet<Vertex<V>>> neighboursOfLeft;
+    HashMap<Vertex<V>, PosSubSet<Vertex<V>>> neighboursOfRight;
     //PosSubSet<Vertex<V>> binSample = new PosSubSet<Vertex<V>>(state.groundSet);
     //PosSubSet<Vertex<V>> mask = new PosSubSet<Vertex<V>>(state.groundSet);
 
@@ -117,26 +117,27 @@ public class CBBackTrackEstimateBinaryFast<V, E> {
             }
 
             // for 1, only need to check that this position is good
-            int validCount = state.neighboursOfRight.get(newposition).subtract(leftInvalidSS).size();
+            int validCount = state.neighboursOfRight.get(state.bigraph.getVertex(state.rightIDMap.inverse().get(newposition))).subtract(leftInvalidSS).size();
             if (validCount == 0) {
                 isPartialHood1 = 0;
             }
 
             // invalidate left neighbors of vertex at right newposition in the 0 case
-            Collection<Vertex<V>> neighbours = state.bigraph.incidentVertices(state.bigraph.getVertex(state.rightIDMap.inverse().get(newposition)));
+            //state.bigraph.incidentVertices(state.bigraph.getVertex(state.rightIDMap.inverse().get(newposition)));
+            Collection<Vertex<V>> neighbours = state.neighboursOfRight.get(state.bigraph.getVertex(state.rightIDMap.inverse().get(newposition)));
 
             PosSubSet<Vertex<V>> invalidNeighbours = new PosSubSet<>(state.groundSet);
             for (Vertex<V> v : neighbours) {
                 newstate0.leftInvalid = newstate0.leftInvalid.cons(v.id());
-                leftInvalidSS.add(state.bigraph.getVertex(v.id()));
-                invalidNeighbours = invalidNeighbours.union(state.neighboursOfLeft.get(v.id()));
+                leftInvalidSS.add(v);
+                invalidNeighbours = invalidNeighbours.union(state.neighboursOfLeft.get(v));
             }
 
             //for (int i = 0; i < newsample0.size(); i++) {
             for (Vertex<V> v : invalidNeighbours) {
                 int i = state.rightIDMap.get(v.id());
                 if (newsample0.nth(i) == 1) {//&& invalidNeighbours.contains(state.bigraph.getVertex(state.rightIDMap.inverse().get(i)))) {
-                    validCount = state.neighboursOfRight.get(i).subtract(leftInvalidSS).size();
+                    validCount = state.neighboursOfRight.get(v).subtract(leftInvalidSS).size();
                     if (validCount == 0) {
                         isPartialHood0 = 0;
                         break;
@@ -178,18 +179,18 @@ public class CBBackTrackEstimateBinaryFast<V, E> {
         state.colCount = g.numRightVertices();
         state.sample = PersistentVector.create();
         state.groundSet = new PosSet<>(g.vertices());
-        state.neighboursOfLeft = new ArrayList<>();
-        state.neighboursOfRight = new ArrayList<>();
+        state.neighboursOfLeft = new HashMap<>();
+        state.neighboursOfRight = new HashMap<>();
         state.bigraph = g;
         state.rnd = new java.util.Random();
 
         for (Vertex<V> node : g.leftVertices()) {
             PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(state.groundSet, g.incidentVertices(node));
-            state.neighboursOfLeft.add(neighbors);
+            state.neighboursOfLeft.put(node, neighbors);
         }
         for (Vertex<V> node : g.rightVertices()) {
             PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(state.groundSet, g.incidentVertices(node));
-            state.neighboursOfRight.add(neighbors);
+            state.neighboursOfRight.put(node, neighbors);
         }
         for (int c = 0; c < state.colCount; c++) {
             state.sample = state.sample.cons(QVAL);

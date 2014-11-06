@@ -636,4 +636,8 @@ public class CutBool {
 		return ret;
 	}
 
+	public static double getLogBW(long bw) {
+		return Math.log(bw) / Math.log(2.0);
+	}
+
 }

@@ -37,9 +37,10 @@ public class TwoWayDecompose extends BaseDecompose {
             //final Split childSplit2 = childSplit;
             split = oldsplit.decomposeAdvance((newlefts, tomove) -> {
                 //final long cb1 = childSplit2.getNewCutBoolWithAddedVertex(tomove);
-                long cb2 = getApproximateCutBool(verticesToInts(newlefts)); //measureCut.applyAsLong(lefts, null);
-                System.out.printf("bw: %.2f\n", getLogBooleanWidth(cb2));
-                //final long cb2 = this.getCutBool(newlefts, true);
+                long cbapx = getApproximateCutBool(verticesToInts(newlefts)); //measureCut.applyAsLong(lefts, null);
+                final long cb2 = this.getCutBool(newlefts, true);
+                System.out.printf("~bw: %.2f, bw: %.2f\n", getLogBooleanWidth(cbapx), getLogBooleanWidth(cb2));
+
                 /*rateLimitedPrint((time) ->
                     System.out.printf("time: %d, logcb1, logcb2, cb1, cb2: %.2f, %.2f, %d, %d\n",
                         time, getLogBooleanWidth(cb1), getLogBooleanWidth(cb2), cb1, cb2));
