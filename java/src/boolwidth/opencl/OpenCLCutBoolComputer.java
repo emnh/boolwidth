@@ -1,5 +1,6 @@
 package boolwidth.opencl;
 
+import boolwidth.CutBool;
 import com.nativelibs4java.opencl.*;
 import com.nativelibs4java.opencl.util.*;
 import com.nativelibs4java.util.*;
@@ -48,7 +49,22 @@ public class OpenCLCutBoolComputer {
 
     public static <V, E> long estimateNeighbourHoods(BiGraph<V, E> bigraph, int sampleCount) {
         initialize();
-        return cache.estimateNeighbourHoods2(bigraph, sampleCount);
+        int tries = 5;
+        Error last = null;
+        while (tries > 0) {
+            try {
+                long bw = cache.estimateNeighbourHoods2(bigraph, sampleCount);
+                System.out.printf("computing cutbool %d/%d: %d: %.2f\n",
+                        bigraph.numLeftVertices(), bigraph.numVertices(),
+                        bw, CutBool.getLogBW(bw));
+                return bw;
+            } catch (Error e) {
+                System.out.printf("openCL failed: %s\n", e);
+                tries--;
+                last = e;
+            }
+        }
+        throw last;
     }
 
     public <V, E> long estimateNeighbourHoods2(BiGraph<V, E> bigraph, int sampleCount) {
@@ -68,7 +84,7 @@ public class OpenCLCutBoolComputer {
         int colWordCount = bmat.get(0).getWords().length;
         Pointer<Long> mat = allocateLongs(rowCount * colWordCount).order(byteOrder);
         Pointer<Long> randoms = allocateLongs(sampleCount * colWordCount).order(byteOrder);
-        Pointer<Integer> randomShuffles = allocateInts(sampleCount * colCount).order(byteOrder);
+        //Pointer<Integer> randomShuffles = allocateInts(sampleCount * colCount).order(byteOrder);
         Pointer<Long> outPtrPre = allocateLongs(sampleCount).order(byteOrder);
         Pointer<Long> resultsPtrPre = allocateLongs(2).order(byteOrder);
         int i = 0;
@@ -85,13 +101,14 @@ public class OpenCLCutBoolComputer {
         Random rnd = new java.util.Random();
         for (i = 0; i < sampleCount; i++) {
             for (int j = 0; j < colWordCount; j++) {
-                long val = rnd.nextLong(); // TODO: take care of signed issues?
+                //long val = rnd.nextLong(); // TODO: take care of signed issues?
                 //System.out.printf("%d\n", i * colWordCount + j);
+                long val = 0;
                 randoms.set(i * colWordCount + j, val);
             }
         }
 
-        ArrayList<Integer> base = new ArrayList<>();
+        /*ArrayList<Integer> base = new ArrayList<>();
         for (int j = 0; j < colCount; j++) {
             base.add(j);
         }
@@ -100,12 +117,12 @@ public class OpenCLCutBoolComputer {
             for (int j = 0; j < colCount; j++) {
                 randomShuffles.set(i * colCount + j, base.get(j));
             }
-        }
+        }*/
 
         // Create OpenCL input buffers (using the native memory pointers aPtr and bPtr) :
         CLBuffer<Long> bufmat = context.createBuffer(CLMem.Usage.Input, mat);
         CLBuffer<Long> bufrandoms = context.createBuffer(CLMem.Usage.Input, randoms);
-        CLBuffer<Integer> bufrandomShuffles = context.createBuffer(CLMem.Usage.Input, randomShuffles);
+        //CLBuffer<Integer> bufrandomShuffles = context.createBuffer(CLMem.Usage.Input, randomShuffles);
 
         // Create an OpenCL output buffer :
         CLBuffer<Long> out = context.createBuffer(CLMem.Usage.Output, outPtrPre);
@@ -113,7 +130,7 @@ public class OpenCLCutBoolComputer {
 
         long start = System.currentTimeMillis();
         addFloatsKernel.setArgs(
-                bufrandoms, bufrandomShuffles, bufmat, colCount, rowCount, colWordCount, out, resultsBuffer,
+                bufrandoms, bufmat, colCount, rowCount, colWordCount, out, resultsBuffer,
                 sampleCount,
                 LocalSize.ofLongArray(colWordCount), LocalSize.ofLongArray(colWordCount), LocalSize.ofLongArray(colWordCount));
 
@@ -127,7 +144,7 @@ public class OpenCLCutBoolComputer {
         queue.release();
         bufmat.release();
         bufrandoms.release();
-        bufrandomShuffles.release();
+        //bufrandomShuffles.release();
         out.release();
         resultsBuffer.release();
         addEvt.release();

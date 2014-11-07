@@ -1,5 +1,6 @@
 __kernel void count_hoods(
-__global const ulong* randoms, __global const ulong* randomShuffles, __global const ulong* bitsets,
+// __global const ulong* randomShuffles,
+__global const ulong* randoms, __global const ulong* bitsets,
 int colCount, int rowCount, int colWordCount, __global ulong* out, __global ulong* results,
 int sampleCount,
 __local ulong* sample, __local ulong* sampleMask, __local ulong* total)
