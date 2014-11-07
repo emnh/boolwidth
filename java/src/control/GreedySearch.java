@@ -83,10 +83,10 @@ public class GreedySearch {
         */
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen6_6.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen10_10.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen12_12.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/myciel7.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
 
@@ -156,7 +156,7 @@ public class GreedySearch {
         final BaseDecompose gd2 = gd;
         JSONObject jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
             if (node != ibt.getRoot()) {
-                obj.put("cutbool", gd2.getCutBool(ibt.getChildren(parent, node)));
+                obj.put("cutbool", gd2.getApproximateCutBool(ibt.getChildren(parent, node)));
             }
         });
 

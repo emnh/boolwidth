@@ -6,6 +6,7 @@ import boolwidth.cutbool.CBBacktrackEstimateBinary;
 import boolwidth.cutbool.CutBoolComparatorCCMIS;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
+import boolwidth.opencl.JOCLOpenCLCutBoolComputer;
 import boolwidth.opencl.OpenCLCutBoolComputer;
 import graph.BiGraph;
 import graph.Vertex;
@@ -29,7 +30,7 @@ public class BaseDecompose {
     long start;
     long oldPrint;
     static final int PRINT_INTERVAL = 1000;
-    static final int SAMPLE_COUNT = 10240;
+    static final int SAMPLE_COUNT = 100;
 
     public BaseDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         this.graph = graph;
@@ -110,7 +111,7 @@ public class BaseDecompose {
         }
         BiGraph<Integer, String> bg = new BiGraph<>(lefts, graph);
         //long cb = CBBackTrackEstimateBinaryFast.estimateNeighborhoods(bg, SAMPLE_COUNT);
-        long cb = OpenCLCutBoolComputer.estimateNeighbourHoods(bg, SAMPLE_COUNT);
+        long cb = JOCLOpenCLCutBoolComputer.estimateNeighbourHoods(bg, SAMPLE_COUNT);
         return cb;
     }
 

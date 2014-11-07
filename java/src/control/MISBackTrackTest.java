@@ -4,6 +4,7 @@ import boolwidth.CutBool;
 import boolwidth.cutbool.*;
 import boolwidth.cutbool.ccmis_trial.CCMISRe;
 import boolwidth.cutbool.ccmis_trial.IndexGraph;
+import boolwidth.opencl.JOCLOpenCLCutBoolComputer;
 import boolwidth.opencl.OpenCLCutBoolComputer;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
@@ -36,7 +37,6 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/jean.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
-        fileNames.clear();
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf");
         //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
         //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
@@ -139,21 +139,21 @@ public class MISBackTrackTest {
         AdjacencyListGraph<Vertex<Integer>, Integer, String> graph = new AdjacencyListGraph.D<Integer, String>();
         DiskGraph.readGraph(fileName, graph);
         ArrayList<Vertex<Integer>> lefts = new ArrayList<Vertex<Integer>>();
-        int[] queen88a = new int[] {0,32,1,4,36,37,6,38,7,8,9,43,12,14,46,47,48,17,50,19,51,20,21,25,26,58,27,61,31};
+        /*int[] queen88a = new int[] {0,32,1,4,36,37,6,38,7,8,9,43,12,14,46,47,48,17,50,19,51,20,21,25,26,58,27,61,31};
         for (int i : queen88a) {
             lefts.add(graph.getVertex(i));
-        }
-        /*for (int i = 0; i < graph.numVertices() / 2; i++) {
-            lefts.add(graph.getVertex(i));
         }*/
+        for (int i = 0; i < graph.numVertices() / 2; i++) {
+            lefts.add(graph.getVertex(i));
+        }
         BiGraph<Integer, String> bigraph = new BiGraph<>(lefts, graph);
 
         BiGraph<Integer, String> bigraphdup = new BiGraph<>(graph);
 
-        final int sampleCount = 1024;
+        final int sampleCount = 1000;
         long bw = 0;
         long est;
-        boolean test = false;
+        boolean test = true;
 
         BenchmarkResult ret;
 
@@ -181,8 +181,8 @@ public class MISBackTrackTest {
         ret = doBenchMark(() -> CBBackTrackEstimateBinaryFast.estimateNeighborhoods(bigraph, sampleCount), test);
         System.out.printf("Fast Approx CB backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
-        OpenCLCutBoolComputer.initialize();
-        ret = doBenchMark(() -> OpenCLCutBoolComputer.estimateNeighbourHoods(bigraph, sampleCount), test);
+        JOCLOpenCLCutBoolComputer.initialize();
+        ret = doBenchMark(() -> JOCLOpenCLCutBoolComputer.estimateNeighbourHoods(bigraph, sampleCount), test);
         System.out.printf("OpenCL Approx CB (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         /*
