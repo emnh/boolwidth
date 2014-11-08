@@ -1,22 +1,25 @@
-package boolwidth.greedysearch;
+package boolwidth.greedysearch.memory;
 
+import boolwidth.greedysearch.BaseDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
+import boolwidth.greedysearch.memory.SplitMemory;
 import graph.Vertex;
 import interfaces.IGraph;
 
 /**
- * Created by emh on 11/3/2014.
+ * Created by emh on 11/2/2014.
  */
-public class SymDiffDecompose extends BaseDecompose {
 
-    public SymDiffDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
+public class MemoryDecompose extends BaseDecompose {
+
+    public MemoryDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
     }
 
     @Override
     public ImmutableBinaryTree decompose() {
-        SplitSymDiff split = new SplitSymDiff(0, this, getGraph().vertices());
+        SplitMemory split = new SplitMemory(0, this, getGraph().vertices());
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
 

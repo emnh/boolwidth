@@ -1,6 +1,8 @@
-package boolwidth.greedysearch;
+package boolwidth.greedysearch.symdiff;
 
-import com.github.krukow.clj_lang.PersistentHashSet;
+import boolwidth.greedysearch.BaseDecompose;
+import boolwidth.greedysearch.MeasureCut;
+import boolwidth.greedysearch.Split;
 import graph.Vertex;
 import graph.subsets.PosSet;
 import graph.subsets.PosSubSet;
@@ -67,7 +69,6 @@ public class SplitSymDiff extends Split {
                         rightCount++;
                         if (!rightHoodAll.contains(u)) {
                             rightNoNeighborInLeft++;
-                            neighbors.add(u);
                         }
                     }
                 }

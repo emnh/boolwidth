@@ -127,6 +127,7 @@ public class BaseDecompose {
         ibt.dfs((parent, node) -> {
             HashSet<Integer> vertexIDs = new HashSet<>(ibt.getChildren(parent, node));
             long cutbool = fgetCutBool.applyAsLong(vertexIDs);
+            System.out.printf("got cutbool: %d, bw: %d\n", vertexIDs.size(), cutbool);
             if (cutbool > maxCutBool[0]) {
                 maxCutBool[0] = cutbool;
             }

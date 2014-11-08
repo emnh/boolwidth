@@ -40,8 +40,12 @@ public class TestOrdering {
 		//String fileName =  ControlInput.GRAPHLIB+"delauney/pr299.tsp-pp.dgf";
         //String fileName =  ControlInput.GRAPHLIB+"coloring/queen10_10.dgf";
         //String fileName =  ControlInput.GRAPHLIB+"coloring/david.dgf";
-        String fileName =  ControlInput.GRAPHLIB+"coloring/myciel7.dgf";
+        //String fileName =  ControlInput.GRAPHLIB+"coloring/myciel7.dgf";
         //String fileName =  ControlInput.GRAPHLIB+"coloring/homer.dgf";
+		//String fileName =  ControlInput.GRAPHLIB+"prob/alarm.dgf";
+		//String fileName =  ControlInput.GRAPHLIB+"coloring/queen8_8.dgf";
+		//String fileName =  ControlInput.GRAPHLIB+"prob/barley.dgf";
+		String fileName =  ControlInput.GRAPHLIB+"prob2/BN_100.dgf";
 	
 		//String fileName =  ControlInput.GRAPHLIB+"p_hat/p_hat1500-1.graph.mis.sadia";
 		//String fileName =  ControlInput.GRAPHLIB+"DIMACS_PP/gen200_p01.graph.mis.sadia";

@@ -1,26 +1,24 @@
-package boolwidth.greedysearch;
+package boolwidth.greedysearch.growNeighbourHood;
 
+import boolwidth.greedysearch.BaseDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
+import boolwidth.greedysearch.symdiff.SplitSymDiff;
 import graph.Vertex;
 import interfaces.IGraph;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
- * Created by emh on 11/2/2014.
+ * Created by emh on 11/3/2014.
  */
+public class GrowNeighbourHoodDecompose extends BaseDecompose {
 
-public class MemoryDecompose extends BaseDecompose {
-
-    public MemoryDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
+    public GrowNeighbourHoodDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
     }
 
     @Override
     public ImmutableBinaryTree decompose() {
-        SplitMemory split = new SplitMemory(0, this, getGraph().vertices());
+        SplitGrowNeighbourhood split = new SplitGrowNeighbourhood(0, this, getGraph().vertices());
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
 

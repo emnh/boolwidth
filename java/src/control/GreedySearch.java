@@ -3,6 +3,9 @@ package control;
 import boolwidth.greedysearch.*;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
+import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
+import boolwidth.greedysearch.memory.MemoryDecompose;
+import boolwidth.greedysearch.symdiff.SymDiffDecompose;
 import control.http.HTTPResultsServer;
 import graph.Vertex;
 import interfaces.IGraph;
@@ -10,6 +13,7 @@ import com.cedarsoftware.util.io.JsonWriter;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 public class GreedySearch {
 
@@ -37,6 +41,7 @@ public class GreedySearch {
         ArrayList<String> fileNames = new ArrayList<>();
         ArrayList<String> fileNames2 = new ArrayList<>();
 
+        // Small test graphs from Sadia's Thesis
         fileNames.add("prob/alarm.dgf");
         fileNames.add("prob/barley.dgf");
         fileNames.add("prob/pigs-pp.dgf");
@@ -45,13 +50,23 @@ public class GreedySearch {
         fileNames.add("coloring/david.dgf");
         fileNames.add("protein/1jhg_graph.dimacs");
         fileNames.add("protein/1aac_graph.dimacs");
-        /*fileNames.add("");
-        fileNames.add("");
-        fileNames.add("");
-        fileNames.add("");
-        fileNames.add("");
-        fileNames.add("");
-        fileNames.add("");*/
+        fileNames.add("freq/celar04-pp.dgf");
+        fileNames.add("protein/1a62_graph.dimacs");
+        fileNames.add("protein/1bkb_graph-pp.dimacs");
+        fileNames.add("coloring/miles250.dgf");
+        fileNames.add("coloring/miles1500.dgf");
+        fileNames.add("protein/1dd3_graph.dimacs");
+        fileNames.add("freq/celar10-pp.dgf");
+        fileNames.add("coloring/anna.dgf");
+        fileNames.add("delauney/pr152.tsp.dgf");
+        fileNames.add("prob/munin2-pp.dgf");
+        fileNames.add("coloring/mulsol.i.5.dgf");
+        fileNames.add("coloring/zeroin.i.2.dgf");
+        fileNames.add("prob/boblo.dgf");
+        fileNames.add("coloring/fpsol2.i.1-pp.dgf");
+        fileNames.add("prob/munin4-wpp.dgf");
+
+        //fileNames.add("coloring/homer.dgf");
 
         for (String f : fileNames) {
             fileNames2.add(ControlUtil.GRAPHLIB + f);
@@ -60,17 +75,19 @@ public class GreedySearch {
         return fileNames2;
     }
 
-    public static void processFiles() {
+    public static void processFiles(Function<IGraph<Vertex<Integer>, Integer, String>, BaseDecompose> getDecomposer) {
         ArrayList<String> results = new ArrayList<>();
         for (String file : getFileNames()) {
             IGraph<Vertex<Integer>, Integer, String> graph;
             graph = ControlUtil.getTestGraph(file);
-            BaseDecompose gd = new SymDiffDecompose(graph);
+            BaseDecompose gd = getDecomposer.apply(graph);
             ImmutableBinaryTree ibt = gd.decompose();
             long bw = gd.getBooleanWidth(ibt);
             String result = String.format("%s: bw: %.2f", file, BaseDecompose.getLogBooleanWidth(bw));
+            System.out.println(result);
             results.add(result);
         }
+        System.out.println("");
         for (String result : results) {
             System.out.println(result);
         }
@@ -83,7 +100,7 @@ public class GreedySearch {
         */
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen6_6.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
@@ -91,7 +108,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_65.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
 
-        //String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/david.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.1.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob/link.dgf";
@@ -111,7 +128,7 @@ public class GreedySearch {
 
         BaseDecompose gd = null;
 
-        switch (6) {
+        switch (7) {
             case 0:
                 gd = new BaseDecompose(graph);
                 break;
@@ -131,11 +148,16 @@ public class GreedySearch {
                 gd = new TwoStepsForthOneBackDecompose(graph);
                 break;
             case 6:
-                gd = new SymDiffDecompose(graph);
-                break;
-            case 7:
-                processFiles();
+                // gd = new SymDiffDecompose(graph);
+                // break;
+                processFiles((g) -> new SymDiffDecompose(g));
                 return;
+            case 7:
+                // gd = new GrowNeighbourHoodDecompose(graph);
+                // break;
+                processFiles((g) -> new GrowNeighbourHoodDecompose(g));
+                return;
+
         }
 
         long decomposeStart = System.currentTimeMillis();
