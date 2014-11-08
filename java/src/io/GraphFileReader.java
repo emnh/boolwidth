@@ -75,8 +75,12 @@ public class GraphFileReader {
 		return this.nodeLabelMap;
 	}
 
+	// Due to a problem with undeclared node labels in some graph files we return this.maxNodeNum + 1,
+	// the maximum number of a node in an edge instead of declared node number in file.
+	// The graph will be a bit bigger than necessary.
+	// An alternative that compresses the graph is to make up the node labels based on the edges and 0-indexing.
 	public int getNodesNum() {
-		return this.nodesNum;
+		return this.maxNodeNum + 1;
 	}
 
 	public void read(String numNodesLabel, String numEdgesLabel,
