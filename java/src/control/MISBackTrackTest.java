@@ -27,6 +27,7 @@ public class MISBackTrackTest {
 
         ArrayList<String> fileNames  = new ArrayList<String>();
 
+        fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "other/risk.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "prob/pigs-pp.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs");
@@ -38,6 +39,9 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf");
+
+        //fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf");
+        //fileNames.add(ControlUtil.GRAPHLIB + "coloring/homer.dgf");
         //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
         //fileNames.add(ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs");
 
@@ -157,12 +161,17 @@ public class MISBackTrackTest {
 
         BenchmarkResult ret;
 
-        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
+        /*ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
         System.out.printf("UNN (bigraph) (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+        */
         /*
         ret = doBenchMark(() -> MISBackTrackPersistent.countNeighborhoods(graph), test);
         System.out.printf("MIS backtrack persistent (%dms): %d\n", ret.eachDuration(), ret.returnValue);
         */
+
+        JOCLOpenCLCutBoolComputer.initialize();
+        ret = doBenchMark(() -> JOCLOpenCLCutBoolComputer.estimateNeighbourHoods(bigraph, sampleCount), test);
+        System.out.printf("OpenCL Approx CB (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
@@ -180,10 +189,6 @@ public class MISBackTrackTest {
 
         ret = doBenchMark(() -> CBBackTrackEstimateBinaryFast.estimateNeighborhoods(bigraph, sampleCount), test);
         System.out.printf("Fast Approx CB backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
-
-        JOCLOpenCLCutBoolComputer.initialize();
-        ret = doBenchMark(() -> JOCLOpenCLCutBoolComputer.estimateNeighbourHoods(bigraph, sampleCount), test);
-        System.out.printf("OpenCL Approx CB (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         /*
         ret = doBenchMark(() -> CCMISApprox.BoolDimBranch(convertSadiaBiGraph(bigraph), sampleCount), test);

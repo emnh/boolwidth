@@ -46,6 +46,17 @@ public class Split {
         }
     }
 
+    public Split(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
+        this.decomposition = decomposition;
+        this.depth = depth;
+        for (Vertex<Integer> v : lefts) {
+            this.lefts = this.lefts.cons(v);
+        }
+        for (Vertex<Integer> v : rights) {
+            this.rights = this.rights.cons(v);
+        }
+    }
+
     public long getNewCutBoolWithAddedVertex(Vertex<Integer> tomove) {
         long cbLeftAddRight = this.getDecomposition().getCutBool(lefts, true);
         long cbRightAddLeft = this.getDecomposition().getCutBool(rights, true);

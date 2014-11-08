@@ -132,6 +132,7 @@ public class OpenCLCutBoolComputer {
         addFloatsKernel.setArgs(
                 bufrandoms, bufmat, colCount, rowCount, colWordCount, out, resultsBuffer,
                 sampleCount,
+                LocalSize.ofLongArray(rowCount * colWordCount), LocalSize.ofLongArray(rowCount * colWordCount),
                 LocalSize.ofLongArray(colWordCount), LocalSize.ofLongArray(colWordCount), LocalSize.ofLongArray(colWordCount));
 
         CLQueue queue = context.createDefaultQueue();

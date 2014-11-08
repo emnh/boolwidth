@@ -5,6 +5,8 @@ import boolwidth.greedysearch.ds.SimpleNode;
 import graph.Vertex;
 import interfaces.IGraph;
 
+import java.util.ArrayList;
+
 /**
  * Created by emh on 11/2/2014.
  */
@@ -17,18 +19,26 @@ public class TwoStepsForthOneBackDecompose extends BaseDecompose {
 
     @Override
     public ImmutableBinaryTree decompose() {
-        Split split = new Split(0, this, getGraph().vertices());
+        ArrayList<Vertex<Integer>> lefts = new ArrayList<>();
+        ArrayList<Vertex<Integer>> rights = new ArrayList<>();
+        int i = 0;
+        for (Vertex<Integer> v : getGraph().vertices()) {
+            if (i % 2 == 0) {
+                lefts.add(v);
+            } else {
+                rights.add(v);
+            }
+        }
+        Split split = new Split(0, this, lefts, rights);
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
 
         SimpleNode last = ibt.getRoot();
         while (!split.done()) {
             System.out.println("move left");
-            split = split.decomposeAdvance((newLefts, toMove) -> this.getCutBool(newLefts, true));
+            split = split.decomposeAdvance((newLefts, toMove) -> this.getApproximateCutBool(this.verticesToInts(newLefts)));
             System.out.println("move right");
-            split = split.decomposeAdvanceRight((newLefts, toMove) -> this.getCutBool(newLefts, true));
-            System.out.println("move left");
-            split = split.decomposeAdvance((newLefts, toMove) -> this.getCutBool(newLefts, true));
+            split = split.decomposeAdvanceRight((newLefts, toMove) -> this.getApproximateCutBool(this.verticesToInts(newLefts)));
 
             ibt = ibt.addChild(last, split.getLastMoved().id());
             last = ibt.getReference();

@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Random;
 
 import static org.bridj.Pointer.allocateLongs;
@@ -98,6 +99,11 @@ public class JOCLOpenCLCutBoolComputer {
         // Create a command-queue for the selected device
         commandQueue =
                 clCreateCommandQueue(context, device, 0, null);
+
+        /*long size[] = new long[1];
+        Pointer sizePtr = Pointer.to(size);
+        clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_SIZE, Sizeof.cl_ulong, sizePtr, null);
+        System.out.printf("local mem size: %d\n", size[0]);*/
     }
 
     public static void initialize() {
@@ -108,35 +114,38 @@ public class JOCLOpenCLCutBoolComputer {
 
     public static <V, E> long estimateNeighbourHoods(BiGraph<V, E> bigraph, int sampleCount) {
         initialize();
-        int tries = 5;
-        Error last = null;
-        while (tries > 0) {
-            try {
-                long bw = cache.estimateNeighbourHoods2(bigraph, sampleCount);
-                /*System.out.printf("computing cutbool %d/%d: %d: %.2f\n",
-                        bigraph.numLeftVertices(), bigraph.numVertices(),
-                        bw, CutBool.getLogBW(bw));*/
-                return bw;
-            } catch (Error e) {
-                System.out.printf("openCL failed: %s\n", e);
-                tries--;
-                last = e;
-            }
-        }
-        throw last;
+        long before = System.currentTimeMillis();
+        long bw = cache.estimateNeighbourHoods2(bigraph, sampleCount);
+        long after = System.currentTimeMillis();
+        /*System.out.printf("computing cutbool %d/%d: %d: %.2f, time: %d\n",
+                bigraph.numLeftVertices(), bigraph.numVertices(),
+                bw, CutBool.getLogBW(bw), after - before);*/
+        return bw;
     }
 
     public <V, E> long estimateNeighbourHoods2(BiGraph<V, E> bigraph, int sampleCount) {
+
+        long beforeData = System.currentTimeMillis();
+
         // prepare data
         ArrayList<PosSubSet<Vertex<V>>> bmat = new ArrayList<>();
         PosSet<Vertex<V>> groundSet = new PosSet<>(bigraph.vertices()); // TODO: highly inefficient, but must be so to deal with cumbersome bigraph ids
-        for (Vertex<V> node : bigraph.rightVertices()) {
+        Collection<Vertex<V>> vertices = new ArrayList<Vertex<V>>();
+
+        // choose smallest side for iteration
+        if (bigraph.numRightVertices() < bigraph.numLeftVertices()) {
+            bigraph.rightVertices().forEach((v) -> vertices.add(v));
+        } else {
+            bigraph.leftVertices().forEach((v) -> vertices.add(v));
+        }
+
+        for (Vertex<V> node : vertices) {
             PosSubSet<Vertex<V>> neighbors = new PosSubSet<>(groundSet, bigraph.incidentVertices(node));
             bmat.add(neighbors);
         }
 
         // OpenCL stuff
-        int rowCount = bigraph.numRightVertices();
+        int rowCount = vertices.size();
         int colCount = bigraph.numVertices(); // TODO: highly inefficient, but must be so to deal with cumbersome bigraph ids
         if (rowCount == 0 || colCount == 0) return 1;
         //int colWordCount = (colCount / Long.SIZE) + 1;
@@ -149,7 +158,7 @@ public class JOCLOpenCLCutBoolComputer {
         //Pointer<Integer> randomShuffles = allocateInts(sampleCount * colCount).order(byteOrder);
 
         int i = 0;
-        for (Vertex<V> node : bigraph.rightVertices()) {
+        for (Vertex<V> node : vertices) {
             long[] words = bmat.get(i).getWords();
             //System.out.printf("words length: %d\n", words.length);
             int j = 0;
@@ -219,6 +228,10 @@ public class JOCLOpenCLCutBoolComputer {
         clSetKernelArg(kernel, a++,
                 Sizeof.cl_int, Pointer.to(new int[] { sampleCount }));
         clSetKernelArg(kernel, a++,
+                Sizeof.cl_long * rowCount * colWordCount, null);
+        clSetKernelArg(kernel, a++,
+                Sizeof.cl_long * rowCount * colWordCount, null);
+        clSetKernelArg(kernel, a++,
                 Sizeof.cl_long * colWordCount, null);
         clSetKernelArg(kernel, a++,
                 Sizeof.cl_long * colWordCount, null);
@@ -236,8 +249,8 @@ public class JOCLOpenCLCutBoolComputer {
         // Read the output data
         clEnqueueReadBuffer(commandQueue, memObjects[2], CL_TRUE, 0,
                 sampleCount * Sizeof.cl_long, ptrOut, 0, null, null);
-        clEnqueueReadBuffer(commandQueue, memObjects[3], CL_TRUE, 0,
-                2 * Sizeof.cl_long, ptrResults, 0, null, null);
+        /*clEnqueueReadBuffer(commandQueue, memObjects[3], CL_TRUE, 0,
+                2 * Sizeof.cl_long, ptrResults, 0, null, null);*/
 
         // Print the first 10 output values :
         long estimate = 0;
@@ -247,8 +260,6 @@ public class JOCLOpenCLCutBoolComputer {
         }
 
         // Release kernel, program, and memory objects
-
-        // for some reason reports ArrayIndexOutOfBoundsException. what's up with that?
         clReleaseMemObject(memObjects[0]);
         clReleaseMemObject(memObjects[1]);
         clReleaseMemObject(memObjects[2]);
@@ -259,10 +270,9 @@ public class JOCLOpenCLCutBoolComputer {
         //clReleaseCommandQueue(commandQueue);
         //clReleaseContext(context);
 
-        //Pointer<Long> outPtr = out.read(queue, addEvt); // blocks until add_floats finished
-        //Pointer<Long> resultsPtr = resultsBuffer.read(queue, addEvt); // blocks until add_floats finished
         long end = System.currentTimeMillis();
 
+        //System.out.printf("OpenCL kernel time: %d, including data init time: %d\n", end - start, end - beforeData);
         /*
         double d = (double) resultsPtr.get(0) / resultsPtr.get(1);
         System.out.printf("results: %d %d/%d/%.2f\n", value, resultsPtr.get(0), resultsPtr.get(1), d);

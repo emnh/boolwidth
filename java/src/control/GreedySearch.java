@@ -83,13 +83,15 @@ public class GreedySearch {
         */
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen6_6.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen10_10.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen12_12.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/myciel7.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_65.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
 
+        //String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/david.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.1.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob/link.dgf";
@@ -99,7 +101,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/pr439.tsp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
+
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
         if (args.length > 0) {
             fileName = args[0];
@@ -109,7 +111,7 @@ public class GreedySearch {
 
         BaseDecompose gd = null;
 
-        switch (2) {
+        switch (6) {
             case 0:
                 gd = new BaseDecompose(graph);
                 break;

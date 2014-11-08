@@ -24,6 +24,7 @@ public class BaseDecompose {
 
     private IGraph<Vertex<Integer>, Integer, String> graph;
     private HashMap<HashSet<Integer>, Long> cache = new HashMap<>();
+    private HashMap<HashSet<Integer>, Long> approxCache = new HashMap<>();
     private Random rnd = new Random();
     public long cacheHits = 0;
     public long cutboolTotalCalls = 0;
@@ -109,9 +110,14 @@ public class BaseDecompose {
         for (Integer id : vertexIDs) {
             lefts.add(graph.getVertex(id));
         }
+        HashSet<Integer> vids = new HashSet<>(vertexIDs);
+        if (approxCache.containsKey(vids)) {
+            return approxCache.get(vids);
+        }
         BiGraph<Integer, String> bg = new BiGraph<>(lefts, graph);
         //long cb = CBBackTrackEstimateBinaryFast.estimateNeighborhoods(bg, SAMPLE_COUNT);
         long cb = JOCLOpenCLCutBoolComputer.estimateNeighbourHoods(bg, SAMPLE_COUNT);
+        approxCache.put(vids, cb);
         return cb;
     }
 
