@@ -1,9 +1,10 @@
-package boolwidth.greedysearch;
+package boolwidth.greedysearch.base;
 
+import boolwidth.greedysearch.Util;
 import com.github.krukow.clj_lang.PersistentHashSet;
 import graph.Vertex;
 
-import java.util.TreeMap;
+import java.util.Collection;
 
 /**
  * Created by emh on 11/2/2014.
@@ -118,12 +119,36 @@ public class Split {
         return lefts.size() >= rights.size();
     }
 
-    public Split decomposeAdvance(MeasureCut measureCut) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Split split = (Split) o;
+
+        if (!lefts.equals(split.lefts)) return false;
+        if (!rights.equals(split.rights)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = rights.hashCode();
+        result = 31 * result + lefts.hashCode();
+        return result;
+    }
+
+    public long measureCutForDecompose(Collection<Vertex<Integer>> newLefts, Vertex<Integer> toMove){
+        return this.getDecomposition().getCutBool(newLefts, true);
+    }
+
+    public Split decomposeAdvance() {
         Split result = new Split(this);
         if (done()) {
             return this;
         } else {
-            long oldcb = measureCut.applyAsLong(lefts, null);
+            long oldcb = measureCutForDecompose(lefts, null);
             long minmove = Long.MAX_VALUE;
             Vertex<Integer> tomove = null;
 
@@ -131,7 +156,7 @@ public class Split {
             for (Vertex<Integer> v : rights) {
                 i += 1;
                 PersistentHashSet<Vertex<Integer>> newlefts = lefts.cons(v);
-                long cb = measureCut.applyAsLong(newlefts, v);
+                long cb = measureCutForDecompose(newlefts, v);
                 //decomposition.getCutBool(newlefts, true);
                 if (cb < minmove) {
                     minmove = cb;
@@ -154,12 +179,12 @@ public class Split {
         return result;
     }
 
-    public Split decomposeAdvanceRight(MeasureCut measureCut) {
+    public Split decomposeAdvanceRight() {
         Split result = new Split(this);
         if (done()) {
             return this;
         } else {
-            long oldcb = measureCut.applyAsLong(lefts, null);
+            long oldcb = measureCutForDecompose(lefts, null);
             long minmove = Long.MAX_VALUE;
             Vertex<Integer> tomove = null;
 
@@ -167,7 +192,7 @@ public class Split {
             for (Vertex<Integer> v : lefts) {
                 i += 1;
                 PersistentHashSet<Vertex<Integer>> newlefts = lefts.disjoin(v);
-                long cb = measureCut.applyAsLong(newlefts, v);
+                long cb = measureCutForDecompose(newlefts, v);
                 if (cb < minmove) {
                     minmove = cb;
                     tomove = v;

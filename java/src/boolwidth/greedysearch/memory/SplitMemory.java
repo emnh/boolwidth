@@ -1,8 +1,7 @@
 package boolwidth.greedysearch.memory;
 
-import boolwidth.greedysearch.BaseDecompose;
-import boolwidth.greedysearch.MeasureCut;
-import boolwidth.greedysearch.Split;
+import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.Split;
 import boolwidth.greedysearch.ds.TreeElement;
 import boolwidth.greedysearch.ds.TreeElementComparator;
 import com.github.krukow.clj_lang.PersistentHashSet;
@@ -32,12 +31,12 @@ public class SplitMemory extends Split {
     }
 
     @Override
-    public SplitMemory decomposeAdvance(MeasureCut measureCut) {
+    public SplitMemory decomposeAdvance() {
         SplitMemory result = new SplitMemory(this);
         if (done()) {
             return this;
         } else {
-            long oldcb = measureCut.applyAsLong(lefts, null);
+            long oldcb = measureCutForDecompose(lefts, null);
             long minmove = Long.MAX_VALUE;
             Vertex<Integer> tomove = null;
 
@@ -67,7 +66,7 @@ public class SplitMemory extends Split {
                 if (!foundit) {
                     i += 1;
                     PersistentHashSet<Vertex<Integer>> newlefts = lefts.cons(v);
-                    long cb = measureCut.applyAsLong(newlefts, v);
+                    long cb = measureCutForDecompose(newlefts, v);
                     addOld(moves, movesVertices, v, cb);
                     //addOld(moves, movesVertices, v, te.cutbool*2);
                     //decomposition.getCutBool(newlefts, true);
@@ -98,7 +97,7 @@ public class SplitMemory extends Split {
                     }
                     i += 1;
                     PersistentHashSet<Vertex<Integer>> newlefts = lefts.cons(v);
-                    long cb = measureCut.applyAsLong(newlefts, v);
+                    long cb = measureCutForDecompose(newlefts, v);
                     addOld(moves, movesVertices, v, cb);
                     //decomposition.getCutBool(newlefts, true);
                     if (cb < minmove) {
@@ -116,7 +115,7 @@ public class SplitMemory extends Split {
             result.lefts = result.lefts.cons(tomove);
             result.rights = result.rights.disjoin(tomove);
             result.cutbool = minmove;
-            result.lastWorstRatio = (double) minmove / measureCut.applyAsLong(lefts, null);
+            result.lastWorstRatio = (double) minmove / measureCutForDecompose(lefts, null);
             System.out.printf("last worst ratio: %.2f\n", result.lastWorstRatio);
             result.reference = tomove;
             result.oldMoves = moves;

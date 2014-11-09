@@ -11,6 +11,14 @@ import java.util.List;
  */
 public class Util {
 
+    public static <T> T getSingle(PersistentHashSet<T> set) {
+        if (set.size() > 1) {
+            throw new IndexOutOfBoundsException("set was not size 1");
+        }
+        for (T r : set) return r;
+        throw new IndexOutOfBoundsException("set was empty");
+    }
+
     @SafeVarargs
     @SuppressWarnings("unchecked")
     // TODO: ask library author krukow to do this instead of working around it

@@ -1,5 +1,7 @@
 package boolwidth.greedysearch;
 
+import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.TrickleDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import graph.Vertex;
@@ -11,7 +13,7 @@ import java.util.HashSet;
 /**
  * Created by emh on 11/2/2014.
  */
-public class RandomDecompose extends BaseDecompose {
+public class RandomDecompose extends TrickleDecompose {
 
     public RandomDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);

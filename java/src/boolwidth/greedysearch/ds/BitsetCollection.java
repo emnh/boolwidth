@@ -7,7 +7,11 @@ import java.util.ArrayList;
  * A collection class for immutable integer bitsets.
  */
 
-public class BitsetCollection {
+public class BitSetCollection {
+
+    public BitSetCollection(int maxSizeBits) {
+        this.maxSizeBits = maxSizeBits;
+    }
 
     private int maxSizeBits = 0;
 

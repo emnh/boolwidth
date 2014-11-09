@@ -4,18 +4,18 @@ package boolwidth.greedysearch.ds;
  * Created by emh on 10/30/2014.
  */
 public class SimpleNode {
-    private int treeID;
+    private int graphID;
 
-    SimpleNode(int treeID) {
-        this.treeID = treeID;
+    SimpleNode(int graphID) {
+        this.graphID = graphID;
     }
 
-    public int getTreeID() {
-        return treeID;
+    public int getGraphID() {
+        return graphID;
     }
 
     public String toString() {
-        return "" + treeID;
+        return "" + graphID;
     }
 
     @Override
@@ -25,13 +25,13 @@ public class SimpleNode {
 
         SimpleNode that = (SimpleNode) o;
 
-        if (treeID != that.treeID) return false;
+        if (graphID != that.graphID) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return treeID;
+        return graphID;
     }
 }

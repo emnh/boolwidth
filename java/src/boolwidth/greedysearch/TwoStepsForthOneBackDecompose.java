@@ -1,5 +1,7 @@
 package boolwidth.greedysearch;
 
+import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.Split;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import graph.Vertex;
@@ -36,9 +38,9 @@ public class TwoStepsForthOneBackDecompose extends BaseDecompose {
         SimpleNode last = ibt.getRoot();
         while (!split.done()) {
             System.out.println("move left");
-            split = split.decomposeAdvance((newLefts, toMove) -> this.getApproximateCutBool(this.verticesToInts(newLefts)));
+            split = split.decomposeAdvance();
             System.out.println("move right");
-            split = split.decomposeAdvanceRight((newLefts, toMove) -> this.getApproximateCutBool(this.verticesToInts(newLefts)));
+            split = split.decomposeAdvanceRight();
 
             ibt = ibt.addChild(last, split.getLastMoved().id());
             last = ibt.getReference();

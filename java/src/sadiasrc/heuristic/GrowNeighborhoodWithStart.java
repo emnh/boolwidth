@@ -154,7 +154,7 @@ public class GrowNeighborhoodWithStart extends AbstractChooser implements IChoos
 					}
 								
 					double E = temp.size();
-					External.put(x, E)	;	
+ 					External.put(x, E)	;
 					double ratio=0;
 					if(I==0)
 						ratio=E/(I+0.1);

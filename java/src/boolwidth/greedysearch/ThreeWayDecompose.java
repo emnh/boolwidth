@@ -1,6 +1,9 @@
 package boolwidth.greedysearch;
 
+import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.StackDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
+import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import com.github.krukow.clj_lang.PersistentVector;
 import graph.Vertex;
 import interfaces.IGraph;
@@ -15,13 +18,6 @@ public class ThreeWayDecompose extends BaseDecompose {
 
     public ThreeWayDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
-    }
-
-    @Override
-    public long getCutValueForTrickle(ImmutableBinaryTree ibt, HashSet<Integer> lefts) {
-        return lefts.size();
-        //return getFunkyCutBool(ibt, lefts);
-        //return getCutBool(lefts);
     }
 
     @Override
@@ -116,9 +112,10 @@ public class ThreeWayDecompose extends BaseDecompose {
         lefts2.forEach((node) -> list2.add(node));
         ArrayList<Vertex<Integer>> list3 = new ArrayList<>();
         remaining.forEach((node) -> list3.add(node));
-        ImmutableBinaryTree ibt1 = decompose(list1);
-        ImmutableBinaryTree ibt2 = decompose(list2);
-        ImmutableBinaryTree ibt3 = decompose(list3);
+        StackDecompose gd = new GrowNeighbourHoodDecompose(getGraph());
+        ImmutableBinaryTree ibt1 = gd.decompose(list1);
+        ImmutableBinaryTree ibt2 = gd.decompose(list2);
+        ImmutableBinaryTree ibt3 = gd.decompose(list3);
         return ibt1.join(ibt2).join(ibt3);
     }
 }

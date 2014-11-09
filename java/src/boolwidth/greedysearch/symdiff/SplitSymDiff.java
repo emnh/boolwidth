@@ -1,8 +1,7 @@
 package boolwidth.greedysearch.symdiff;
 
-import boolwidth.greedysearch.BaseDecompose;
-import boolwidth.greedysearch.MeasureCut;
-import boolwidth.greedysearch.Split;
+import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.Split;
 import graph.Vertex;
 import graph.subsets.PosSet;
 import graph.subsets.PosSubSet;
@@ -24,7 +23,7 @@ public class SplitSymDiff extends Split {
     }
 
     @Override
-    public SplitSymDiff decomposeAdvance(MeasureCut measureCut) {
+    public SplitSymDiff decomposeAdvance() {
         SplitSymDiff result = new SplitSymDiff(this);
         if (done()) {
             return this;

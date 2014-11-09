@@ -1,6 +1,6 @@
 package boolwidth.greedysearch.ds;
 
-import boolwidth.greedysearch.ToJSONPostProcess;
+import boolwidth.greedysearch.base.ToJSONPostProcess;
 import boolwidth.greedysearch.Util;
 import com.github.krukow.clj_lang.PersistentHashSet;
 import com.github.krukow.clj_lang.PersistentVector;
@@ -110,14 +110,14 @@ public class ImmutableBinaryTree {
 
         // add child as neighbor of parent
         result.neighbours =
-                result.neighbours.assocN(parent.getTreeID(),
-                        result.neighbours.nth(parent.getTreeID()).cons(result.reference));
+                result.neighbours.assocN(parent.getGraphID(),
+                        result.neighbours.nth(parent.getGraphID()).cons(result.reference));
         return result;
     }
 
     public ImmutableBinaryTree remove(SimpleNode node) {
         ImmutableBinaryTree result = copy();
-        result.externalIDs = this.externalIDs.assocN(node.getTreeID(), EMPTY_NODE);
+        result.externalIDs = this.externalIDs.assocN(node.getGraphID(), EMPTY_NODE);
         return result;
     }
 
@@ -208,11 +208,11 @@ public class ImmutableBinaryTree {
 
     public PersistentHashSet<SimpleNode> getNeighbours(SimpleNode root) {
         //System.out.printf("root: %s\n", root);
-        return neighbours.nth(root.getTreeID());
+        return neighbours.nth(root.getGraphID());
     }
 
     public Integer getExternalID(SimpleNode root) {
-        return externalIDs.nth(root.getTreeID());
+        return externalIDs.nth(root.getGraphID());
     }
 
     public JSONObject toJSON() {
@@ -232,7 +232,7 @@ public class ImmutableBinaryTree {
     public JSONObject toJSON(HashSet<SimpleNode> seen, SimpleNode parent, SimpleNode root, ToJSONPostProcess postProcess) {
         seen.add(root);
         JSONObject obj = new JSONObject();
-        obj.put("id", root.getTreeID());
+        obj.put("id", root.getGraphID());
         obj.put("value", getExternalID(root));
 
         ArrayList<SimpleNode> neighbours = new ArrayList<>(getNeighbours(root));

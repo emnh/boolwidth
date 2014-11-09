@@ -43,9 +43,10 @@ public class TestOrdering {
         //String fileName =  ControlInput.GRAPHLIB+"coloring/myciel7.dgf";
         //String fileName =  ControlInput.GRAPHLIB+"coloring/homer.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob/alarm.dgf";
+		String fileName =  ControlInput.GRAPHLIB+"prob2/BN_26.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"coloring/queen8_8.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob/barley.dgf";
-		String fileName =  ControlInput.GRAPHLIB+"prob2/BN_100.dgf";
+		//String fileName =  ControlInput.GRAPHLIB+"prob2/BN_100.dgf";
 	
 		//String fileName =  ControlInput.GRAPHLIB+"p_hat/p_hat1500-1.graph.mis.sadia";
 		//String fileName =  ControlInput.GRAPHLIB+"DIMACS_PP/gen200_p01.graph.mis.sadia";
@@ -90,7 +91,7 @@ public class TestOrdering {
 			//System.out.println("Already in MIS : "+taken_in_MIS);
 			//result+= " "+ "Already in MIS "+taken_in_MIS+" ";
 			
-			if(G.numVertices()>0 && G.numVertices()<=1000){
+			if(G.numVertices()>0 && G.numVertices()<=4000){
 	
 		
 		

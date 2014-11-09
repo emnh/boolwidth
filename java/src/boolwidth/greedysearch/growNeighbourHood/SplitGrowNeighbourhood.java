@@ -1,8 +1,7 @@
 package boolwidth.greedysearch.growNeighbourHood;
 
-import boolwidth.greedysearch.BaseDecompose;
-import boolwidth.greedysearch.MeasureCut;
-import boolwidth.greedysearch.Split;
+import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.Split;
 import graph.Vertex;
 import graph.subsets.PosSet;
 import graph.subsets.PosSubSet;
@@ -24,7 +23,7 @@ public class SplitGrowNeighbourhood extends Split {
     }
 
     @Override
-    public SplitGrowNeighbourhood decomposeAdvance(MeasureCut measureCut) {
+    public SplitGrowNeighbourhood decomposeAdvance() {
         SplitGrowNeighbourhood result = new SplitGrowNeighbourhood(this);
         if (done()) {
             return this;
@@ -32,10 +31,10 @@ public class SplitGrowNeighbourhood extends Split {
             IGraph<Vertex<Integer>, Integer, String> graph = this.getDecomposition().getGraph();
             PosSet<Vertex<Integer>> all = new PosSet<>(graph.vertices());
             TreeSet<PosSubSet<Vertex<Integer>>> nodeHoods = new TreeSet<>();
-            PosSubSet<Vertex<Integer>> N_LEFT = new PosSubSet<Vertex<Integer>>(all);
+            PosSubSet<Vertex<Integer>> N_LEFT = new PosSubSet<>(all);
 
             int minLeftHoodInRightCount = Integer.MAX_VALUE;
-            PosSubSet<Vertex<Integer>> minLeftHoodInRight = null;
+            PosSubSet<Vertex<Integer>> minLeftHoodInRight = new PosSubSet<>(all);
             for (Vertex<Integer> node : graph.vertices()) {
                 if (lefts.contains(node)) {
                     PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
@@ -66,9 +65,34 @@ public class SplitGrowNeighbourhood extends Split {
             //long cb2 = this.getDecomposition().getApproximateCutBool(this.getDecomposition().verticesToInts(lefts)); //measureCut.applyAsLong(lefts, null);
             //System.out.printf("bw: %.2f\n", this.decomposition.getLogBooleanWidth(cb2));
 
-            int i = 0;
+
             // TODO: what if rightHoodAll is empty and there are more nodes in right?
-            if (minLeftHoodInRight != null) {
+
+            // First check for isolated or twin nodes
+            for (Vertex<Integer> v : rights) {
+                int rightNeighboursOfVCount = 0;
+                PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
+                for (Vertex<Integer> u : graph.incidentVertices(v)) {
+                    if (rights.contains(u)) {
+                        neighbors.add(u);
+                        rightNeighboursOfVCount++;
+                    }
+                }
+                // isolated node
+                if (rightNeighboursOfVCount == 0) {
+                    tomove = v;
+                    break;
+                }
+                // twin node
+                if (nodeHoods.contains(neighbors)) {
+                    tomove = v;
+                    break;
+                }
+            }
+
+            // Now choose by ratio
+            int i = 0;
+            if (tomove == null) {
                 for (Vertex<Integer> v : minLeftHoodInRight) {
                     i += 1;
 
@@ -92,27 +116,16 @@ public class SplitGrowNeighbourhood extends Split {
                     } else {
                         ratio = external / internal;
                     }
-
-                    // isolated node
-                    if (rightNeighboursOfVCount == 0) {
-                        minmove = ratio;
-                        tomove = v;
-                        break;
-                    }
-                    // twin node
-                    if (nodeHoods.contains(neighbors)) {
-                        minmove = ratio;
-                        tomove = v;
-                        break;
-                    }
                     if (ratio < minmove) {
                         minmove = ratio;
                         tomove = v;
                     }
                 }
-            } else {
+            }
+            if (tomove == null) {
                 for (Vertex<Integer> v : rights) {
                     System.out.println("was empty, just took first");
+                    // TODO: BFS
                     tomove = v;
                     break;
                 }
