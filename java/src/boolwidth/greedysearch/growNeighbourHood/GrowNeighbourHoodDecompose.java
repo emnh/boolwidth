@@ -2,7 +2,7 @@ package boolwidth.greedysearch.growNeighbourHood;
 
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.Split;
-import boolwidth.greedysearch.base.StackDecompose;
+import boolwidth.greedysearch.base.StackDecomposeTryAllFirstVertexChoice;
 import graph.Vertex;
 import interfaces.IGraph;
 
@@ -22,7 +22,7 @@ class SplitStackItem {
     }
 }
 
-public class GrowNeighbourHoodDecompose extends StackDecompose {
+public class GrowNeighbourHoodDecompose extends StackDecomposeTryAllFirstVertexChoice {
 
     public GrowNeighbourHoodDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);

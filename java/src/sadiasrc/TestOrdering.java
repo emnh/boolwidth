@@ -43,7 +43,7 @@ public class TestOrdering {
         //String fileName =  ControlInput.GRAPHLIB+"coloring/myciel7.dgf";
         //String fileName =  ControlInput.GRAPHLIB+"coloring/homer.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob/alarm.dgf";
-		String fileName =  ControlInput.GRAPHLIB+"prob2/BN_26.dgf";
+		String fileName =  ControlInput.GRAPHLIB+"delauney/rat575.tsp.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"coloring/queen8_8.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob/barley.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob2/BN_100.dgf";
@@ -121,12 +121,12 @@ public class TestOrdering {
 		
 			IChooser chooser;
 		
-			start1=System.currentTimeMillis();
+			/*start1=System.currentTimeMillis();
 			chooser = new Symmdiff(G);
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);
 			System.out.println("Ordered Sequence: "+OrderedSequence);	
 			end1=System.currentTimeMillis();
-			System.out.println("Time taken: "+ (end1-start1)+ " ms");
+			System.out.println("Time taken: "+ (end1-start1)+ " ms");*/
 
 
 		//	result += "Symdiff "+ " "+ (end1-start1)+ " ";
@@ -139,13 +139,13 @@ public class TestOrdering {
 			result += "MIS"+ " "+ (maxis+taken_in_MIS)+" "+(end-start)+ " ";
 			*/
 
-			start=System.currentTimeMillis();
+			/*start=System.currentTimeMillis();
 			UBfromCP=caterpiller.getLinearBooleanWidth(OrderedSequence, G);
 			end=System.currentTimeMillis();
 			System.out.println("UB : "+logBW(UBfromCP)+" from SymmDiff Time taken: "+ (end-start)+ " ms");
 			
-			result +=  "Without Start "+UBfromCP;//+ " "+ (end-start)+ " ";
-			
+			result +=  "Without Start "+UBfromCP;//+ " "+ (end-start)+ " ";*/
+
 			
 			start1=System.currentTimeMillis();
 			chooser = new SymmdiffWithStart(G);

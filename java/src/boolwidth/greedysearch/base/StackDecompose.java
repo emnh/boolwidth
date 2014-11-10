@@ -1,6 +1,5 @@
 package boolwidth.greedysearch.base;
 
-import boolwidth.greedysearch.Util;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import com.google.common.collect.ArrayListMultimap;
@@ -15,17 +14,7 @@ import java.util.Stack;
 /**
  * Created by emh on 11/9/2014.
  */
-class SplitStackItem {
-    public Split parent;
-    public Split child;
-    public boolean isLeft;
 
-    public SplitStackItem(Split parent, Split child, boolean isLeft) {
-        this.child = child;
-        this.parent = parent;
-        this.isLeft = isLeft;
-    }
-}
 
 public class StackDecompose extends BaseDecompose {
 
@@ -40,16 +29,16 @@ public class StackDecompose extends BaseDecompose {
 
     public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
         Split rootSplit = createSplit(0, this, vertices);
-        Stack<SplitStackItem> splits = new Stack<>();
+        Stack<StackDecomposeSplitStackItem> splits = new Stack<>();
         Multimap<Split, Split> splitChildren = ArrayListMultimap.create();
 
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
         SimpleNode last = ibt.getRoot();
 
-        splits.push(new SplitStackItem(null, rootSplit, true));
+        splits.push(new StackDecomposeSplitStackItem(null, rootSplit, true));
         while (!splits.isEmpty()) {
-            SplitStackItem splitStackItem = splits.pop();
+            StackDecomposeSplitStackItem splitStackItem = splits.pop();
             Split split = splitStackItem.child;
             Split parent = splitStackItem.parent;
             //while (!(2 * split.lefts.size() >= split.rights.size())) {
@@ -62,21 +51,21 @@ public class StackDecompose extends BaseDecompose {
             if (split.getLefts().size() >= 2) {
                 Split leftChild = createSplit(split.getDepth() + 1, this, split.getLefts());
                 splitChildren.put(split, leftChild);
-                splits.push(new SplitStackItem(split, leftChild, true));
+                splits.push(new StackDecomposeSplitStackItem(split, leftChild, true));
             }
             if (split.getRights().size() >= 2) {
                 Split rightChild = createSplit(split.getDepth() + 1, this, split.getRights());
                 splitChildren.put(split, rightChild);
-                splits.push(new SplitStackItem(split, rightChild, false));
+                splits.push(new StackDecomposeSplitStackItem(split, rightChild, false));
             }
         }
 
         rootSplit = splitChildren.get(null).iterator().next();
-        splits.push(new SplitStackItem(null, rootSplit, true));
+        splits.push(new StackDecomposeSplitStackItem(null, rootSplit, true));
         HashMap<Split, SimpleNode> ibtMap = new HashMap<>();
         ibtMap.put(null, ibt.getRoot());
         while (!splits.isEmpty()) {
-            SplitStackItem splitStackItem = splits.pop();
+            StackDecomposeSplitStackItem splitStackItem = splits.pop();
             Split split = splitStackItem.child;
             Split splitParent = splitStackItem.parent;
             SimpleNode nodeParent = ibtMap.get(splitParent);
@@ -94,7 +83,7 @@ public class StackDecompose extends BaseDecompose {
             }
             for (Split child : splitChildren.get(split)) {
                 // true for isLeft is bogus, but we don't need it in this case
-                splits.push(new SplitStackItem(split, child, true));
+                splits.push(new StackDecomposeSplitStackItem(split, child, true));
             }
         }
         return ibt;

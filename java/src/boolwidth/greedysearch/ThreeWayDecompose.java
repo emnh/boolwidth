@@ -1,7 +1,7 @@
 package boolwidth.greedysearch;
 
 import boolwidth.greedysearch.base.BaseDecompose;
-import boolwidth.greedysearch.base.StackDecompose;
+import boolwidth.greedysearch.base.Util;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import com.github.krukow.clj_lang.PersistentVector;
@@ -112,7 +112,7 @@ public class ThreeWayDecompose extends BaseDecompose {
         lefts2.forEach((node) -> list2.add(node));
         ArrayList<Vertex<Integer>> list3 = new ArrayList<>();
         remaining.forEach((node) -> list3.add(node));
-        StackDecompose gd = new GrowNeighbourHoodDecompose(getGraph());
+        GrowNeighbourHoodDecompose gd = new GrowNeighbourHoodDecompose(getGraph());
         ImmutableBinaryTree ibt1 = gd.decompose(list1);
         ImmutableBinaryTree ibt2 = gd.decompose(list2);
         ImmutableBinaryTree ibt3 = gd.decompose(list3);

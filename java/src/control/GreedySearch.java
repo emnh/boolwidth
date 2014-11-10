@@ -12,8 +12,12 @@ import control.http.HTTPResultsServer;
 import graph.Vertex;
 import interfaces.IGraph;
 import com.cedarsoftware.util.io.JsonWriter;
+import io.DiskGraph;
 import org.json.simple.JSONObject;
 
+import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.function.Function;
 
@@ -109,7 +113,6 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "coloring/myciel7.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_65.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
-
         //String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/david.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.1.dgf";
@@ -119,8 +122,10 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "freq/celar11.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/rd400.tsp.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.3.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.3.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/vm1084.tsp.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "delauney/u724.tsp.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "delauney/u724.tsp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob/diabetes.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "freq/graph02-pp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "freq/graph04-pp.dgf";
@@ -128,17 +133,43 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "delauney/pr439.tsp.dgf";
-
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
+
+        // large graphs from Sadia's thesis
+        //String fileName = DiskGraph.getMatchingGraph("**link-pp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**diabetes-wpp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**link-wpp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**celar10.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**celar11.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**rd400.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**diabetes.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**fpsol2.i.3.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**pigs.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**celar08.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**homer.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**rat575.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**u724.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**inithx.i.1.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**munin2.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**vm1084.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**BN_24.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**BN_25.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**BN_23.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**BN_26.dgf");
+
+        //String fileName = DiskGraph.getMatchingGraph("**munin2.dgf");
+
         if (args.length > 0) {
             fileName = args[0];
         }
+        System.out.printf("filename: %s\n", fileName);
         IGraph<Vertex<Integer>, Integer, String> graph;
         graph = ControlUtil.getTestGraph(fileName);
 
         BaseDecompose gd = null;
 
-        switch (6) {
+        switch (8) {
             case 0:
                 gd = new BaseDecompose(graph);
                 break;
@@ -183,19 +214,23 @@ public class GreedySearch {
         long computeWidthStart = System.currentTimeMillis();
         long bw = gd.getBooleanWidth(ibt);
         long computeWidthEnd = System.currentTimeMillis();
-        result.put("cache hits", (double) gd.cacheHits / gd.cutboolTotalCalls);
-        result.put("decompose time", decomposeEnd - decomposeStart);
-        result.put("compute width time", computeWidthEnd - computeWidthStart);
-        result.put("boolean-width", BaseDecompose.getLogBooleanWidth(bw));
-        result.put("2^boolean-width", bw);
+        result.put("cacheHits", (double) gd.cacheHits / gd.cutboolTotalCalls);
+        result.put("decomposeTime", decomposeEnd - decomposeStart);
+        result.put("computeWidthTime", computeWidthEnd - computeWidthStart);
+        result.put("booleanWidth", BaseDecompose.getLogBooleanWidth(bw));
+        result.put("2^booleanWidth", bw);
+        result.put("graph", fileName);
+        result.put("v", graph.numVertices());
+        result.put("e", graph.numEdges());
         final BaseDecompose gd2 = gd;
         JSONObject jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
             if (node != ibt.getRoot()) {
-                obj.put("cutbool", gd2.getCutBool(ibt.getChildren(parent, node)));
+                obj.put("cutBool", gd2.getCutBool(ibt.getChildren(parent, node)));
             }
         });
 
         //System.out.println(JsonWriter.formatJson(jsonDecomposition.toString()));
+        System.out.printf("result: %s\n", result.toString()); // for parsing
         System.out.println(JsonWriter.formatJson(result.toString()));
 
         HTTPResultsServer hrServer = new HTTPResultsServer();

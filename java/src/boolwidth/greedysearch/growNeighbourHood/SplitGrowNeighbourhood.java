@@ -1,7 +1,9 @@
 package boolwidth.greedysearch.growNeighbourHood;
 
+import boolwidth.greedysearch.base.Util;
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.Split;
+import graph.BasicGraphAlgorithms;
 import graph.Vertex;
 import graph.subsets.PosSet;
 import graph.subsets.PosSubSet;
@@ -14,8 +16,8 @@ import java.util.TreeSet;
  */
 public class SplitGrowNeighbourhood extends Split {
 
-    public SplitGrowNeighbourhood(SplitGrowNeighbourhood old) {
-        copy(old);
+    public SplitGrowNeighbourhood() {
+        super();
     }
 
     public SplitGrowNeighbourhood(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
@@ -23,8 +25,15 @@ public class SplitGrowNeighbourhood extends Split {
     }
 
     @Override
+    public SplitGrowNeighbourhood create(Split old) {
+        SplitGrowNeighbourhood result = new SplitGrowNeighbourhood();
+        result.copy(old);
+        return result;
+    }
+
+    @Override
     public SplitGrowNeighbourhood decomposeAdvance() {
-        SplitGrowNeighbourhood result = new SplitGrowNeighbourhood(this);
+        SplitGrowNeighbourhood result = create(this);
         if (done()) {
             return this;
         } else {
@@ -65,26 +74,26 @@ public class SplitGrowNeighbourhood extends Split {
             //long cb2 = this.getDecomposition().getApproximateCutBool(this.getDecomposition().verticesToInts(lefts)); //measureCut.applyAsLong(lefts, null);
             //System.out.printf("bw: %.2f\n", this.decomposition.getLogBooleanWidth(cb2));
 
-
-            // TODO: what if rightHoodAll is empty and there are more nodes in right?
-
             // First check for isolated or twin nodes
             for (Vertex<Integer> v : rights) {
                 int rightNeighboursOfVCount = 0;
                 PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
+                PosSubSet<Vertex<Integer>> neighbors_plus_V = new PosSubSet<>(all);
                 for (Vertex<Integer> u : graph.incidentVertices(v)) {
                     if (rights.contains(u)) {
                         neighbors.add(u);
                         rightNeighboursOfVCount++;
                     }
                 }
+                neighbors_plus_V = neighbors.clone();
+                neighbors_plus_V.add(v);
                 // isolated node
                 if (rightNeighboursOfVCount == 0) {
                     tomove = v;
                     break;
                 }
                 // twin node
-                if (nodeHoods.contains(neighbors)) {
+                if (nodeHoods.contains(neighbors) || nodeHoods.contains(neighbors_plus_V)) {
                     tomove = v;
                     break;
                 }
@@ -117,18 +126,17 @@ public class SplitGrowNeighbourhood extends Split {
                         ratio = external / internal;
                     }
                     if (ratio < minmove) {
+                        //System.out.println("chose by ratio");
                         minmove = ratio;
                         tomove = v;
                     }
                 }
             }
             if (tomove == null) {
-                for (Vertex<Integer> v : rights) {
-                    System.out.println("was empty, just took first");
-                    // TODO: BFS
-                    tomove = v;
-                    break;
-                }
+                tomove = Util.getFirst(rights);
+                //tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
+                //tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
+                //System.out.println("was empty, did BFS");
             }
 
             result.lefts = result.lefts.cons(tomove);

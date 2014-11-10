@@ -1,16 +1,16 @@
 package boolwidth.greedysearch.symdiff;
 
 import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.CaterpillarDecompose;
 import boolwidth.greedysearch.base.Split;
-import boolwidth.greedysearch.base.StackDecompose;
-import boolwidth.greedysearch.growNeighbourHood.SplitGrowNeighbourhood;
+import boolwidth.greedysearch.base.StackDecomposeTryAllFirstVertexChoice;
 import graph.Vertex;
 import interfaces.IGraph;
 
 /**
  * Created by emh on 11/3/2014.
  */
-public class SymDiffDecompose extends StackDecompose {
+public class SymDiffDecompose extends CaterpillarDecompose {
 
     public SymDiffDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);

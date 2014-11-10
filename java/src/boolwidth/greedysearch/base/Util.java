@@ -1,4 +1,4 @@
-package boolwidth.greedysearch;
+package boolwidth.greedysearch.base;
 
 import com.github.krukow.clj_lang.PersistentVector;
 import com.github.krukow.clj_lang.PersistentHashSet;
@@ -15,6 +15,11 @@ public class Util {
         if (set.size() > 1) {
             throw new IndexOutOfBoundsException("set was not size 1");
         }
+        for (T r : set) return r;
+        throw new IndexOutOfBoundsException("set was empty");
+    }
+
+    public static <T> T getFirst(PersistentHashSet<T> set) {
         for (T r : set) return r;
         throw new IndexOutOfBoundsException("set was empty");
     }

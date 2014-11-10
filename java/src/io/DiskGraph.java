@@ -1,5 +1,6 @@
 package io;
 
+import control.ControlUtil;
 import exceptions.FatalHandler;
 import exceptions.InvalidGraphFileFormatException;
 import graph.Vertex;
@@ -7,6 +8,10 @@ import interfaces.IGraph;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -178,6 +183,29 @@ public class DiskGraph {
 
 	public static void setFileName(IGraph<?, ?, ?> graph, String filename) {
 		graph.setAttr(SOURCE_FILENAME_FIELD, filename);
+	}
+
+	public static String getMatchingGraph(String pattern) throws IOException {
+		String path = ControlUtil.GRAPHLIB;
+		PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+		int count = 0;
+		String fileName = null;
+		ArrayList<String> fileNames = new ArrayList<>();
+		for (File file : DiskGraph.iterateOver(path, true)) {
+			//Path p = FileSystems.getDefault().getPath(file.toString());
+			if (matcher.matches(file.toPath())) {
+				count++;
+				fileName = file.toString();
+				fileNames.add(fileName);
+			}
+		}
+		if (count != 1) {
+			for (String f : fileNames) {
+				System.out.println(f);
+			}
+			throw new IOException("invalid number of matching files: " + count);
+		}
+		return fileName;
 	}
 
 }

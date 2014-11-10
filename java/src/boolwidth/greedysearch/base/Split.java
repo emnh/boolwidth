@@ -1,6 +1,5 @@
 package boolwidth.greedysearch.base;
 
-import boolwidth.greedysearch.Util;
 import com.github.krukow.clj_lang.PersistentHashSet;
 import graph.Vertex;
 
@@ -21,8 +20,10 @@ public class Split {
 
     }
 
-    public Split(Split old) {
-        copy(old);
+    public Split create(Split old) {
+        Split result = new Split();
+        result.copy(old);
+        return result;
     }
 
     protected void copy(Split old) {
@@ -101,16 +102,18 @@ public class Split {
             lastid = getLastMoved().id();
             lastDegree = this.getDecomposition().getGraph().degree(getLastMoved());
         }
-        System.out.printf("time: %d, d: %d, sz: %d/%d, bw: %.2f, 2^bw: %d, last: %d, deg: %d, lefts: %s\n",
-                System.currentTimeMillis() - this.decomposition.getStart(),
-                depth, lefts.size(), lefts.size() + rights.size(),
-                decomposition.getLogBooleanWidth(cutbool), cutbool,
-                lastid, lastDegree,
-                lefts);
+        if (false) {
+            System.out.printf("time: %d, d: %d, sz: %d/%d, bw: %.2f, 2^bw: %d, last: %d, deg: %d, lefts: %s\n",
+                    System.currentTimeMillis() - this.decomposition.getStart(),
+                    depth, lefts.size(), lefts.size() + rights.size(),
+                    decomposition.getLogBooleanWidth(cutbool), cutbool,
+                    lastid, lastDegree,
+                    lefts);
+        }
     }
 
     public Split cons(Vertex<Integer> toadd) {
-        Split result = new Split(this);
+        Split result = create(this);
         result.rights = result.rights.cons(toadd);
         return result;
     }
@@ -143,8 +146,18 @@ public class Split {
         return this.getDecomposition().getCutBool(newLefts, true);
     }
 
+    public Split decomposeAdvanceFixed(Vertex<Integer> tomove) {
+        Split result = create(this);
+        result.lefts = result.lefts.cons(tomove);
+        result.rights = result.rights.disjoin(tomove);
+        result.cutbool = 0;
+        result.reference = tomove;
+        result.logStatement();
+        return result;
+    }
+
     public Split decomposeAdvance() {
-        Split result = new Split(this);
+        Split result = create(this);
         if (done()) {
             return this;
         } else {
@@ -180,7 +193,7 @@ public class Split {
     }
 
     public Split decomposeAdvanceRight() {
-        Split result = new Split(this);
+        Split result = create(this);
         if (done()) {
             return this;
         } else {

@@ -2,6 +2,9 @@ package boolwidth.greedysearch.symdiff;
 
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.Split;
+import boolwidth.greedysearch.base.Util;
+import boolwidth.greedysearch.growNeighbourHood.SplitGrowNeighbourhood;
+import graph.BasicGraphAlgorithms;
 import graph.Vertex;
 import graph.subsets.PosSet;
 import graph.subsets.PosSubSet;
@@ -14,8 +17,14 @@ import java.util.TreeSet;
  */
 public class SplitSymDiff extends Split {
 
-    public SplitSymDiff(SplitSymDiff old) {
-        copy(old);
+    public SplitSymDiff() {
+    }
+
+    @Override
+    public SplitSymDiff create(Split old) {
+        SplitSymDiff result = new SplitSymDiff();
+        result.copy(old);
+        return result;
     }
 
     public SplitSymDiff(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
@@ -24,7 +33,7 @@ public class SplitSymDiff extends Split {
 
     @Override
     public SplitSymDiff decomposeAdvance() {
-        SplitSymDiff result = new SplitSymDiff(this);
+        SplitSymDiff result = create(this);
         if (done()) {
             return this;
         } else {
@@ -55,40 +64,50 @@ public class SplitSymDiff extends Split {
             //long cb2 = this.getDecomposition().getApproximateCutBool(this.getDecomposition().verticesToInts(lefts)); //measureCut.applyAsLong(lefts, null);
             //System.out.printf("bw: %.2f\n", this.decomposition.getLogBooleanWidth(cb2));
 
-            int i = 0;
-            for (Vertex<Integer> v : rights) {
-                i += 1;
+            if (lefts.size() == 0) {
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
+                //System.out.println("was empty, did BFS");
+            }
 
-                PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
-                int rightCount = 0;
-                int rightNoNeighborInLeft = 0;
-                for (Vertex<Integer> u : graph.incidentVertices(v)) {
-                    if (rights.contains(u)) {
-                        neighbors.add(u);
-                        rightCount++;
-                        if (!rightHoodAll.contains(u)) {
-                            rightNoNeighborInLeft++;
+            if (tomove == null) {
+                int i = 0;
+                for (Vertex<Integer> v : rights) {
+                    i += 1;
+
+                    PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
+                    PosSubSet<Vertex<Integer>> neighbors_plus_V = new PosSubSet<>(all);
+                    neighbors_plus_V.add(v);
+                    int rightCount = 0;
+                    int rightNoNeighborInLeft = 0;
+                    for (Vertex<Integer> u : graph.incidentVertices(v)) {
+                        if (rights.contains(u)) {
+                            neighbors.add(u);
+                            neighbors_plus_V.add(u);
+                            rightCount++;
+                            if (!rightHoodAll.contains(u)) {
+                                rightNoNeighborInLeft++;
+                            }
                         }
                     }
-                }
+                    long cb = rightNoNeighborInLeft; // neighbors.size();
 
-                long cb = rightNoNeighborInLeft; // neighbors.size();
-
-                // isolated node
-                if (rightCount == 0) {
-                    minmove = cb;
-                    tomove = v;
-                    break;
-                }
-                // twin node
-                if (nodeHoods.contains(neighbors)) {
-                    minmove = cb;
-                    tomove = v;
-                    break;
-                }
-                if (cb < minmove) {
-                    minmove = cb;
-                    tomove = v;
+                    // isolated node
+                    if (rightCount == 0 && rightHoodAll.contains(v)) {
+                        minmove = cb;
+                        tomove = v;
+                        break;
+                    }
+                    // twin node
+                    if (nodeHoods.contains(neighbors) || nodeHoods.contains(neighbors_plus_V)) {
+                        minmove = cb;
+                        tomove = v;
+                        break;
+                    }
+                    if (cb < minmove) {
+                        minmove = cb;
+                        tomove = v;
+                    }
                 }
             }
             result.lefts = result.lefts.cons(tomove);
