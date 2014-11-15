@@ -156,7 +156,57 @@ public class Split {
         return result;
     }
 
-    public Split decomposeAdvance() {
+    public Split localSearch() {
+        Split result = create(this);
+        if (done()) {
+            return this;
+        } else {
+            long oldCutBoolLeft = measureCutForDecompose(lefts, null);
+            long oldCutBoolRight = measureCutForDecompose(rights, null);
+            long minMove = Math.max(oldCutBoolLeft, oldCutBoolRight);
+            Vertex<Integer> toMove = null;
+
+            if (2 * (lefts.size() - 1) >= (rights.size() + 1)) {
+                for (Vertex<Integer> v : lefts) {
+                    PersistentHashSet<Vertex<Integer>> newRights = rights.cons(v);
+                    PersistentHashSet<Vertex<Integer>> newLefts = lefts.disjoin(v);
+                    long cb1 = measureCutForDecompose(newRights, v);
+                    long cb2 = measureCutForDecompose(newLefts, v);
+                    long cb = Math.max(cb1, cb2);
+                    if (cb < minMove) {
+                        minMove = cb;
+                        toMove = v;
+                    }
+                }
+            }
+            if (2 * (rights.size() - 1) >= (lefts.size() + 1)) {
+                for (Vertex<Integer> v : rights) {
+                    PersistentHashSet<Vertex<Integer>> newLefts = lefts.cons(v);
+                    PersistentHashSet<Vertex<Integer>> newRights = rights.disjoin(v);
+                    long cb1 = measureCutForDecompose(newRights, v);
+                    long cb2 = measureCutForDecompose(newLefts, v);
+                    long cb = Math.max(cb1, cb2);
+                    if (cb < minMove) {
+                        minMove = cb;
+                        toMove = v;
+                    }
+                }
+            }
+            if (rights.contains(toMove)) {
+                result.lefts = result.lefts.cons(toMove);
+                result.rights = result.rights.disjoin(toMove);
+            } else if (lefts.contains(toMove)) {
+                result.lefts = result.lefts.disjoin(toMove);
+                result.rights = result.rights.cons(toMove);
+            }
+            result.cutbool = minMove;
+            result.reference = toMove;
+            result.logStatement();
+        }
+        return result;
+    }
+
+    public Split decomposeAdvanceBase() {
         Split result = create(this);
         if (done()) {
             return this;
@@ -175,8 +225,8 @@ public class Split {
                     minmove = cb;
                     tomove = v;
                     if (cb <= oldcb) {
-                    //if (cb <= Math.pow(2, 20)) {
-                    //if (cb <= Math.pow(2.0, 13)) {
+                        //if (cb <= Math.pow(2, 20)) {
+                        //if (cb <= Math.pow(2.0, 13)) {
                         // exit early if we didn't increase
                         System.out.printf("cheated: %d/%d\n", i, rights.size());
                         break;
@@ -192,7 +242,11 @@ public class Split {
         return result;
     }
 
-    public Split decomposeAdvanceRight() {
+    public Split decomposeAdvance() {
+        return decomposeAdvanceBase();
+    }
+
+    public Split decomposeAdvanceBaseRight() {
         Split result = create(this);
         if (done()) {
             return this;
@@ -223,5 +277,9 @@ public class Split {
             result.logStatement();
         }
         return result;
+    }
+
+    public Split decomposeAdvanceRight() {
+        return decomposeAdvanceBaseRight();
     }
 }

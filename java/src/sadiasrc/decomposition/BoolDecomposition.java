@@ -164,7 +164,7 @@ public class BoolDecomposition extends DisjointBinaryDecomposition {
 				nout.retainAll(out);
 				nrest.retainAll(rest);
 
-				total *= boolDimBranch(G,nall,nout,nrest);
+				total = Math.multiplyExact(total, boolDimBranch(G,nall,nout,nrest));
 //				System.out.println("total = "+total);
 			}
 

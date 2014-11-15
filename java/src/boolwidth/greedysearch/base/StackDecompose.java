@@ -18,6 +18,8 @@ import java.util.Stack;
 
 public class StackDecompose extends BaseDecompose {
 
+    public static final int LOCAL_SEARCH_TIME = 10*1000;
+
     public StackDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
     }
@@ -32,36 +34,127 @@ public class StackDecompose extends BaseDecompose {
         Stack<StackDecomposeSplitStackItem> splits = new Stack<>();
         Multimap<Split, Split> splitChildren = ArrayListMultimap.create();
 
-        ImmutableBinaryTree ibt = new ImmutableBinaryTree();
-        ibt = ibt.addRoot();
-        SimpleNode last = ibt.getRoot();
+        splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+        decomposeSplits(splits, splitChildren);
 
-        splits.push(new StackDecomposeSplitStackItem(null, rootSplit, true));
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < LOCAL_SEARCH_TIME) {
+            rootSplit = splitChildren.get(null).iterator().next();
+            splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+            localSearch(splits, splitChildren);
+        }
+
+        rootSplit = splitChildren.get(null).iterator().next();
+        splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+        return getImmutableBinaryTree(splits, splitChildren);
+    }
+
+    protected void localSearch(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
+        long UB = 0;
+        long secondLargest = 0;
+        StackDecomposeSplitStackItem maxSplit = null;
+
+        // iterate tree and find largest split
+        while (!splits.isEmpty()) {
+            StackDecomposeSplitStackItem splitStackItem = splits.pop();
+            Split split = splitStackItem.child;
+            Split parent = splitStackItem.parent;
+            /*if (!split.isBalanced()) {
+                split = initSplit(splits, splitChildren, split, parent);
+            }*/
+            long leftCutbool = split.measureCutForDecompose(split.getLefts(), null);
+            long rightCutbool = split.measureCutForDecompose(split.getRights(), null);
+            long maxCutBool = Math.max(leftCutbool, rightCutbool);
+            if (maxCutBool > UB) {
+                secondLargest = UB;
+                UB = maxCutBool;
+                maxSplit = splitStackItem;
+            }
+            initSplitChildren(splits, splitChildren, split);
+        }
+
+        // do local search on largest split
+        for (int i = 0; i < 1; i++) {
+            System.out.println("local search");
+            Split split = maxSplit.child;
+            Split parent = maxSplit.parent;
+            Split newSplit = split.localSearch();
+            long leftCutbool2 = split.measureCutForDecompose(newSplit.getLefts(), null);
+            long rightCutbool2 = split.measureCutForDecompose(newSplit.getRights(), null);
+            long maxCutBool2 = Math.max(leftCutbool2, rightCutbool2);
+            System.out.printf("LS: old: %.2f, new: %.2f\n", getLogBooleanWidth(UB), getLogBooleanWidth(maxCutBool2));
+            UB = maxCutBool2;
+
+            splitChildren.remove(parent, split);
+            splitChildren.put(parent, newSplit);
+            split = newSplit;
+            maxSplit = new StackDecomposeSplitStackItem(parent, split);
+
+            if (UB < secondLargest) {
+                System.out.printf("break: second: %.2f\n", getLogBooleanWidth(secondLargest));
+                break;
+            }
+        }
+
+        // resplit tree if necessary
+        Split rootSplit = splitChildren.get(null).iterator().next();
+        splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+        while (!splits.isEmpty()) {
+            StackDecomposeSplitStackItem splitStackItem = splits.pop();
+            Split split = splitStackItem.child;
+            Split parent = splitStackItem.parent;
+            if (split.getLefts().size() == 0 || split.getRights().size() == 0) {
+                split = initSplit(splits, splitChildren, split, parent);
+            }
+            initSplitChildren(splits, splitChildren, split);
+        }
+        //decomposeSplits(splits, splitChildren);
+    }
+
+    protected void decomposeSplits(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
         while (!splits.isEmpty()) {
             StackDecomposeSplitStackItem splitStackItem = splits.pop();
             Split split = splitStackItem.child;
             Split parent = splitStackItem.parent;
             //while (!(2 * split.lefts.size() >= split.rights.size())) {
-            while (!split.isBalanced()) {
-                Split newSplit = split.decomposeAdvance();
-                splitChildren.remove(parent, split);
-                splitChildren.put(parent, newSplit);
-                split = newSplit;
-            }
+            split = initSplit(splits, splitChildren, split, parent);
+            initSplitChildren(splits, splitChildren, split);
+        }
+    }
+
+    private Split initSplit(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren, Split split, Split parent) {
+        while (!split.isBalanced()) {
+            Split newSplit = split.decomposeAdvance();
+            splitChildren.remove(parent, split);
+            splitChildren.put(parent, newSplit);
+            split = newSplit;
+        }
+        return split;
+    }
+
+    private void initSplitChildren(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren, Split split) {
+        if (splitChildren.get(split).isEmpty()) {
             if (split.getLefts().size() >= 2) {
                 Split leftChild = createSplit(split.getDepth() + 1, this, split.getLefts());
                 splitChildren.put(split, leftChild);
-                splits.push(new StackDecomposeSplitStackItem(split, leftChild, true));
+                splits.push(new StackDecomposeSplitStackItem(split, leftChild));
             }
             if (split.getRights().size() >= 2) {
                 Split rightChild = createSplit(split.getDepth() + 1, this, split.getRights());
                 splitChildren.put(split, rightChild);
-                splits.push(new StackDecomposeSplitStackItem(split, rightChild, false));
+                splits.push(new StackDecomposeSplitStackItem(split, rightChild));
+            }
+        } else {
+            for (Split child : splitChildren.get(split)) {
+                splits.push(new StackDecomposeSplitStackItem(split, child));
             }
         }
+    }
 
-        rootSplit = splitChildren.get(null).iterator().next();
-        splits.push(new StackDecomposeSplitStackItem(null, rootSplit, true));
+    protected ImmutableBinaryTree getImmutableBinaryTree(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
+        ImmutableBinaryTree ibt = new ImmutableBinaryTree();
+        ibt = ibt.addRoot();
+        SimpleNode last = ibt.getRoot();
         HashMap<Split, SimpleNode> ibtMap = new HashMap<>();
         ibtMap.put(null, ibt.getRoot());
         while (!splits.isEmpty()) {
@@ -83,7 +176,7 @@ public class StackDecompose extends BaseDecompose {
             }
             for (Split child : splitChildren.get(split)) {
                 // true for isLeft is bogus, but we don't need it in this case
-                splits.push(new StackDecomposeSplitStackItem(split, child, true));
+                splits.push(new StackDecomposeSplitStackItem(split, child));
             }
         }
         return ibt;

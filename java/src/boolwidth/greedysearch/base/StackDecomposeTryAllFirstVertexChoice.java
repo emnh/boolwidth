@@ -14,7 +14,7 @@ import java.util.Stack;
 /**
  * Created by emh on 11/9/2014.
  */
-public class StackDecomposeTryAllFirstVertexChoice extends BaseDecompose {
+public class StackDecomposeTryAllFirstVertexChoice extends StackDecompose {
 
     public StackDecomposeTryAllFirstVertexChoice(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
@@ -28,9 +28,9 @@ public class StackDecomposeTryAllFirstVertexChoice extends BaseDecompose {
     public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
         Split rootSplit0 = createSplit(0, this, vertices);
 
-        ArrayList<String> results = new ArrayList<>();
         long minBW = Long.MAX_VALUE;
         ImmutableBinaryTree minIBT = null;
+        Multimap<Split, Split> minSplitChildren = null;
 
         int i = 0;
         for (Vertex<Integer> v : vertices) {
@@ -39,68 +39,42 @@ public class StackDecomposeTryAllFirstVertexChoice extends BaseDecompose {
             Stack<StackDecomposeSplitStackItem> splits = new Stack<>();
             Multimap<Split, Split> splitChildren = ArrayListMultimap.create();
 
-            ImmutableBinaryTree ibt = new ImmutableBinaryTree();
-            ibt = ibt.addRoot();
-            SimpleNode last = ibt.getRoot();
+            // TODO: reuse split tree for next iterations
+            splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+            decomposeSplits(splits, splitChildren);
 
-            splits.push(new StackDecomposeSplitStackItem(null, rootSplit, true));
-            while (!splits.isEmpty()) {
-                StackDecomposeSplitStackItem splitStackItem = splits.pop();
-                Split split = splitStackItem.child;
-                Split parent = splitStackItem.parent;
-                //while (!(2 * split.lefts.size() >= split.rights.size())) {
-                while (!split.isBalanced()) {
-                    Split newSplit = split.decomposeAdvance();
-                    splitChildren.remove(parent, split);
-                    splitChildren.put(parent, newSplit);
-                    split = newSplit;
-                }
-                if (split.getLefts().size() >= 2) {
-                    Split leftChild = createSplit(split.getDepth() + 1, this, split.getLefts());
-                    splitChildren.put(split, leftChild);
-                    splits.push(new StackDecomposeSplitStackItem(split, leftChild, true));
-                }
-                if (split.getRights().size() >= 2) {
-                    Split rightChild = createSplit(split.getDepth() + 1, this, split.getRights());
-                    splitChildren.put(split, rightChild);
-                    splits.push(new StackDecomposeSplitStackItem(split, rightChild, false));
-                }
-            }
-
+            // TODO: don't construct IBT just to getBooleanWidth
             rootSplit = splitChildren.get(null).iterator().next();
-            splits.push(new StackDecomposeSplitStackItem(null, rootSplit, true));
-            HashMap<Split, SimpleNode> ibtMap = new HashMap<>();
-            ibtMap.put(null, ibt.getRoot());
-            while (!splits.isEmpty()) {
-                StackDecomposeSplitStackItem splitStackItem = splits.pop();
-                Split split = splitStackItem.child;
-                Split splitParent = splitStackItem.parent;
-                SimpleNode nodeParent = ibtMap.get(splitParent);
-                if (split.getLefts().size() >= 2) {
-                    ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
-                    ibtMap.put(split, ibt.getReference());
-                } else if (split.getLefts().size() == 1) {
-                    ibt = ibt.addChild(nodeParent, Util.getSingle(split.getLefts()).id());
-                }
-                if (split.getRights().size() >= 2) {
-                    ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
-                    ibtMap.put(split, ibt.getReference());
-                } else if (split.getRights().size() == 1) {
-                    ibt = ibt.addChild(nodeParent, Util.getSingle(split.getRights()).id());
-                }
-                for (Split child : splitChildren.get(split)) {
-                    // true for isLeft is bogus, but we don't need it in this case
-                    splits.push(new StackDecomposeSplitStackItem(split, child, true));
-                }
-            }
+            splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+            ImmutableBinaryTree ibt = getImmutableBinaryTree(splits, splitChildren);
+
             long bw = getBooleanWidth(ibt);
             System.out.printf("i: %d/%d, minBW: %.2f, BW: %.2f\n",
                     i, vertices.size(), getLogBooleanWidth(minBW), getLogBooleanWidth(bw));
             if (bw < minBW) {
                 minBW = bw;
                 minIBT = ibt;
+                minSplitChildren = splitChildren;
             }
         }
+
+        // local search
+        long start = System.currentTimeMillis();
+        Stack<StackDecomposeSplitStackItem> splits = new Stack<>();
+        while (System.currentTimeMillis() - start < LOCAL_SEARCH_TIME) {
+            Split rootSplit = minSplitChildren.get(null).iterator().next();
+            splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+            localSearch(splits, minSplitChildren);
+        }
+        Split rootSplit = minSplitChildren.get(null).iterator().next();
+        splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+        ImmutableBinaryTree lsIBT = getImmutableBinaryTree(splits, minSplitChildren);
+
+        // local search is dumb enough that it can increase boolean width, because it considers local cuts only
+        if (getBooleanWidth(lsIBT) < getBooleanWidth(minIBT)) {
+            minIBT = lsIBT;
+        }
+
         return minIBT;
     }
 

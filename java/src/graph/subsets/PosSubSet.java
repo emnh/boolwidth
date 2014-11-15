@@ -459,6 +459,22 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
         return new PosSubSet<TVertex>(this.groundSet, newWords);
     }
 
+	public PosSubSet<TVertex> symmetricDifference(PosSubSet<TVertex> set) {
+		if ((Set<?>) this.groundSet != set.getSet()) {
+			throw new IndexOutOfBoundsException(
+					"Different ground sets can not be compared");
+		}
+
+		long[] oldWords = set.getWords();
+		long[] newWords = new long[this.words.length];
+
+		// Perform logical AND on words
+		for (int i = 0; i < this.words.length; i++) {
+			newWords[i] = this.words[i] ^ oldWords[i];
+		}
+		return new PosSubSet<TVertex>(this.groundSet, newWords);
+	}
+
     public boolean isSubset(PosSubSet<TVertex> set) {
         return this.intersect(set).equals(this);
     }

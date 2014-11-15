@@ -31,6 +31,7 @@ public class BaseDecompose {
     long oldPrint;
     static final int PRINT_INTERVAL = 1000;
     static final int SAMPLE_COUNT = 100;
+    static final int UPPER_BOUND_EXCEEDED = -1;
 
     public BaseDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         this.graph = graph;
@@ -135,12 +136,38 @@ public class BaseDecompose {
         return maxCutBool[0];
     }
 
+    public long getBooleanWidth(ImmutableBinaryTree ibt, ToLongFunction<HashSet<Integer>> fgetCutBool, long UB) {
+        final long[] maxCutBool = {0};
+
+        ArrayList<HashSet<Integer>> lefts = new ArrayList<>();
+        ibt.dfs((parent, node) -> {
+            HashSet<Integer> vertexIDs = new HashSet<>(ibt.getChildren(parent, node));
+            lefts.add(vertexIDs);
+        });
+        for (HashSet<Integer> vertexIDs : lefts) {
+            long cutbool = fgetCutBool.applyAsLong(vertexIDs);
+            if (cutbool > UB) {
+                System.out.println("UB exceeded, returning");
+                return UPPER_BOUND_EXCEEDED;
+            }
+            System.out.printf("got cutbool: %d, bw: %d\n", vertexIDs.size(), cutbool);
+            if (cutbool > maxCutBool[0]) {
+                maxCutBool[0] = cutbool;
+            }
+        }
+        return maxCutBool[0];
+    }
+
     public long getFunkyBooleanWidth(ImmutableBinaryTree ibt) {
         return getBooleanWidth(ibt, (lefts) -> getFunkyCutBool(ibt, lefts));
     }
 
     public long getBooleanWidth(ImmutableBinaryTree ibt) {
         return getBooleanWidth(ibt, (lefts) -> getCutBool(lefts));
+    }
+
+    public long getBooleanWidth(ImmutableBinaryTree ibt, long UB) {
+        return getBooleanWidth(ibt, (lefts) -> getCutBool(lefts), UB);
     }
 
     public long getApproximateBooleanWidth(ImmutableBinaryTree ibt) {
@@ -217,6 +244,9 @@ public class BaseDecompose {
         if (!valid[0]) {
             System.out.println("vertexIDs: " + vertexIds);
             System.out.println("children: " + children);
+            HashSet<Integer> difference = new HashSet<>(vertexIds);
+            difference.removeAll(children);
+            System.out.println("difference: " + difference);
         }
 
         ibt.dfs((parent, node) -> {

@@ -17,7 +17,7 @@ public class CaterpillarDecompose extends BaseDecompose {
 
     @Override
     public ImmutableBinaryTree decompose() {
-        SplitSymDiff split = new SplitSymDiff(0, this, getGraph().vertices());
+        Split split = createSplit(0, this, getGraph().vertices());
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
 

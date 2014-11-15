@@ -6,11 +6,9 @@ package boolwidth.greedysearch.base;
 class StackDecomposeSplitStackItem {
     public Split parent;
     public Split child;
-    public boolean isLeft;
 
-    public StackDecomposeSplitStackItem(Split parent, Split child, boolean isLeft) {
+    public StackDecomposeSplitStackItem(Split parent, Split child) {
         this.child = child;
         this.parent = parent;
-        this.isLeft = isLeft;
     }
 }

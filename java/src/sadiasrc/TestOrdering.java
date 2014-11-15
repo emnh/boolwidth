@@ -43,7 +43,7 @@ public class TestOrdering {
         //String fileName =  ControlInput.GRAPHLIB+"coloring/myciel7.dgf";
         //String fileName =  ControlInput.GRAPHLIB+"coloring/homer.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob/alarm.dgf";
-		String fileName =  ControlInput.GRAPHLIB+"delauney/rat575.tsp.dgf";
+		String fileName =  ControlInput.GRAPHLIB+"prob2/BN_23.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"coloring/queen8_8.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob/barley.dgf";
 		//String fileName =  ControlInput.GRAPHLIB+"prob2/BN_100.dgf";
@@ -147,7 +147,7 @@ public class TestOrdering {
 			result +=  "Without Start "+UBfromCP;//+ " "+ (end-start)+ " ";*/
 
 			
-			start1=System.currentTimeMillis();
+			/*start1=System.currentTimeMillis();
 			chooser = new SymmdiffWithStart(G);
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);
 			System.out.println("Ordered Sequence: "+OrderedSequence);	
@@ -167,7 +167,7 @@ public class TestOrdering {
 			
 			
 			
-			start1=System.currentTimeMillis();
+			/*start1=System.currentTimeMillis();
 			chooser = new GrowNeighborhood(G);
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);
 			System.out.println("Ordered Sequence: "+OrderedSequence);	
@@ -179,9 +179,9 @@ public class TestOrdering {
 			start=System.currentTimeMillis();
 			UBfromCP=caterpiller.getLinearBooleanWidth(OrderedSequence, G);
 			end=System.currentTimeMillis();
-			System.out.println("UB : "+logBW(UBfromCP)+" from GrowNeighbourhood Time taken: "+ (end-start)+ " ms");
+			System.out.println("UB : "+logBW(UBfromCP)+" from GrowNeighbourhood Time taken: "+ (end-start)+ " ms");*/
 			
-			result += UBfromCP+ " "+ (end-start)+ " ";
+			//-----------++result += UBfromCP+ " "+ (end-start)+ " ";
 			start1=System.currentTimeMillis();
 			chooser = new GrowNeighborhoodWithStart(G);
 			OrderedSequence = CreateOrdering.BuildSequence(G, chooser);

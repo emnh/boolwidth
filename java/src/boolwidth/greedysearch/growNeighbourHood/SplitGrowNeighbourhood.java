@@ -69,33 +69,54 @@ public class SplitGrowNeighbourhood extends Split {
 
             //long oldcb = this.getDecomposition
             double minmove = Double.MAX_VALUE;
+            double minmove_E = Double.MAX_VALUE;
             Vertex<Integer> tomove = null;
+            Vertex<Integer> tomove_E = null;
 
             //long cb2 = this.getDecomposition().getApproximateCutBool(this.getDecomposition().verticesToInts(lefts)); //measureCut.applyAsLong(lefts, null);
             //System.out.printf("bw: %.2f\n", this.decomposition.getLogBooleanWidth(cb2));
 
-            // First check for isolated or twin nodes
-            for (Vertex<Integer> v : rights) {
-                int rightNeighboursOfVCount = 0;
-                PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
-                PosSubSet<Vertex<Integer>> neighbors_plus_V = new PosSubSet<>(all);
-                for (Vertex<Integer> u : graph.incidentVertices(v)) {
-                    if (rights.contains(u)) {
-                        neighbors.add(u);
-                        rightNeighboursOfVCount++;
+            if (tomove == null && lefts.size() == 0) {
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
+            }
+
+            // First check for isolated nodes
+            if (tomove == null) {
+                for (Vertex<Integer> v : N_LEFT) {
+                    int rightNeighboursOfVCount = 0;
+                    for (Vertex<Integer> u : graph.incidentVertices(v)) {
+                        if (rights.contains(u)) {
+                            rightNeighboursOfVCount++;
+                        }
+                    }
+                    // isolated node
+                    if (rightNeighboursOfVCount == 0) {
+                        tomove = v;
+                        break;
                     }
                 }
-                neighbors_plus_V = neighbors.clone();
-                neighbors_plus_V.add(v);
-                // isolated node
-                if (rightNeighboursOfVCount == 0) {
-                    tomove = v;
-                    break;
-                }
-                // twin node
-                if (nodeHoods.contains(neighbors) || nodeHoods.contains(neighbors_plus_V)) {
-                    tomove = v;
-                    break;
+            }
+
+            // Then check for twin nodes
+            if (tomove == null) {
+                for (Vertex<Integer> v : rights) {
+                    int rightNeighboursOfVCount = 0;
+                    PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
+                    PosSubSet<Vertex<Integer>> neighbors_plus_V = new PosSubSet<>(all);
+                    for (Vertex<Integer> u : graph.incidentVertices(v)) {
+                        if (rights.contains(u)) {
+                            neighbors.add(u);
+                            rightNeighboursOfVCount++;
+                        }
+                    }
+                    neighbors_plus_V = neighbors.clone();
+                    neighbors_plus_V.add(v);
+                    // twin node
+                    if (nodeHoods.contains(neighbors) || nodeHoods.contains(neighbors_plus_V)) {
+                        tomove = v;
+                        break;
+                    }
                 }
             }
 
@@ -130,7 +151,18 @@ public class SplitGrowNeighbourhood extends Split {
                         minmove = ratio;
                         tomove = v;
                     }
+                    if (external < minmove_E) {
+                        minmove_E = external;
+                        tomove_E = v;
+                    }
+                    minmove = ratio;
+                    tomove = v;
+                    break;
                 }
+            }
+            if (tomove != null && tomove_E != null) {
+                //System.out.println("tomove_E");
+                tomove = tomove_E;
             }
             if (tomove == null) {
                 tomove = Util.getFirst(rights);

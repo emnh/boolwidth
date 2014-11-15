@@ -106,7 +106,7 @@ public class CCMIS {
 
 				long next = boolDimBranch(G,nall,nout,nrest);
                 if (next == 0) return 0;
-                total *= next;
+                total = Math.multiplyExact(total, next);
 //				System.out.println("total = "+total);
 			}
 

@@ -2,9 +2,11 @@ package control;
 
 import boolwidth.greedysearch.*;
 import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.FixedOrderingDecompose;
 import boolwidth.greedysearch.base.StackDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
+import boolwidth.greedysearch.eachSymDiff.EachSymDiffDecompose;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import boolwidth.greedysearch.memory.MemoryDecompose;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
@@ -15,9 +17,7 @@ import com.cedarsoftware.util.io.JsonWriter;
 import io.DiskGraph;
 import org.json.simple.JSONObject;
 
-import java.io.File;
-import java.nio.file.FileSystems;
-import java.nio.file.PathMatcher;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.function.Function;
 
@@ -43,7 +43,7 @@ public class GreedySearch {
 
     }*/
 
-    public static ArrayList<String> getFileNames() {
+    public static ArrayList<String> getSmallFileNames() {
         ArrayList<String> fileNames = new ArrayList<>();
         ArrayList<String> fileNames2 = new ArrayList<>();
 
@@ -81,17 +81,66 @@ public class GreedySearch {
         return fileNames2;
     }
 
-    public static void processFiles(Function<IGraph<Vertex<Integer>, Integer, String>, BaseDecompose> getDecomposer) {
+    public static ArrayList<String> getLargeFileNames() throws IOException {
+        // large graphs from Sadia's thesis
+        ArrayList<String> fileNames = new ArrayList<>();
+        fileNames.add(DiskGraph.getMatchingGraph("**link-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**diabetes-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**link-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**celar10.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**celar11.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rd400.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**diabetes.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**fpsol2.i.3.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pigs.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**celar08.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**d493.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**homer.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rat575.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**u724.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**inithx.i.1.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin2.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**vm1084.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_24.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_25.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_23.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_26.dgf"));
+        return fileNames;
+    }
+
+    public static void processFiles(ArrayList<String> fileNames, Function<IGraph<Vertex<Integer>, Integer, String>, BaseDecompose> getDecomposer) {
         ArrayList<String> results = new ArrayList<>();
-        for (String file : getFileNames()) {
+        for (String file : fileNames) {
+            System.out.printf("processing: %s\n", file);
             IGraph<Vertex<Integer>, Integer, String> graph;
             graph = ControlUtil.getTestGraph(file);
             BaseDecompose gd = getDecomposer.apply(graph);
+
+            long decomposeStart = System.currentTimeMillis();
             ImmutableBinaryTree ibt = gd.decompose();
+            long decomposeEnd = System.currentTimeMillis();
+
+            boolean valid = gd.validateDecomposition(ibt);
+
+            System.out.println("computing boolean width");
+            long computeWidthStart = System.currentTimeMillis();
             long bw = gd.getBooleanWidth(ibt);
-            String result = String.format("%s: bw: %.2f", file, BaseDecompose.getLogBooleanWidth(bw));
-            System.out.println(result);
-            results.add(result);
+            long computeWidthEnd = System.currentTimeMillis();
+
+            JSONObject result = new JSONObject();
+            result.put("valid", valid);
+            result.put("cacheHits", (double) gd.cacheHits / gd.cutboolTotalCalls);
+            result.put("decomposeTime", decomposeEnd - decomposeStart);
+            result.put("computeWidthTime", computeWidthEnd - computeWidthStart);
+            result.put("booleanWidth", BaseDecompose.getLogBooleanWidth(bw));
+            result.put("2^booleanWidth", bw);
+            result.put("graph", file);
+            result.put("v", graph.numVertices());
+            result.put("e", graph.numEdges());
+
+            String resultStr = result.toString();
+            System.out.printf("result: %s\n", resultStr); // for parsing
+            results.add(resultStr);
         }
         System.out.println("");
         for (String result : results) {
@@ -135,30 +184,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "delauney/pr439.tsp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
 
-        // large graphs from Sadia's thesis
-        //String fileName = DiskGraph.getMatchingGraph("**link-pp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**diabetes-wpp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**link-wpp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**celar10.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**celar11.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**rd400.tsp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**diabetes.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**fpsol2.i.3.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**pigs.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**celar08.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**homer.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**rat575.tsp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**u724.tsp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**inithx.i.1.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**munin2.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**vm1084.tsp.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**BN_24.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**BN_25.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**BN_23.dgf");
-        //String fileName = DiskGraph.getMatchingGraph("**BN_26.dgf");
-
-        //String fileName = DiskGraph.getMatchingGraph("**munin2.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**BN_26.dgf");
 
         if (args.length > 0) {
             fileName = args[0];
@@ -171,10 +197,13 @@ public class GreedySearch {
 
         switch (8) {
             case 0:
-                gd = new BaseDecompose(graph);
+                gd = new FixedOrderingDecompose(graph);
                 break;
             case 1:
                 gd = new RandomDecompose(graph);
+                break;
+            case 2:
+                gd = new EachSymDiffDecompose(graph);
                 break;
             case 3:
                 gd = new ThreeWayDecompose(graph);
@@ -189,31 +218,32 @@ public class GreedySearch {
                 gd = new SymDiffDecompose(graph);
                 break;
             case 7:
-                processFiles((g) -> new SymDiffDecompose(g));
+                processFiles(getSmallFileNames(), (g) -> new SymDiffDecompose(g));
                 return;
             case 8:
                 gd = new GrowNeighbourHoodDecompose(graph);
                 break;
             case 9:
-                processFiles((g) -> new GrowNeighbourHoodDecompose(g));
+                processFiles(getLargeFileNames(), (g) -> new GrowNeighbourHoodDecompose(g));
                 return;
             case 10:
-                processFiles((g) -> new StackDecompose(g));
+                processFiles(getSmallFileNames(), (g) -> new StackDecompose(g));
                 return;
         }
 
         long decomposeStart = System.currentTimeMillis();
         final ImmutableBinaryTree ibt = gd.decompose();
-        //final ImmutableBinaryTree ibt = gd.decomposeTopCut3Way();
-
         long decomposeEnd = System.currentTimeMillis();
 
-        JSONObject result = new JSONObject();
-        result.put("valid", gd.validateDecomposition(ibt));
+        boolean valid = gd.validateDecomposition(ibt);
+
         System.out.println("computing boolean width");
         long computeWidthStart = System.currentTimeMillis();
         long bw = gd.getBooleanWidth(ibt);
         long computeWidthEnd = System.currentTimeMillis();
+
+        JSONObject result = new JSONObject();
+        result.put("valid", valid);
         result.put("cacheHits", (double) gd.cacheHits / gd.cutboolTotalCalls);
         result.put("decomposeTime", decomposeEnd - decomposeStart);
         result.put("computeWidthTime", computeWidthEnd - computeWidthStart);

@@ -23,7 +23,7 @@ public class TestMDH{
 	public static void main(String[] args)
 	{
 		
-		String fileName =  ControlInput.GRAPHLIB + "prob/munin3.dgf";
+		String fileName =  ControlInput.GRAPHLIB + "prob/link-pp.dgf";
 		ControlInput cio= new ControlInput();
 		IndexGraph G=new IndexGraph();
 		G =	cio.getTestGraph(fileName, G);
