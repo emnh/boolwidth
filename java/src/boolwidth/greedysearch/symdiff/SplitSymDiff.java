@@ -114,6 +114,11 @@ public class SplitSymDiff extends Split {
                     }
                 }
             }
+            if (tomove == null) {
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
+                //System.out.println("was empty, did BFS");
+            }
             result.lefts = result.lefts.cons(tomove);
             result.rights = result.rights.disjoin(tomove);
             result.cutbool = minmove;

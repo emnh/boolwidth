@@ -190,7 +190,7 @@ public class GreedySearch {
 
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**homer.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**vm1084.tsp.dgf");
 
         String cls = "";
         if (args.length > 0) {
@@ -208,7 +208,7 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (-5) {
+            switch (-3) {
                 case -5:
                     gd = new BestDecompose(graph);
                     break;
