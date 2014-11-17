@@ -115,6 +115,7 @@ public class DegreeList {
 		 //System.out.println("decreasing "+n1);
 		remove(n1);
 		int d = degree[n1.id()]-1;
+		if (d < 0) d = 0;
 		add(n1,d);
 	}
 

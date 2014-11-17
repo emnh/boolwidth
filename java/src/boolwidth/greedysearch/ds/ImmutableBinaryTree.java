@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 public class ImmutableBinaryTree {
 
     public static final int EMPTY_NODE = -1;
+    public String creatorName;
     private int maxid = 0;
     private SimpleNode reference = null; // pointer to last added
     private SimpleNode root = null;

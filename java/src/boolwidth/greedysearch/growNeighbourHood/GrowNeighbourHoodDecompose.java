@@ -10,9 +10,9 @@ import interfaces.IGraph;
 
 //public class GrowNeighbourHoodDecompose extends StackDecomposeTryAllFirstVertexChoice {
 //public class GrowNeighbourHoodDecompose extends StackDecompose {
-//public class GrowNeighbourHoodDecompose extends CaterpillarDecompose {
+public class GrowNeighbourHoodDecompose extends CaterpillarDecompose {
 //public class GrowNeighbourHoodDecompose extends CaterpillarToFullDecompose {
-public class GrowNeighbourHoodDecompose extends CaterpillarToFullTryAllFirstVertexChoiceDecompose {
+//public class GrowNeighbourHoodDecompose extends CaterpillarToFullTryAllFirstVertexChoiceDecompose {
 
     public GrowNeighbourHoodDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);

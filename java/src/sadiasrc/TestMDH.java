@@ -1,4 +1,5 @@
 
+package sadiasrc;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,16 +24,16 @@ public class TestMDH{
 	public static void main(String[] args)
 	{
 		
-		String fileName =  ControlInput.GRAPHLIB + "prob/link-pp.dgf";
+		String fileName =  ControlInput.GRAPHLIB + "prob/pigs.dgf";
 		ControlInput cio= new ControlInput();
 		IndexGraph G=new IndexGraph();
 		G =	cio.getTestGraph(fileName, G);
 		//System.out.println(G);
 		long start = System.currentTimeMillis();
 		DisjointBinaryDecomposition decomp = MinDegreeFillin.DBDbyMDH(G);
-		System.out.println(decomp);
+		//System.out.println(decomp);
 		//System.out.println("Boolean-width is: log("+CutBool.countNeighbourhoods(decomp)+")");
-		System.out.println("Boolean-width is: log("+CutBool.countMIS(decomp)+")");
+		//System.out.println("Boolean-width is: log("+CutBool.countMIS(decomp)+")");
 		ArrayList<IndexVertex> s=MinDegreeFillin.sequence(G);
 		System.out.println("Degree Sequence"+s);
 		Stack<VSubSet> r1=MinDegreeFillin.greedySeparate(G, s);
@@ -60,7 +61,7 @@ public class TestMDH{
 				//System.out.println("cut"+cut+"val"+val);
 			}
 		}
-			System.out.println("cutbool = "+maxval);
+		System.out.printf("cutbool = %.2f\n", Math.log(maxval) / Math.log(2.0));
 			
 
 			long end = System.currentTimeMillis();

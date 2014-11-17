@@ -31,7 +31,7 @@ public class BaseDecompose {
     long oldPrint;
     static final int PRINT_INTERVAL = 1000;
     static final int SAMPLE_COUNT = 100;
-    static final int UPPER_BOUND_EXCEEDED = -1;
+    static final public int UPPER_BOUND_EXCEEDED = -1;
 
     public BaseDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         this.graph = graph;

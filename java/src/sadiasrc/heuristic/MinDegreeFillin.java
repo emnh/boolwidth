@@ -40,7 +40,7 @@ public class MinDegreeFillin {
 //		for(ArrayList<IndexVertex> t: neighborList)
 //			System.out.println(t);
 		boolean[] added = new boolean[g.numVertices()];
-		boolean[][] adj = new boolean[g.numVertices()][g.numVertices()];
+		boolean[][] adj = new boolean[g.numVertices()+1][g.numVertices()+1];
 		for (IndexVertex v : g.vertices()) {
 			for (IndexVertex n : g.neighbours(v)) {
 				adj[v.id()][n.id()] = true;
@@ -55,7 +55,8 @@ public class MinDegreeFillin {
 //			System.out.println("Min degree"+v);
 //			System.out.println("Neighbors of v"+v);
 //			System.out.println(neighborList.get(v.id()));
-			for(IndexVertex n1 : neighborList.get(v.id())) //O(n*k)
+			ArrayList<IndexVertex> neighbors = new ArrayList<>(neighborList.get(v.id()));
+			for(IndexVertex n1 : neighbors) //O(n*k)
 			{				
 				dl.decrease(n1);
 				neighborList.get(n1.id()).remove(v);	//O(n)
@@ -300,12 +301,12 @@ public class MinDegreeFillin {
 	public static Stack<VSubSet> greedySeparate(IndexGraph g, IVSet vs, IVSet bag,ArrayList<IndexVertex> seq,Stack<VSubSet> s)
 	{
 		int i = seq.size()-1;
-		
-		while(BasicGraphAlgorithms.isConnected(g,vs))
-		{
-			if(BasicGraphAlgorithms.isClique(g, vs))
+		System.out.printf("seq size: %d\n", seq.size());
+
+		while (BasicGraphAlgorithms.isConnected(g, vs) && i >= 0) {
+			if (BasicGraphAlgorithms.isClique(g, vs))
 				break;
-			IndexVertex sep= seq.get(i);
+			IndexVertex sep = seq.get(i);
 			vs.remove(sep);
 			bag.add(sep);
 			i--;

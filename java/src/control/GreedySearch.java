@@ -8,8 +8,9 @@ import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import boolwidth.greedysearch.memory.MemoryDecompose;
-import boolwidth.greedysearch.reorder.ExperimentalDecompose;
+import boolwidth.greedysearch.best.BestDecompose;
 import boolwidth.greedysearch.spanning.GreedyMergeDecompose;
+import boolwidth.greedysearch.spanning.SpanningTreeDecompose;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
 import control.http.HTTPResultsServer;
 import graph.Vertex;
@@ -19,6 +20,7 @@ import io.DiskGraph;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.function.Function;
 
@@ -138,7 +140,7 @@ public class GreedySearch {
             result.put("graph", file);
             result.put("v", graph.numVertices());
             result.put("e", graph.numEdges());
-            result.put("heuristic", gd.getClass().getName());
+            result.put("heuristic", ibt.creatorName);
 
             String resultStr = result.toString();
             System.out.printf("result: %s\n", resultStr); // for parsing
@@ -188,10 +190,12 @@ public class GreedySearch {
 
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**link-pp.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**homer.dgf");
 
+        String cls = "";
         if (args.length > 0) {
-            fileName = args[0];
+            cls = "boolwidth.greedysearch." + args[0];
+            fileName = args[1];
         }
         System.out.printf("filename: %s\n", fileName);
         IGraph<Vertex<Integer>, Integer, String> graph;
@@ -199,45 +203,57 @@ public class GreedySearch {
 
         BaseDecompose gd = null;
 
-        switch (2) {
-            case -1:
-                gd = new ExperimentalDecompose(graph);
-                break;
-            case 0:
-                gd = new FixedOrderingDecompose(graph);
-                break;
-            case 1:
-                gd = new RandomDecompose(graph);
-                break;
-            case 2:
-                //gd = new GreedyMergeDecompose(graph);
-                //break;
-                processFiles(getLargeFileNames(), (g) -> new GreedyMergeDecompose(g));
-                return;
-            case 3:
-                gd = new ThreeWayDecompose(graph);
-                break;
-            case 4:
-                gd = new MemoryDecompose(graph);
-                break;
-            case 5:
-                gd = new StackDecompose(graph);
-                break;
-            case 6:
-                gd = new SymDiffDecompose(graph);
-                break;
-            case 7:
-                processFiles(getSmallFileNames(), (g) -> new SymDiffDecompose(g));
-                return;
-            case 8:
-                gd = new GrowNeighbourHoodDecompose(graph);
-                break;
-            case 9:
-                processFiles(getLargeFileNames(), (g) -> new GrowNeighbourHoodDecompose(g));
-                return;
-            case 10:
-                processFiles(getSmallFileNames(), (g) -> new StackDecompose(g));
-                return;
+        if (cls != "") {
+            Class<?> clazz = Class.forName(cls);
+            Constructor<?> ctor = clazz.getConstructor(IGraph.class);
+            gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
+        } else {
+            switch (-5) {
+                case -5:
+                    gd = new BestDecompose(graph);
+                    break;
+                case -4:
+                    gd = new GrowNeighbourHoodDecompose(graph);
+                    break;
+                case -3:
+                    gd = new SymDiffDecompose(graph);
+                    break;
+                case -2:
+                    gd = new SpanningTreeDecompose(graph);
+                    break;
+                case -1:
+                    processFiles(getSmallFileNames(), (g) -> new SpanningTreeDecompose(g));
+                    return;
+                case 0:
+                    gd = new FixedOrderingDecompose(graph);
+                    break;
+                case 1:
+                    gd = new RandomDecompose(graph);
+                    break;
+                case 2:
+                    //gd = new GreedyMergeDecompose(graph);
+                    //break;
+                    processFiles(getLargeFileNames(), (g) -> new GreedyMergeDecompose(g));
+                    return;
+                case 3:
+                    gd = new ThreeWayDecompose(graph);
+                    break;
+                case 4:
+                    gd = new MemoryDecompose(graph);
+                    break;
+                case 5:
+                    gd = new StackDecompose(graph);
+                    break;
+                case 7:
+                    processFiles(getSmallFileNames(), (g) -> new SymDiffDecompose(g));
+                    return;
+                case 8:
+                    processFiles(getLargeFileNames(), (g) -> new GrowNeighbourHoodDecompose(g));
+                    return;
+                case 9:
+                    processFiles(getSmallFileNames(), (g) -> new StackDecompose(g));
+                    return;
+            }
         }
 
         long decomposeStart = System.currentTimeMillis();
@@ -261,7 +277,11 @@ public class GreedySearch {
         result.put("graph", fileName);
         result.put("v", graph.numVertices());
         result.put("e", graph.numEdges());
-        result.put("heuristic", gd.getClass().getName());
+        if (ibt.creatorName != null) {
+            result.put("heuristic", ibt.creatorName);
+        } else {
+            result.put("heuristic", gd.getClass().getName());
+        }
         final BaseDecompose gd2 = gd;
         JSONObject jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
             if (node != ibt.getRoot()) {
@@ -273,9 +293,11 @@ public class GreedySearch {
         System.out.printf("result: %s\n", result.toString()); // for parsing
         System.out.println(JsonWriter.formatJson(result.toString()));
 
-        HTTPResultsServer hrServer = new HTTPResultsServer();
-        hrServer.addResult("decomposition", jsonDecomposition);
-        hrServer.addResult("result", result);
+        if (args.length == 0) {
+            HTTPResultsServer hrServer = new HTTPResultsServer();
+            hrServer.addResult("decomposition", jsonDecomposition);
+            hrServer.addResult("result", result);
+        }
         //hrServer.openBrowser("static/decomposition.html");
     }
 }

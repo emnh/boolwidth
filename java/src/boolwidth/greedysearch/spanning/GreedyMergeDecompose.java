@@ -84,7 +84,7 @@ public class GreedyMergeDecompose extends BaseDecompose {
                 }
             }
             if (mincb == Long.MAX_VALUE) break;
-            System.out.printf("connected: %d, new merge cutbool: %.2f\n", componentCount, getLogBooleanWidth(mincb));
+            //System.out.printf("connected: %d, new merge cutbool: %.2f\n", componentCount, getLogBooleanWidth(mincb));
             ArrayList<Vertex<Integer>> aComponent = components.get(mina.id());
             for (Vertex<Integer> v : components.get(minb.id())) {
                 components.set(v.id(), aComponent);

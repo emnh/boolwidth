@@ -25,10 +25,12 @@ public class TestTDtoBooD  {
 		double p=0.5;
 		String result=null;
 
-		String fileName =  ControlInput.GRAPHLIB+"TableCH8/pr299.tsp-pp.dgf";
-		String dirName = ControlInput.GRAPHLIB + "TableCH6_1/";
+		String fileName =  ControlInput.GRAPHLIB + "prob/pigs.dgf";
+		//String dirName = ControlInput.GRAPHLIB + "TableCH6_1/";
 		ControlInput cio= new ControlInput();
-		ArrayList<File> listOfFiles = (ArrayList<File>) cio.getListOfTestGraphs(dirName);
+		ArrayList<File> listOfFiles = new ArrayList<>();
+		listOfFiles.add(new File(fileName));
+		//(ArrayList<File>) cio.getListOfTestGraphs(dirName);
 		long start,start1;//start time for an ordering
 		long  end,end1;//end time for an ordering 
 		long UBfromCP=0;
@@ -51,7 +53,7 @@ public class TestTDtoBooD  {
 		String[] names;
 //		
 		
-		G =	cio.getTestGraph(dirName+file.getName(), G);
+		G =	cio.getTestGraph(file.toString(), G);
 		names=file.getName().split("/");
 ////		
 		

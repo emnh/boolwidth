@@ -25,16 +25,17 @@ Write-Output "Starting run for graphs with nodes in range [$lower, $upper>"
 
 $graphs | % {
   $FileName = $_.FileName
-  $LogName = (Join-Path $out $FileName) + ".txt"
+  $Heuristic = "spanning.SpanningTreeDecompose"
+  $LogName = (Join-Path $out $FileName) + "." + $Heuristic + ".txt"
   $Run = {
-    param($currentPath, $FileName, $LogName)
+    param($Heuristic, $currentPath, $FileName, $LogName)
     cd $currentPath
-    ./scripts/runHeuristic.ps1 $FileName 2>&1 > $LogName
+    ./scripts/runHeuristic.ps1 $Heuristic $FileName 2>&1 > $LogName
   }
   Write-Output "Starting job on $($_.FileName) with $($_.Nodes) nodes"
-  $job = Start-Job -ScriptBlock $Run -ArgumentList $currentPath,$FileName,$LogName
+  $job = Start-Job -ScriptBlock $Run -ArgumentList $Heuristic,$currentPath,$FileName,$LogName
   Write-Output "Waiting for job $($job.Id)"
-  Wait-Job -Timeout 3600 $job
+  Wait-Job -Timeout 600 $job
   if ($job.State -eq "Running") {
     Write-Output "Timed out, stopping job forcibly"
     Stop-Job $job

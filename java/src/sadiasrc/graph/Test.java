@@ -19,7 +19,7 @@ public class Test{
 	public static void main(String[] args)
 	{
 		
-		String fileName =  ControlInput.GRAPHLIB + "prob2/BN_95.dgf";
+		String fileName =  ControlInput.GRAPHLIB + "prob/pigs.dgf";
 		ControlInput cio= new ControlInput();
 		IndexGraph G=new IndexGraph();
 		G =	cio.getTestGraph(fileName, G);
