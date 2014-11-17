@@ -16,11 +16,11 @@ import java.util.*;
 
 
 
-public class SpanningTreeDecompose extends BaseDecompose {
+public class GreedyMergeDecompose extends BaseDecompose {
 
     private ArrayList<PosSubSet<Vertex<Integer>>> hoods = BasicGraphAlgorithms.getNeighbourHoods(getGraph());
 
-    public SpanningTreeDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
+    public GreedyMergeDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
         hoods = BasicGraphAlgorithms.getNeighbourHoods(getGraph());
     }
@@ -58,26 +58,41 @@ public class SpanningTreeDecompose extends BaseDecompose {
             }
         }
 
-        // Kruskal's algorithm for minimum spanning tree
-        while (!edges.isEmpty()) {
-            NodePair np = edges.poll();
+        // Minimum merge tree
+        int componentCount = components.size();
+        while (componentCount > 1) {
             //System.out.printf("cost: %.2f\n", np.cost);
 
-            if (components.get(np.a.id()) != components.get(np.b.id())) {
-                //System.out.printf("setting %s component to %s component\n", np.a.id(), np.b.id());
-                ArrayList<Vertex<Integer>> aComponent = components.get(np.a.id());
-                for (Vertex<Integer> v : components.get(np.b.id())) {
-                    components.set(v.id(), aComponent);
-                    aComponent.add(v);
+            long mincb = Long.MAX_VALUE;
+            Vertex<Integer> mina = null, minb = null;
+            for (Vertex<Integer> a : getGraph().vertices()) {
+                for (Vertex<Integer> b : getGraph().incidentVertices(a)) {
+                    if (components.get(a.id()) != components.get(b.id())) {
+                        //System.out.printf("setting %s component to %s component\n", np.a.id(), np.b.id());
+                        ArrayList<Vertex<Integer>> newComponent = new ArrayList<>();
+                        newComponent.addAll(components.get(a.id()));
+                        newComponent.addAll(components.get(b.id()));
+                        long cb = getCutBool(newComponent, true);
+                        if (cb < mincb) {
+                            mincb = cb;
+                            mina = a;
+                            minb = b;
+                        }
+                    } else {
+                        // not different components, so not part of spanning tree
+                    }
                 }
-
-                //long cb = getCutBool(aComponent, true);
-
-                spanningTreeNeighbours.get(np.a.id()).add(np.b);
-                spanningTreeNeighbours.get(np.b.id()).add(np.a);
-            } else {
-                // not different components, so not part of spanning tree
             }
+            if (mincb == Long.MAX_VALUE) break;
+            System.out.printf("connected: %d, new merge cutbool: %.2f\n", componentCount, getLogBooleanWidth(mincb));
+            ArrayList<Vertex<Integer>> aComponent = components.get(mina.id());
+            for (Vertex<Integer> v : components.get(minb.id())) {
+                components.set(v.id(), aComponent);
+                aComponent.add(v);
+            }
+            spanningTreeNeighbours.get(mina.id()).add(minb);
+            spanningTreeNeighbours.get(minb.id()).add(mina);
+            componentCount--;
         }
 
         // Appoint root as vertex with index 0

@@ -6,12 +6,10 @@ import boolwidth.greedysearch.base.FixedOrderingDecompose;
 import boolwidth.greedysearch.base.StackDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
-import boolwidth.greedysearch.eachSymDiff.EachSymDiffDecompose;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import boolwidth.greedysearch.memory.MemoryDecompose;
 import boolwidth.greedysearch.reorder.ExperimentalDecompose;
-import boolwidth.greedysearch.spanning.SpanningTreeAllDecompose;
-import boolwidth.greedysearch.spanning.SpanningTreeDecompose;
+import boolwidth.greedysearch.spanning.GreedyMergeDecompose;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
 import control.http.HTTPResultsServer;
 import graph.Vertex;
@@ -190,7 +188,7 @@ public class GreedySearch {
 
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**link-pp.dgf");
 
         if (args.length > 0) {
             fileName = args[0];
@@ -212,10 +210,10 @@ public class GreedySearch {
                 gd = new RandomDecompose(graph);
                 break;
             case 2:
-                gd = new SpanningTreeDecompose(graph);
-                break;
-            //processFiles(getLargeFileNames(), (g) -> new SpanningTreeAllDecompose(g));
-            //return;
+                //gd = new GreedyMergeDecompose(graph);
+                //break;
+                processFiles(getLargeFileNames(), (g) -> new GreedyMergeDecompose(g));
+                return;
             case 3:
                 gd = new ThreeWayDecompose(graph);
                 break;
