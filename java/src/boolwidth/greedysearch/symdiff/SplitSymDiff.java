@@ -31,6 +31,10 @@ public class SplitSymDiff extends Split {
         super(depth, decomposition, rights);
     }
 
+    public SplitSymDiff(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
+        super(depth, decomposition, lefts, rights);
+    }
+
     @Override
     public SplitSymDiff decomposeAdvance() {
         SplitSymDiff result = create(this);
@@ -40,7 +44,7 @@ public class SplitSymDiff extends Split {
             IGraph<Vertex<Integer>, Integer, String> graph = this.getDecomposition().getGraph();
             PosSet<Vertex<Integer>> all = new PosSet<>(graph.vertices());
             TreeSet<PosSubSet<Vertex<Integer>>> nodeHoods = new TreeSet<>();
-            PosSubSet<Vertex<Integer>> rightHoodAll = new PosSubSet<Vertex<Integer>>(all);
+            PosSubSet<Vertex<Integer>> N_LEFT = new PosSubSet<Vertex<Integer>>(all);
 
             for (Vertex<Integer> node : graph.vertices()) {
                 if (lefts.contains(node)) {
@@ -52,7 +56,7 @@ public class SplitSymDiff extends Split {
                     }
                     if (neighbors.size() > 0) {
                         nodeHoods.add(neighbors);
-                        rightHoodAll = rightHoodAll.union(neighbors);
+                        N_LEFT = N_LEFT.union(neighbors);
                     }
                 }
             }
@@ -72,7 +76,7 @@ public class SplitSymDiff extends Split {
 
             if (tomove == null) {
                 int i = 0;
-                for (Vertex<Integer> v : rights) {
+                for (Vertex<Integer> v : N_LEFT) {
                     i += 1;
 
                     PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
@@ -85,7 +89,7 @@ public class SplitSymDiff extends Split {
                             neighbors.add(u);
                             neighbors_plus_V.add(u);
                             rightCount++;
-                            if (!rightHoodAll.contains(u)) {
+                            if (!N_LEFT.contains(u)) {
                                 rightNoNeighborInLeft++;
                             }
                         }
@@ -93,7 +97,7 @@ public class SplitSymDiff extends Split {
                     long cb = rightNoNeighborInLeft; // neighbors.size();
 
                     // isolated node
-                    if (rightCount == 0 && rightHoodAll.contains(v)) {
+                    if (rightCount == 0 && N_LEFT.contains(v)) {
                         minmove = cb;
                         tomove = v;
                         break;

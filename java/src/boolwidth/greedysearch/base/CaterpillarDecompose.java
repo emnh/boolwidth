@@ -6,6 +6,8 @@ import boolwidth.greedysearch.symdiff.SplitSymDiff;
 import graph.Vertex;
 import interfaces.IGraph;
 
+import java.util.ArrayList;
+
 /**
  * Created by emh on 11/9/2014.
  */
@@ -15,18 +17,26 @@ public class CaterpillarDecompose extends BaseDecompose {
         super(graph);
     }
 
-    @Override
-    public ImmutableBinaryTree decompose() {
-        Split split = createSplit(0, this, getGraph().vertices());
+    public static ImmutableBinaryTree getCaterpillarIBTFromOrdering(ArrayList<Vertex<Integer>> vertexOrdering) {
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
-
         SimpleNode last = ibt.getRoot();
-        while (!split.done()) {
-            split = split.decomposeAdvance();
-            ibt = ibt.addChild(last, split.getLastMoved().id());
+        for (Vertex<Integer> v : vertexOrdering) {
+            ibt = ibt.addChild(last, v.id());
             last = ibt.getReference();
         }
         return ibt;
+    }
+
+    @Override
+    public ImmutableBinaryTree decompose() {
+        Split split = createSplit(0, this, getGraph().vertices());
+        ArrayList<Vertex<Integer>> ordering = new ArrayList<>();
+
+        while (!split.done()) {
+            split = split.decomposeAdvance();
+            ordering.add(split.getLastMoved());
+        }
+        return getCaterpillarIBTFromOrdering(ordering);
     }
 }

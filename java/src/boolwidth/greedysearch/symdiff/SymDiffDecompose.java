@@ -17,7 +17,7 @@ public class SymDiffDecompose extends CaterpillarDecompose {
     }
 
     @Override
-    public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
-        return new SplitSymDiff(depth, decomposition, rights);
+    public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
+        return new SplitSymDiff(depth, decomposition, lefts, rights);
     }
 }

@@ -246,40 +246,22 @@ public class Split {
         return decomposeAdvanceBase();
     }
 
-    public Split decomposeAdvanceBaseRight() {
-        Split result = create(this);
-        if (done()) {
-            return this;
-        } else {
-            long oldcb = measureCutForDecompose(lefts, null);
-            long minmove = Long.MAX_VALUE;
-            Vertex<Integer> tomove = null;
-
-            int i = 0;
-            for (Vertex<Integer> v : lefts) {
-                i += 1;
-                PersistentHashSet<Vertex<Integer>> newlefts = lefts.disjoin(v);
-                long cb = measureCutForDecompose(newlefts, v);
-                if (cb < minmove) {
-                    minmove = cb;
-                    tomove = v;
-                    /*if (cb <= Math.pow(2.0, 13)) {
-                        // exit early if we didn't increase
-                        System.out.printf("cheated: %d/%d\n", i, rights.size());
-                        break;
-                    }*/
-                }
-            }
-            result.lefts = result.lefts.disjoin(tomove);
-            result.rights = result.rights.cons(tomove);
-            result.cutbool = minmove;
-            result.reference = tomove;
-            result.logStatement();
-        }
-        return result;
-    }
-
     public Split decomposeAdvanceRight() {
-        return decomposeAdvanceBaseRight();
+        Split result = create(this);
+
+        // swap lefts and rights
+        PersistentHashSet<Vertex<Integer>> temp = result.getLefts();
+        result.lefts = result.rights;
+        result.rights = temp;
+
+        // advance
+        result = result.decomposeAdvance();
+
+        // swap back
+        temp = result.getLefts();
+        result.lefts = result.rights;
+        result.rights = temp;
+
+        return result;
     }
 }

@@ -3,6 +3,7 @@ package boolwidth.greedysearch.growNeighbourHood;
 import boolwidth.greedysearch.base.Util;
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.Split;
+import com.github.krukow.clj_lang.PersistentHashSet;
 import graph.BasicGraphAlgorithms;
 import graph.Vertex;
 import graph.subsets.PosSet;
@@ -22,6 +23,10 @@ public class SplitGrowNeighbourhood extends Split {
 
     public SplitGrowNeighbourhood(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
         super(depth, decomposition, rights);
+    }
+
+    public SplitGrowNeighbourhood(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
+        super(depth, decomposition, lefts, rights);
     }
 
     @Override

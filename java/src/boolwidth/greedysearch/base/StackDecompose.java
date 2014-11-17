@@ -24,10 +24,10 @@ public class StackDecompose extends BaseDecompose {
         super(graph);
     }
 
-    @Override
+    /*@Override
     public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
         return new Split(depth, decomposition, rights);
-    }
+    }*/
 
     public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
         Split rootSplit = createSplit(0, this, vertices);
@@ -44,9 +44,7 @@ public class StackDecompose extends BaseDecompose {
             localSearch(splits, splitChildren);
         }
 
-        rootSplit = splitChildren.get(null).iterator().next();
-        splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
-        return getImmutableBinaryTree(splits, splitChildren);
+        return getImmutableBinaryTree(splitChildren);
     }
 
     protected void localSearch(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
@@ -151,7 +149,11 @@ public class StackDecompose extends BaseDecompose {
         }
     }
 
-    protected ImmutableBinaryTree getImmutableBinaryTree(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
+    protected static ImmutableBinaryTree getImmutableBinaryTree(Multimap<Split, Split> splitChildren) {
+        Stack<StackDecomposeSplitStackItem> splits = new Stack<>();
+        Split rootSplit = splitChildren.get(null).iterator().next();
+        splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
+
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
         SimpleNode last = ibt.getRoot();

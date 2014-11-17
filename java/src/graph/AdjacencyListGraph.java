@@ -540,6 +540,7 @@ Iterable<TVertex>, IAttributeStorage, Cloneable {
 		return this.vList;
 	}
 
+	// TODO: maybe return a copy so no harm is done to vList
     public Collection<TVertex> verticesCollection() {
         return this.vList;
     }

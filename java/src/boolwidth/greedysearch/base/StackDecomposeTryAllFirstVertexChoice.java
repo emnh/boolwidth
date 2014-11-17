@@ -20,10 +20,10 @@ public class StackDecomposeTryAllFirstVertexChoice extends StackDecompose {
         super(graph);
     }
 
-    @Override
+    /*@Override
     public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
         return new Split(depth, decomposition, rights);
-    }
+    }*/
 
     public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
         Split rootSplit0 = createSplit(0, this, vertices);
@@ -44,9 +44,7 @@ public class StackDecomposeTryAllFirstVertexChoice extends StackDecompose {
             decomposeSplits(splits, splitChildren);
 
             // TODO: don't construct IBT just to getBooleanWidth
-            rootSplit = splitChildren.get(null).iterator().next();
-            splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
-            ImmutableBinaryTree ibt = getImmutableBinaryTree(splits, splitChildren);
+            ImmutableBinaryTree ibt = getImmutableBinaryTree(splitChildren);
 
             long bw = getBooleanWidth(ibt);
             System.out.printf("i: %d/%d, minBW: %.2f, BW: %.2f\n",
@@ -66,9 +64,7 @@ public class StackDecomposeTryAllFirstVertexChoice extends StackDecompose {
             splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
             localSearch(splits, minSplitChildren);
         }
-        Split rootSplit = minSplitChildren.get(null).iterator().next();
-        splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
-        ImmutableBinaryTree lsIBT = getImmutableBinaryTree(splits, minSplitChildren);
+        ImmutableBinaryTree lsIBT = getImmutableBinaryTree(minSplitChildren);
 
         // local search is dumb enough that it can increase boolean width, because it considers local cuts only
         if (getBooleanWidth(lsIBT) < getBooleanWidth(minIBT)) {

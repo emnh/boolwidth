@@ -150,7 +150,7 @@ public class BaseDecompose {
                 System.out.println("UB exceeded, returning");
                 return UPPER_BOUND_EXCEEDED;
             }
-            System.out.printf("got cutbool: %d, bw: %d\n", vertexIDs.size(), cutbool);
+            //System.out.printf("got cutbool: %d, bw: %d\n", vertexIDs.size(), cutbool);
             if (cutbool > maxCutBool[0]) {
                 maxCutBool[0] = cutbool;
             }
@@ -228,7 +228,11 @@ public class BaseDecompose {
     }
 
     public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
-        return new Split(depth, decomposition, rights);
+        return createSplit(depth, decomposition, new ArrayList<>(), rights);
+    }
+
+    public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
+        return new Split(depth, decomposition, lefts, rights);
     }
 
     public boolean validateDecomposition(ImmutableBinaryTree ibt) {
@@ -262,6 +266,9 @@ public class BaseDecompose {
             if (!dfschildren.equals(dfsparent)) {
                 System.out.println("dfsparent: " + dfsparent);
                 System.out.println("dfschildren: " + dfschildren);
+                HashSet<Integer> difference = new HashSet<>(dfsparent);
+                difference.removeAll(dfschildren);
+                System.out.println("dfsdifference: " + difference);
                 //dfsparent.removeAll(dfschildren);
                 //System.out.println("diff: " + dfsparent);
             }

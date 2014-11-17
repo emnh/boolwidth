@@ -9,6 +9,9 @@ import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.eachSymDiff.EachSymDiffDecompose;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import boolwidth.greedysearch.memory.MemoryDecompose;
+import boolwidth.greedysearch.reorder.ExperimentalDecompose;
+import boolwidth.greedysearch.spanning.SpanningTreeAllDecompose;
+import boolwidth.greedysearch.spanning.SpanningTreeDecompose;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
 import control.http.HTTPResultsServer;
 import graph.Vertex;
@@ -137,6 +140,7 @@ public class GreedySearch {
             result.put("graph", file);
             result.put("v", graph.numVertices());
             result.put("e", graph.numEdges());
+            result.put("heuristic", gd.getClass().getName());
 
             String resultStr = result.toString();
             System.out.printf("result: %s\n", resultStr); // for parsing
@@ -184,7 +188,9 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB + "delauney/pr439.tsp.dgf";
         //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
 
-        String fileName = DiskGraph.getMatchingGraph("**BN_26.dgf");
+        //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
+        //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
 
         if (args.length > 0) {
             fileName = args[0];
@@ -195,7 +201,10 @@ public class GreedySearch {
 
         BaseDecompose gd = null;
 
-        switch (8) {
+        switch (2) {
+            case -1:
+                gd = new ExperimentalDecompose(graph);
+                break;
             case 0:
                 gd = new FixedOrderingDecompose(graph);
                 break;
@@ -203,8 +212,10 @@ public class GreedySearch {
                 gd = new RandomDecompose(graph);
                 break;
             case 2:
-                gd = new EachSymDiffDecompose(graph);
+                gd = new SpanningTreeDecompose(graph);
                 break;
+            //processFiles(getLargeFileNames(), (g) -> new SpanningTreeAllDecompose(g));
+            //return;
             case 3:
                 gd = new ThreeWayDecompose(graph);
                 break;
@@ -252,6 +263,7 @@ public class GreedySearch {
         result.put("graph", fileName);
         result.put("v", graph.numVertices());
         result.put("e", graph.numEdges());
+        result.put("heuristic", gd.getClass().getName());
         final BaseDecompose gd2 = gd;
         JSONObject jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
             if (node != ibt.getRoot()) {

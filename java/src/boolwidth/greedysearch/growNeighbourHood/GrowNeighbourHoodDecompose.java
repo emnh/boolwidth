@@ -11,14 +11,15 @@ import interfaces.IGraph;
 //public class GrowNeighbourHoodDecompose extends StackDecomposeTryAllFirstVertexChoice {
 //public class GrowNeighbourHoodDecompose extends StackDecompose {
 //public class GrowNeighbourHoodDecompose extends CaterpillarDecompose {
-public class GrowNeighbourHoodDecompose extends CaterpillarTryAllFirstVertexChoiceDecompose {
+//public class GrowNeighbourHoodDecompose extends CaterpillarToFullDecompose {
+public class GrowNeighbourHoodDecompose extends CaterpillarToFullTryAllFirstVertexChoiceDecompose {
 
     public GrowNeighbourHoodDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
     }
 
     @Override
-    public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
+    public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
         return new SplitGrowNeighbourhood(depth, decomposition, rights);
     }
 }
