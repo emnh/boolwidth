@@ -118,5 +118,6 @@
     <orderEntry type="library" name="javacl-1.0.0-RC3" level="project" />
     <orderEntry type="library" name="javacl-1.0.0-RC3-shaded" level="project" />
     <orderEntry type="library" name="JOCL-0.1.9" level="project" />
+    <orderEntry type="library" name="libtw" level="project" />
   </component>
 </module>

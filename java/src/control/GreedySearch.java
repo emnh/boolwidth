@@ -264,7 +264,13 @@ public class GreedySearch {
 
         System.out.println("computing boolean width");
         long computeWidthStart = System.currentTimeMillis();
-        long bw = gd.getBooleanWidth(ibt);
+        boolean overflow = false;
+        long bw = 0;
+        try {
+            bw = gd.getBooleanWidth(ibt);
+        } catch (ArithmeticException e) {
+            overflow = true;
+        }
         long computeWidthEnd = System.currentTimeMillis();
 
         JSONObject result = new JSONObject();
@@ -272,8 +278,13 @@ public class GreedySearch {
         result.put("cacheHits", (double) gd.cacheHits / gd.cutboolTotalCalls);
         result.put("decomposeTime", decomposeEnd - decomposeStart);
         result.put("computeWidthTime", computeWidthEnd - computeWidthStart);
-        result.put("booleanWidth", BaseDecompose.getLogBooleanWidth(bw));
-        result.put("2^booleanWidth", bw);
+        if (overflow) {
+            result.put("booleanWidth", "overflow");
+            result.put("2^booleanWidth", "overflow");
+        } else {
+            result.put("booleanWidth", BaseDecompose.getLogBooleanWidth(bw));
+            result.put("2^booleanWidth", bw);
+        }
         result.put("graph", fileName);
         result.put("v", graph.numVertices());
         result.put("e", graph.numEdges());
