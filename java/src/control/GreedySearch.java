@@ -160,7 +160,6 @@ public class GreedySearch {
         fileNames.add(DiskGraph.getMatchingGraph("**pr2392.tsp.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**pr226.tsp.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**BN_63-pp.dgf"));
-        fileNames.clear();
         fileNames.add(DiskGraph.getMatchingGraph("**vm1748.tsp-pp.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**BN_44-pp.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**rl1323.tsp-pp.dgf"));
@@ -277,7 +276,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**u574.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**BN_43.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**BN_129.dgf");
 
         String cls = "";
         if (args.length > 0) {
@@ -297,8 +296,10 @@ public class GreedySearch {
         } else {
             switch (-7) {
                 case -7:
-                    processFiles(getUnbeatFileNames(), (g) -> new TreeWidthGreedyFillinDecompose(g));
-                    return;
+                    gd = new TreeWidthGreedyFillinDecompose(graph);
+                    break;
+                    //processFiles(getUnbeatFileNames(), (g) -> new TreeWidthGreedyFillinDecompose(g));
+                    //return;
                 case -6:
                     gd = new GreedyMergeDecompose(graph);
                     break;

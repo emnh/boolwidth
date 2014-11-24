@@ -39,7 +39,9 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
             for (TVertex v2 : graph.incidentVertices(v1)) {
                 NVertex<GraphInput.InputData> newVertex1 = result.oldToNewVertex.get(v1);
                 NVertex<GraphInput.InputData> newVertex2 = result.oldToNewVertex.get(v2);
-                result.twGraph.addEdge(newVertex1, newVertex2);
+                if (v1.id() < v2.id()) {
+                    result.twGraph.addEdge(newVertex1, newVertex2);
+                }
             }
         }
         return result;
