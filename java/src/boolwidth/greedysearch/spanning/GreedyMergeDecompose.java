@@ -30,7 +30,7 @@ public class GreedyMergeDecompose extends BaseDecompose {
     }
 
     public double getCost(Vertex<Integer> a, Vertex<Integer> b) {
-        double cost = -(double) hoods.get(a.id()).intersect(hoods.get(b.id())).size() / hoods.get(a.id()).union(hoods.get(b.id())).size();
+        double cost = -(double) hoods.get(a.id()).intersection(hoods.get(b.id())).size() / hoods.get(a.id()).union(hoods.get(b.id())).size();
         //double cost = -(double) hoods.get(a.id()).subtract(hoods.get(b.id())).size() / hoods.get(a.id()).size(); //union(hoods.get(b.id())).size();
         return cost;
     }

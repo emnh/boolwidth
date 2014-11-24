@@ -443,20 +443,9 @@ ISubSet<PosSubSet<TVertex>, TVertex> {
         return s;
     }*/
 
+	// TODO: why are there two methods intersect and intersection doing the same thing?
     public PosSubSet<TVertex> intersect(PosSubSet<TVertex> set) {
-        if ((Set<?>) this.groundSet != set.getSet()) {
-            throw new IndexOutOfBoundsException(
-                    "Different ground sets can not be compared");
-        }
-
-        long[] oldWords = set.getWords();
-        long[] newWords = new long[this.words.length];
-
-        // Perform logical AND on words
-        for (int i = 0; i < this.words.length; i++) {
-            newWords[i] = this.words[i] & oldWords[i];
-        }
-        return new PosSubSet<TVertex>(this.groundSet, newWords);
+        return intersection(set);
     }
 
 	public PosSubSet<TVertex> symmetricDifference(PosSubSet<TVertex> set) {

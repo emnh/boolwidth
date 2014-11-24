@@ -1,0 +1,193 @@
+package boolwidth.treewidth;
+
+import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.Split;
+import boolwidth.greedysearch.ds.ImmutableBinaryTree;
+import boolwidth.greedysearch.ds.SimpleNode;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import graph.Vertex;
+import interfaces.IGraph;
+import nl.uu.cs.treewidth.algorithm.*;
+import nl.uu.cs.treewidth.input.GraphInput;
+import nl.uu.cs.treewidth.ngraph.*;
+import sadiasrc.modularDecomposition.Graph;
+
+import java.util.*;
+
+
+/**
+ * Created by emh on 11/24/2014.
+ */
+public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
+
+    public TreeWidthGreedyFillinDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
+        super(graph);
+    }
+
+    public static <TVertex extends Vertex<V>, V, E> GraphAndMap toTreeWidthGraph(IGraph<TVertex, V, E> graph) {
+        NVertex<GraphInput.InputData> vertexPrototype = new ListVertex<GraphInput.InputData>();
+        GraphAndMap<TVertex, V> result = new GraphAndMap();
+        for (TVertex v : graph.vertices()) {
+            NVertex<GraphInput.InputData> newVertex = vertexPrototype.newOfSameType(new GraphInput.InputData(v.id(), ""));
+            result.twGraph.addVertex(newVertex);
+            result.oldToNewVertex.put(v, newVertex);
+        }
+        for (TVertex v1 : graph.vertices()) {
+            for (TVertex v2 : graph.incidentVertices(v1)) {
+                NVertex<GraphInput.InputData> newVertex1 = result.oldToNewVertex.get(v1);
+                NVertex<GraphInput.InputData> newVertex2 = result.oldToNewVertex.get(v2);
+                result.twGraph.addEdge(newVertex1, newVertex2);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public ImmutableBinaryTree decompose() {
+        GraphAndMap<Vertex<Integer>, Integer> graphAndMap = toTreeWidthGraph(getGraph());
+
+        Permutation<GraphInput.InputData> p = new LexBFS<>(); //The upperbound algorithm
+        PermutationToTreeDecomposition<GraphInput.InputData> pttd = new PermutationToTreeDecomposition<GraphInput.InputData>(p);
+        pttd.setInput(graphAndMap.twGraph);
+        pttd.run();
+        int upperBound1 = pttd.getUpperBound();
+
+        GreedyFillIn<GraphInput.InputData> ubAlgo2 = new GreedyFillIn<GraphInput.InputData>();
+        ubAlgo2.setInput(graphAndMap.twGraph);
+        ubAlgo2.run();
+        int upperBound2 = ubAlgo2.getUpperBound();
+
+        GreedyDegree<GraphInput.InputData> ubAlgo3 = new GreedyDegree<>();
+        ubAlgo3.setInput(graphAndMap.twGraph);
+        ubAlgo3.run();
+        int upperBound3 = ubAlgo3.getUpperBound();
+
+        int UB = Math.min(Math.min(upperBound1, upperBound2), upperBound3);
+
+        NVertexOrder<GraphInput.InputData> permutation = null;
+        if (UB == upperBound1) {
+            permutation = p.getPermutation();
+        } else if (UB == upperBound2) {
+            permutation = ubAlgo2.getPermutation();
+        } else if (UB == upperBound3) {
+            permutation = ubAlgo3.getPermutation();
+        }
+
+        System.out.printf("UB: %d [%d, %d, %d]\n",
+                UB,
+                upperBound1,
+                upperBound2,
+                upperBound3);
+
+
+
+        PermutationToTreeDecomposition<GraphInput.InputData> convertor = new PermutationToTreeDecomposition<>(permutation);
+        convertor.setInput(graphAndMap.twGraph);
+        convertor.run();
+        NGraph<NTDBag<GraphInput.InputData>> decomposition = convertor.getDecomposition();
+        //decomposition.edges()
+        //decomposition.printGraph(true, true);
+        ArrayList<Vertex<Integer>> ordering = new ArrayList<>();
+        HashSet<Vertex<Integer>> seen = new HashSet<>();
+        BiMap<HashSet<Vertex<Integer>>, NVertex<NTDBag<GraphInput.InputData>>> bagMap = HashBiMap.create();
+        ArrayList<ArrayList<Vertex<Integer>>> spanningTreeNeighbours = new ArrayList<>();
+
+        Stack<NVertex<NTDBag<GraphInput.InputData>>> bags = new Stack<>();
+        HashSet<NVertex<NTDBag<GraphInput.InputData>>> seenBags = new HashSet<>();
+        bags.push(decomposition.getVertex(0));
+        seenBags.add(decomposition.getVertex(0));
+
+        /*for (NVertex<NTDBag<GraphInput.InputData>> bag : decomposition) {
+            HashSet<Vertex<Integer>> vertices = new HashSet<>();
+            for (NVertex<GraphInput.InputData> newVertex : bag.data.vertices) {
+                Vertex<Integer> v = graphAndMap.oldToNewVertex.inverse().get(newVertex);
+                vertices.add(v);
+            }
+            System.out.printf("vertices: %s\n", vertices);
+        }*/
+
+        ImmutableBinaryTree ibt = new ImmutableBinaryTree();
+        ibt = ibt.addRoot();
+        HashMap<NVertex<NTDBag<GraphInput.InputData>>, SimpleNode> ibtMap = new HashMap<>();
+        ibtMap.put(decomposition.getVertex(0), ibt.getRoot());
+
+        while (!bags.isEmpty()) {
+            NVertex<NTDBag<GraphInput.InputData>> bag = bags.pop();
+
+            HashSet<Vertex<Integer>> vertices = new HashSet<>();
+            for (NVertex<GraphInput.InputData> newVertex : bag.data.vertices) {
+                Vertex<Integer> v = graphAndMap.oldToNewVertex.inverse().get(newVertex);
+                if (!seen.contains(v)) {
+                    ordering.add(v);
+                    seen.add(v);
+                    vertices.add(v);
+                }
+            }
+            bagMap.put(vertices, bag);
+
+            Stack<NVertex<NTDBag<GraphInput.InputData>>> childBags = new Stack<>();
+            Iterator<NVertex<NTDBag<GraphInput.InputData>>> it = bag.getNeighbors();
+            while (it.hasNext()) {
+                NVertex<NTDBag<GraphInput.InputData>> bag2 = it.next();
+                if (!seenBags.contains(bag2)) {
+                    bags.push(bag2);
+                    seenBags.add(bag2);
+                    childBags.add(bag2);
+                }
+            }
+
+            SimpleNode nodeParent = ibtMap.get(bag);
+            //System.out.printf("nodeParent of %s = %s\n", v, nodeParent);
+            //ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
+            int i = 0;
+            for (Vertex<Integer> v : vertices) {
+                i++;
+                // add left/right child
+                ibt = ibt.addChild(nodeParent, v.id());
+
+                // add extra internal right child if more than 2 children
+                if (vertices.size() + childBags.size() - i > 1) {
+                    // insert extra internal node
+                    ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
+                    nodeParent = ibt.getReference();
+                }
+            }
+
+            // add isolated bags
+            if (bags.isEmpty()) {
+                for (NVertex<NTDBag<GraphInput.InputData>> isolatedBag : decomposition) {
+                    if (!seenBags.contains(isolatedBag)) {
+                        seenBags.add(isolatedBag);
+                        childBags.push(isolatedBag);
+                        bags.push(isolatedBag);
+                    }
+                }
+            }
+
+            while (!childBags.isEmpty()) {
+                // add left/right child
+                NVertex<NTDBag<GraphInput.InputData>> child = childBags.pop();
+                ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
+                ibtMap.put(child, ibt.getReference());
+
+                // add extra internal right child if more than 2 children
+                if (childBags.size() > 1) {
+                    // insert extra internal node
+                    ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
+                    nodeParent = ibt.getReference();
+                }
+            }
+        }
+
+        //Vertex<Integer> root = graphAndMap.oldToNewVertex.inverse().get(decomposition.getVertex(0).data.vertices.iterator().next());
+
+        /*for (Vertex<Integer> v : ordering) {
+            //System.out.printf("id: %d\n", v.id());
+            split = split.decomposeAdvanceFixed(v);
+            ibt = ibt.addChild(last, split.getLastMoved().id());
+            last = ibt.getReference();
+        }*/
+        return ibt;
+    }
+}

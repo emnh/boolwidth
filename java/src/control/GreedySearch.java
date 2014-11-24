@@ -9,9 +9,9 @@ import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import boolwidth.greedysearch.memory.MemoryDecompose;
 import boolwidth.greedysearch.best.BestDecompose;
-import boolwidth.greedysearch.spanning.GreedyMergeDecompose;
-import boolwidth.greedysearch.spanning.SpanningTreeDecompose;
+import boolwidth.greedysearch.spanning.*;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
+import boolwidth.treewidth.TreeWidthGreedyFillinDecompose;
 import control.http.HTTPResultsServer;
 import graph.Vertex;
 import interfaces.IGraph;
@@ -127,7 +127,13 @@ public class GreedySearch {
 
             System.out.println("computing boolean width");
             long computeWidthStart = System.currentTimeMillis();
-            long bw = gd.getBooleanWidth(ibt);
+            boolean overflow = false;
+            long bw = 0;
+            try {
+                bw = gd.getBooleanWidth(ibt);
+            } catch (ArithmeticException e) {
+                overflow = true;
+            }
             long computeWidthEnd = System.currentTimeMillis();
 
             JSONObject result = new JSONObject();
@@ -135,8 +141,13 @@ public class GreedySearch {
             result.put("cacheHits", (double) gd.cacheHits / gd.cutboolTotalCalls);
             result.put("decomposeTime", decomposeEnd - decomposeStart);
             result.put("computeWidthTime", computeWidthEnd - computeWidthStart);
-            result.put("booleanWidth", BaseDecompose.getLogBooleanWidth(bw));
-            result.put("2^booleanWidth", bw);
+            if (overflow) {
+                result.put("booleanWidth", "overflow");
+                result.put("2^booleanWidth", "overflow");
+            } else {
+                result.put("booleanWidth", BaseDecompose.getLogBooleanWidth(bw));
+                result.put("2^booleanWidth", bw);
+            }
             result.put("graph", file);
             result.put("v", graph.numVertices());
             result.put("e", graph.numEdges());
@@ -190,7 +201,8 @@ public class GreedySearch {
 
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**vm1084.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**u574.tsp.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**BN_43.dgf");
 
         String cls = "";
         if (args.length > 0) {
@@ -208,9 +220,20 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (-3) {
+            switch (-7) {
+                case -7:
+                    gd = new TreeWidthGreedyFillinDecompose(graph);
+                    break;
+                case -6:
+                    gd = new GreedyMergeDecompose(graph);
+                    break;
                 case -5:
-                    gd = new BestDecompose(graph);
+                    //gd = new SpanningTreeDecompose(graph);
+                    //gd = new SpanningTreeCostSymDiffDecompose(graph);
+                    //gd = new SpanningTreeComponentDecompose(graph);
+                    gd = new SpanningTreeComponentAverageDecompose(graph);
+                    //processFiles(getLargeFileNames(), (g) -> new SpanningTreeComponentAverageDecompose(g));
+                    //return;
                     break;
                 case -4:
                     gd = new GrowNeighbourHoodDecompose(graph);
@@ -222,7 +245,7 @@ public class GreedySearch {
                     gd = new SpanningTreeDecompose(graph);
                     break;
                 case -1:
-                    processFiles(getSmallFileNames(), (g) -> new SpanningTreeDecompose(g));
+                    processFiles(getLargeFileNames(), (g) -> new SpanningTreeComponentDecompose(g));
                     return;
                 case 0:
                     gd = new FixedOrderingDecompose(graph);
@@ -294,9 +317,13 @@ public class GreedySearch {
             result.put("heuristic", gd.getClass().getName());
         }
         final BaseDecompose gd2 = gd;
+
+        final boolean overflow2 = overflow;
         JSONObject jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
             if (node != ibt.getRoot()) {
-                obj.put("cutBool", gd2.getCutBool(ibt.getChildren(parent, node)));
+                if (!overflow2) {
+                    obj.put("cutBool", gd2.getCutBool(ibt.getChildren(parent, node)));
+                }
             }
         });
 

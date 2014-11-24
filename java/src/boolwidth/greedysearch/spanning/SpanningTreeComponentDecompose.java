@@ -7,6 +7,7 @@ import graph.BasicGraphAlgorithms;
 import graph.Vertex;
 import graph.subsets.PosSubSet;
 import interfaces.IGraph;
+import javafx.geometry.Pos;
 
 import java.util.*;
 
@@ -16,11 +17,11 @@ import java.util.*;
 
 
 
-public class SpanningTreeDecompose extends BaseDecompose {
+public class SpanningTreeComponentDecompose extends BaseDecompose {
 
-    protected ArrayList<PosSubSet<Vertex<Integer>>> hoods = BasicGraphAlgorithms.getNeighbourHoods(getGraph());
+    private ArrayList<PosSubSet<Vertex<Integer>>> hoods = BasicGraphAlgorithms.getNeighbourHoods(getGraph());
 
-    public SpanningTreeDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
+    public SpanningTreeComponentDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
         hoods = BasicGraphAlgorithms.getNeighbourHoods(getGraph());
     }
@@ -29,17 +30,22 @@ public class SpanningTreeDecompose extends BaseDecompose {
         return getGraph().incidentVertices(v);
     }
 
-    public double getCost(Vertex<Integer> a, Vertex<Integer> b) {
+    public double getCost(PosSubSet<Vertex<Integer>> a, PosSubSet<Vertex<Integer>> b) {
         // FIRST GOOD
-        double cost = -(double) hoods.get(a.id()).intersect(hoods.get(b.id())).size() / hoods.get(a.id()).union(hoods.get(b.id())).size();
+        double cost = -(double) a.intersection(b).size() / a.union(b).size();
         // SAME SAME
-        //double cost = -(double) hoods.get(a.id()).intersect(hoods.get(b.id())).size() / hoods.get(a.id()).symmetricDifference(hoods.get(b.id())).size();
+        //double cost = -(double) a.intersection(b).size() / a.symmetricDifference(b).size();
 
         // SECOND GOOD
-        //double cost = hoods.get(a.id()).symmetricDifference(hoods.get(b.id())).size();
+        //double cost = a.symmetricDifference(b).size();
 
         // EXPERIMENTAL
-        //double cost = hoods.get(b.id()).size() - hoods.get(a.id()).size();
+        //double cost = b.subtract(a).size();
+        return cost;
+    }
+
+    public double getCost(Vertex<Integer> a, Vertex<Integer> b) {
+        double cost = getCost(hoods.get(a.id()), hoods.get(b.id()));
         return cost;
     }
 
@@ -48,12 +54,14 @@ public class SpanningTreeDecompose extends BaseDecompose {
         //Multimap<Vertex<Integer>, Vertex<Integer>> spanningTree = ArrayListMultimap.create();
         ArrayList<ArrayList<Vertex<Integer>>> spanningTreeNeighbours = new ArrayList<>();
         ArrayList<ArrayList<Vertex<Integer>>> components = new ArrayList<>();
+        ArrayList<PosSubSet<Vertex<Integer>>> N_LEFTs = new ArrayList<>();
         PriorityQueue<NodePair> edges = new PriorityQueue<>(getGraph().numEdges(), Comparator.comparingDouble((n) -> n.cost));
 
         // Initialize edges with costs
         for (Vertex<Integer> a : getGraph().vertices()) {
             ArrayList<Vertex<Integer>> component =  new ArrayList<>();
             component.add(a);
+            N_LEFTs.add(hoods.get(a.id()));
             components.add(component);
             spanningTreeNeighbours.add(new ArrayList<>());
             //for (Vertex<Integer> b : getGraph().incidentVertices(a)) {
@@ -74,15 +82,47 @@ public class SpanningTreeDecompose extends BaseDecompose {
             if (components.get(np.a.id()) != components.get(np.b.id())) {
                 //System.out.printf("setting %s component to %s component\n", np.a.id(), np.b.id());
                 ArrayList<Vertex<Integer>> aComponent = components.get(np.a.id());
+                PosSubSet<Vertex<Integer>> N_LEFT = N_LEFTs.get(np.a.id());
+
+                /*PosSubSet<Vertex<Integer>> N_INTERNAL = new PosSubSet<>(N_LEFT.groundSet);
+                for (Vertex<Integer> v : aComponent) {
+                    N_INTERNAL.add(v);
+                }
+                for (Vertex<Integer> v : components.get(np.b.id())) {
+                    N_INTERNAL.add(v);
+                }*/
+                N_LEFT = N_LEFT.union(N_LEFTs.get(np.b.id()));
+                //N_LEFT = N_LEFT.subtract(N_INTERNAL);
+
+                for (Vertex<Integer> v : aComponent) {
+                    N_LEFTs.set(v.id(), N_LEFT);
+                }
                 for (Vertex<Integer> v : components.get(np.b.id())) {
                     components.set(v.id(), aComponent);
+                    N_LEFTs.set(v.id(), N_LEFT);
                     aComponent.add(v);
                 }
-
-                //long cb = getCutBool(aComponent, true);
-
                 spanningTreeNeighbours.get(np.a.id()).add(np.b);
                 spanningTreeNeighbours.get(np.b.id()).add(np.a);
+
+                // update edge priorities based on new component
+                for (Vertex<Integer> u : aComponent) {
+                    for (Vertex<Integer> v : getIncidentVertices(u)) {
+                        if (aComponent != components.get(v.id())) {
+                            ArrayList<NodePair> removeList = new ArrayList<>();
+                            for (NodePair e : edges) {
+                                if(e.a == u && e.b == v || e.a == v && e.b == u) {
+                                    removeList.add(e);
+                                }
+                            }
+                            edges.removeAll(removeList);
+                            PosSubSet<Vertex<Integer>> N_RIGHT = N_LEFTs.get(v.id());
+                            double cost = getCost(N_LEFT, N_RIGHT);
+                            NodePair npNew = new NodePair(u, v, cost);
+                            edges.add(npNew);
+                        }
+                    }
+                }
             } else {
                 // not different components, so not part of spanning tree
             }

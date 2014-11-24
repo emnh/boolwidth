@@ -62,7 +62,7 @@ public class StackDecomposeTryAllFirstVertexChoice extends StackDecompose {
         while (System.currentTimeMillis() - start < LOCAL_SEARCH_TIME) {
             Split rootSplit = minSplitChildren.get(null).iterator().next();
             splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
-            localSearch(splits, minSplitChildren);
+            if (!localSearch(splits, minSplitChildren)) break;
         }
         ImmutableBinaryTree lsIBT = getImmutableBinaryTree(minSplitChildren);
 

@@ -4,10 +4,12 @@ import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import graph.BasicGraphAlgorithms;
 import graph.Vertex;
 import interfaces.IGraph;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -18,7 +20,7 @@ import java.util.Stack;
 
 public class StackDecompose extends BaseDecompose {
 
-    public static final int LOCAL_SEARCH_TIME = 10*1000;
+    public static final int LOCAL_SEARCH_TIME = 60*1000;
 
     public StackDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
@@ -41,15 +43,16 @@ public class StackDecompose extends BaseDecompose {
         while (System.currentTimeMillis() - start < LOCAL_SEARCH_TIME) {
             rootSplit = splitChildren.get(null).iterator().next();
             splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
-            localSearch(splits, splitChildren);
+            if (!localSearch(splits, splitChildren)) break;
         }
 
         return getImmutableBinaryTree(splitChildren);
     }
 
-    protected void localSearch(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
+    protected boolean localSearch(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
         long UB = 0;
         long secondLargest = 0;
+        boolean better = false;
         StackDecomposeSplitStackItem maxSplit = null;
 
         // iterate tree and find largest split
@@ -81,6 +84,7 @@ public class StackDecompose extends BaseDecompose {
             long rightCutbool2 = split.measureCutForDecompose(newSplit.getRights(), null);
             long maxCutBool2 = Math.max(leftCutbool2, rightCutbool2);
             System.out.printf("LS: old: %.2f, new: %.2f\n", getLogBooleanWidth(UB), getLogBooleanWidth(maxCutBool2));
+            better = maxCutBool2 < UB;
             UB = maxCutBool2;
 
             splitChildren.remove(parent, split);
@@ -107,6 +111,7 @@ public class StackDecompose extends BaseDecompose {
             initSplitChildren(splits, splitChildren, split);
         }
         //decomposeSplits(splits, splitChildren);
+        return better;
     }
 
     protected void decomposeSplits(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren) {
@@ -186,8 +191,9 @@ public class StackDecompose extends BaseDecompose {
 
     @Override
     public ImmutableBinaryTree decompose() {
-        ArrayList<Vertex<Integer>> list = new ArrayList<>();
-        this.getGraph().vertices().forEach((node) -> list.add(node));
-        return decompose(list);
+        ArrayList<Vertex<Integer>> vertices = BasicGraphAlgorithms.BFSAll(getGraph(), getGraph().vertices().iterator().next());
+        vertices = BasicGraphAlgorithms.BFSAll(getGraph(), vertices.iterator().next());
+        //Collections.shuffle(vertices);
+        return decompose(vertices);
     }
 }
