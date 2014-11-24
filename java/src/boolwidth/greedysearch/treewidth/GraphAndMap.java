@@ -1,4 +1,4 @@
-package boolwidth.treewidth;
+package boolwidth.greedysearch.treewidth;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;

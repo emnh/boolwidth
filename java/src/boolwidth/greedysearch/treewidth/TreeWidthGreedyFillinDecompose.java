@@ -1,19 +1,16 @@
-package boolwidth.treewidth;
+package boolwidth.greedysearch.treewidth;
 
 import boolwidth.greedysearch.base.BaseDecompose;
-import boolwidth.greedysearch.base.Split;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.spanning.SpanningTreeDecompose;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.thoughtworks.xstream.mapper.Mapper;
 import graph.Vertex;
 import interfaces.IGraph;
 import nl.uu.cs.treewidth.algorithm.*;
 import nl.uu.cs.treewidth.input.GraphInput;
 import nl.uu.cs.treewidth.ngraph.*;
-import sadiasrc.modularDecomposition.Graph;
 
 import java.util.*;
 
@@ -27,9 +24,9 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
         super(graph);
     }
 
-    public static <TVertex extends Vertex<V>, V, E> GraphAndMap toTreeWidthGraph(IGraph<TVertex, V, E> graph) {
+    public static <TVertex extends Vertex<V>, V, E> GraphAndMap<TVertex, V> toTreeWidthGraph(IGraph<TVertex, V, E> graph) {
         NVertex<GraphInput.InputData> vertexPrototype = new ListVertex<GraphInput.InputData>();
-        GraphAndMap<TVertex, V> result = new GraphAndMap();
+        GraphAndMap<TVertex, V> result = new GraphAndMap<>();
         for (TVertex v : graph.vertices()) {
             NVertex<GraphInput.InputData> newVertex = vertexPrototype.newOfSameType(new GraphInput.InputData(v.id(), ""));
             result.twGraph.addVertex(newVertex);
