@@ -4,8 +4,10 @@ import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.Split;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
+import boolwidth.greedysearch.spanning.SpanningTreeDecompose;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.thoughtworks.xstream.mapper.Mapper;
 import graph.Vertex;
 import interfaces.IGraph;
 import nl.uu.cs.treewidth.algorithm.*;
@@ -48,25 +50,44 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
         GraphAndMap<Vertex<Integer>, Integer> graphAndMap = toTreeWidthGraph(getGraph());
 
         Permutation<GraphInput.InputData> p = new LexBFS<>(); //The upperbound algorithm
-        PermutationToTreeDecomposition<GraphInput.InputData> pttd = new PermutationToTreeDecomposition<GraphInput.InputData>(p);
-        pttd.setInput(graphAndMap.twGraph);
-        pttd.run();
-        int upperBound1 = pttd.getUpperBound();
+        int upperBound1 = Integer.MAX_VALUE;
+        try {
+            PermutationToTreeDecomposition<GraphInput.InputData> pttd = new PermutationToTreeDecomposition<>(p);
+            pttd.setInput(graphAndMap.twGraph);
+            pttd.run();
+            upperBound1 = pttd.getUpperBound();
+        } catch (ConcurrentModificationException e) {
+            System.out.println("warning! treewidthlib bug!");
+        }
 
-        GreedyFillIn<GraphInput.InputData> ubAlgo2 = new GreedyFillIn<GraphInput.InputData>();
-        ubAlgo2.setInput(graphAndMap.twGraph);
-        ubAlgo2.run();
-        int upperBound2 = ubAlgo2.getUpperBound();
+        GreedyFillIn<GraphInput.InputData> ubAlgo2 = new GreedyFillIn<>();
+        int upperBound2 = Integer.MAX_VALUE;
+        try {
+            ubAlgo2.setInput(graphAndMap.twGraph);
+            ubAlgo2.run();
+            upperBound2 = ubAlgo2.getUpperBound();
+        } catch (ConcurrentModificationException e) {
+            System.out.println("warning! treewidthlib bug!");
+        }
 
+        int upperBound3 = Integer.MAX_VALUE;
         GreedyDegree<GraphInput.InputData> ubAlgo3 = new GreedyDegree<>();
-        ubAlgo3.setInput(graphAndMap.twGraph);
-        ubAlgo3.run();
-        int upperBound3 = ubAlgo3.getUpperBound();
+        try {
+            ubAlgo3.setInput(graphAndMap.twGraph);
+            ubAlgo3.run();
+            upperBound3 = ubAlgo3.getUpperBound();
+        } catch (ConcurrentModificationException e) {
+            System.out.println("warning! treewidthlib bug!");
+        } catch (NullPointerException e) {
+            System.out.println("warning! treewidthlib bug!");
+        }
 
         int UB = Math.min(Math.min(upperBound1, upperBound2), upperBound3);
 
         NVertexOrder<GraphInput.InputData> permutation = null;
-        if (UB == upperBound1) {
+        if (UB == Integer.MAX_VALUE) {
+            return new SpanningTreeDecompose(getGraph()).decompose();
+        } else if (UB == upperBound1) {
             permutation = p.getPermutation();
         } else if (UB == upperBound2) {
             permutation = ubAlgo2.getPermutation();
@@ -79,8 +100,6 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
                 upperBound1,
                 upperBound2,
                 upperBound3);
-
-
 
         PermutationToTreeDecomposition<GraphInput.InputData> convertor = new PermutationToTreeDecomposition<>(permutation);
         convertor.setInput(graphAndMap.twGraph);

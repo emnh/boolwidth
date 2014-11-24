@@ -111,6 +111,80 @@ public class GreedySearch {
         return fileNames;
     }
 
+    public static ArrayList<String> getUnbeatFileNames() throws IOException {
+        ArrayList<String> fileNames = new ArrayList<>();
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_43.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_45.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_42.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_44.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rl1323.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rd400.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**d1655.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**p654.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin3.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**fl1577.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**fl1577.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin2-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**u574.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**link-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pigs-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**link.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**diabetes-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**fl1400.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**fl1400.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**d657.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_77.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**link-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin2.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**diabetes-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pr1002.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**p654.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_46.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**graph12pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pr299.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin_kgo_complete.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rl1889.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rl1889.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pigs.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**boblo.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**u1817.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**u1817.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**diabetes.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_71.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin3-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_77-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**d1291.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**d1291.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin4.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_42-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pr2392.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pr226.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_63-pp.dgf"));
+        fileNames.clear();
+        fileNames.add(DiskGraph.getMatchingGraph("**vm1748.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_44-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rl1323.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**u2152.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_49.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_60.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**d1655.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**ch130.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**vm1748.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_58.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_74.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**tsp225.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_49-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**fl417.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_59-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_61.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**fl417.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_19.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin4-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_17.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**u2152.tsp-pp.dgf"));
+        return fileNames;
+    }
+
     public static void processFiles(ArrayList<String> fileNames, Function<IGraph<Vertex<Integer>, Integer, String>, BaseDecompose> getDecomposer) {
         ArrayList<String> results = new ArrayList<>();
         for (String file : fileNames) {
@@ -156,10 +230,11 @@ public class GreedySearch {
             String resultStr = result.toString();
             System.out.printf("result: %s\n", resultStr); // for parsing
             results.add(resultStr);
-        }
-        System.out.println("");
-        for (String result : results) {
-            System.out.println(result);
+
+            System.out.println("");
+            for (String result2 : results) {
+                System.out.println(result2);
+            }
         }
     }
 
@@ -222,8 +297,8 @@ public class GreedySearch {
         } else {
             switch (-7) {
                 case -7:
-                    gd = new TreeWidthGreedyFillinDecompose(graph);
-                    break;
+                    processFiles(getUnbeatFileNames(), (g) -> new TreeWidthGreedyFillinDecompose(g));
+                    return;
                 case -6:
                     gd = new GreedyMergeDecompose(graph);
                     break;
