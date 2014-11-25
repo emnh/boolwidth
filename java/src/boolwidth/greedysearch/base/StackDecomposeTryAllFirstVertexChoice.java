@@ -56,21 +56,6 @@ public class StackDecomposeTryAllFirstVertexChoice extends StackDecompose {
             }
         }
 
-        // local search
-        long start = System.currentTimeMillis();
-        Stack<StackDecomposeSplitStackItem> splits = new Stack<>();
-        while (System.currentTimeMillis() - start < LOCAL_SEARCH_TIME) {
-            Split rootSplit = minSplitChildren.get(null).iterator().next();
-            splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
-            if (!localSearch(splits, minSplitChildren)) break;
-        }
-        ImmutableBinaryTree lsIBT = getImmutableBinaryTree(minSplitChildren);
-
-        // local search is dumb enough that it can increase boolean width, because it considers local cuts only
-        if (getBooleanWidth(lsIBT) < getBooleanWidth(minIBT)) {
-            minIBT = lsIBT;
-        }
-
         return minIBT;
     }
 

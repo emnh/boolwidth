@@ -64,11 +64,13 @@ public class SpanningTreeDecompose extends BaseDecompose {
             components.add(component);
             spanningTreeNeighbours.add(new ArrayList<>());
             //for (Vertex<Integer> b : getGraph().incidentVertices(a)) {
-            for (Vertex<Integer> b : getIncidentVertices(a)) {
-                if (a.id() < b.id() && allVertices.contains(a) && allVertices.contains(b)) {
-                    NodePair np = new NodePair(a, b, getCost(a, b));
-                    edges.add(np);
-                    //System.out.printf("adding edge: %s - %s\n", np.a, np.b);
+            if (allVertices.contains(a)) {
+                for (Vertex<Integer> b : getIncidentVertices(a)) {
+                    if (a.id() < b.id() && allVertices.contains(b)) {
+                        NodePair np = new NodePair(a, b, getCost(a, b));
+                        edges.add(np);
+                        //System.out.printf("adding edge: %s - %s\n", np.a, np.b);
+                    }
                 }
             }
         }

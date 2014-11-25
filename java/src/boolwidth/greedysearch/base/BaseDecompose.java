@@ -6,10 +6,12 @@ import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.growNeighbourHood.SplitGrowNeighbourhood;
 import boolwidth.opencl.JOCLOpenCLCutBoolComputer;
+import graph.BasicGraphAlgorithms;
 import graph.BiGraph;
 import graph.Vertex;
 import interfaces.IGraph;
 import sadiasrc.decomposition.CCMIS;
+import sadiasrc.graph.BasicGraphAlgorithm;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
@@ -222,6 +224,11 @@ public class BaseDecompose {
     }
 
     public ImmutableBinaryTree decompose() {
+        // TODO: use BFS here?
+        return decompose(new ArrayList<>(BasicGraphAlgorithms.getAllVertices(getGraph())));
+    }
+
+    public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
         throw new UnsupportedOperationException("abstract method: decompose");
     }
 

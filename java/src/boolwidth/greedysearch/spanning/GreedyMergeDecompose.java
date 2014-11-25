@@ -36,11 +36,11 @@ public class GreedyMergeDecompose extends BaseDecompose {
     }
 
     @Override
-    public ImmutableBinaryTree decompose() {
+    public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> allVerticesList) {
         //Multimap<Vertex<Integer>, Vertex<Integer>> spanningTree = ArrayListMultimap.create();
         ArrayList<ArrayList<Vertex<Integer>>> spanningTreeNeighbours = new ArrayList<>();
         ArrayList<ArrayList<Vertex<Integer>>> components = new ArrayList<>();
-        PriorityQueue<NodePair> edges = new PriorityQueue<>(getGraph().numEdges(), Comparator.comparingDouble((n) -> n.cost));
+        //PriorityQueue<NodePair> edges = new PriorityQueue<>(getGraph().numEdges(), Comparator.comparingDouble((n) -> n.cost));
 
         // Initialize edges with costs
         for (Vertex<Integer> a : getGraph().vertices()) {
@@ -49,13 +49,13 @@ public class GreedyMergeDecompose extends BaseDecompose {
             components.add(component);
             spanningTreeNeighbours.add(new ArrayList<>());
             //for (Vertex<Integer> b : getGraph().incidentVertices(a)) {
-            for (Vertex<Integer> b : getIncidentVertices(a)) {
+            /*for (Vertex<Integer> b : getIncidentVertices(a)) {
                 if (a.id() < b.id()) {
                     NodePair np = new NodePair(a, b, getCost(a, b));
                     edges.add(np);
                     //System.out.printf("adding edge: %s - %s\n", np.a, np.b);
                 }
-            }
+            }*/
         }
 
         // Minimum merge tree
@@ -65,7 +65,7 @@ public class GreedyMergeDecompose extends BaseDecompose {
 
             double mincb = Long.MAX_VALUE;
             Vertex<Integer> mina = null, minb = null;
-            ArrayList<Vertex<Integer>> vertices = new ArrayList<>(BasicGraphAlgorithms.getAllVertices(getGraph()));
+            ArrayList<Vertex<Integer>> vertices = allVerticesList;
             Collections.shuffle(vertices); // randomize so running multiple times can improve
             for (Vertex<Integer> a : vertices) {
                 for (Vertex<Integer> b : getGraph().incidentVertices(a)) {

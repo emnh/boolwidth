@@ -3,7 +3,7 @@ package boolwidth.greedysearch.base;
 /**
  * Created by emh on 11/9/2014.
  */
-class StackDecomposeSplitStackItem {
+public class StackDecomposeSplitStackItem {
     public Split parent;
     public Split child;
 

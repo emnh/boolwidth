@@ -146,6 +146,17 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
                 }
             }
 
+            // add isolated bags
+            if (bags.isEmpty()) {
+                for (NVertex<NTDBag<GraphInput.InputData>> isolatedBag : decomposition) {
+                    if (!seenBags.contains(isolatedBag)) {
+                        seenBags.add(isolatedBag);
+                        childBags.push(isolatedBag);
+                        bags.push(isolatedBag);
+                    }
+                }
+            }
+
             SimpleNode nodeParent = ibtMap.get(bag);
             //System.out.printf("nodeParent of %s = %s\n", v, nodeParent);
             //ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
@@ -163,16 +174,7 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
                 }
             }
 
-            // add isolated bags
-            if (bags.isEmpty()) {
-                for (NVertex<NTDBag<GraphInput.InputData>> isolatedBag : decomposition) {
-                    if (!seenBags.contains(isolatedBag)) {
-                        seenBags.add(isolatedBag);
-                        childBags.push(isolatedBag);
-                        bags.push(isolatedBag);
-                    }
-                }
-            }
+
 
             while (!childBags.isEmpty()) {
                 // add left/right child

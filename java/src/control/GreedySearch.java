@@ -8,12 +8,11 @@ import boolwidth.greedysearch.base.TrickleDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
-import boolwidth.greedysearch.localsearch.LocalSearch;
+import boolwidth.greedysearch.base.LocalSearch;
 import boolwidth.greedysearch.memory.MemoryDecompose;
 import boolwidth.greedysearch.spanning.*;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
 import boolwidth.greedysearch.treewidth.TreeWidthGreedyFillinDecompose;
-import control.http.HTTPResultsServer;
 import graph.Vertex;
 import interfaces.IGraph;
 import com.cedarsoftware.util.io.JsonWriter;
@@ -219,51 +218,15 @@ public class GreedySearch {
         return fileNames;
     }
 
-    public static void processFiles(ArrayList<String> fileNames, Function<IGraph<Vertex<Integer>, Integer, String>, BaseDecompose> getDecomposer) {
+    public static void processFiles(ArrayList<String> fileNames, Function<IGraph<Vertex<Integer>, Integer, String>, BaseDecompose> getDecomposer) throws IOException {
         ArrayList<String> results = new ArrayList<>();
         for (String file : fileNames) {
             System.out.printf("processing: %s\n", file);
+
             IGraph<Vertex<Integer>, Integer, String> graph;
             graph = ControlUtil.getTestGraph(file);
             BaseDecompose gd = getDecomposer.apply(graph);
-
-            long decomposeStart = System.currentTimeMillis();
-            ImmutableBinaryTree ibt = gd.decompose();
-            long decomposeEnd = System.currentTimeMillis();
-
-            boolean valid = gd.validateDecomposition(ibt);
-
-            System.out.println("computing boolean width");
-            long computeWidthStart = System.currentTimeMillis();
-            boolean overflow = false;
-            long bw = 0;
-            try {
-                bw = gd.getBooleanWidth(ibt);
-            } catch (ArithmeticException e) {
-                overflow = true;
-            }
-            long computeWidthEnd = System.currentTimeMillis();
-
-            JSONObject result = new JSONObject();
-            result.put("valid", valid);
-            result.put("cacheHits", (double) gd.cacheHits / gd.cutboolTotalCalls);
-            result.put("decomposeTime", decomposeEnd - decomposeStart);
-            result.put("computeWidthTime", computeWidthEnd - computeWidthStart);
-            if (overflow) {
-                result.put("booleanWidth", "overflow");
-                result.put("2^booleanWidth", "overflow");
-            } else {
-                result.put("booleanWidth", BaseDecompose.getLogBooleanWidth(bw));
-                result.put("2^booleanWidth", bw);
-            }
-            result.put("graph", file);
-            result.put("v", graph.numVertices());
-            result.put("e", graph.numEdges());
-            if (ibt.creatorName != null) {
-                result.put("heuristic", ibt.creatorName);
-            } else {
-                result.put("heuristic", gd.getClass().getName());
-            }
+            JSONObject result = processGraph(file, graph, gd);
 
             String resultStr = result.toString();
             System.out.printf("result: %s\n", resultStr); // for parsing
@@ -278,44 +241,10 @@ public class GreedySearch {
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
-        /*test();
-        System.exit(1);
-        */
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen6_6.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen11_11.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/myciel7.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_65.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob/alarm.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/david.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.1.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob/link.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob/link-pp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob/diabetes-wpp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "freq/celar11.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "delauney/rd400.tsp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.3.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "coloring/fpsol2.i.3.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "delauney/vm1084.tsp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "delauney/u724.tsp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob/diabetes.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "freq/graph02-pp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "freq/graph04-pp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "freq/graph07-pp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
-        //String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "delauney/pr439.tsp.dgf";
-        //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
-
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**u574.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**pigs.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**graph12pp.dgf");
 
         String cls = "";
         if (args.length > 0) {
@@ -333,7 +262,7 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (-5) {
+            switch (-7) {
                 case -9:
                     /*long minbw = Long.MAX_VALUE;
                     for (int i = 0; i < 100; i++ ) {
@@ -352,10 +281,10 @@ public class GreedySearch {
                     gd = new TrickleDecompose(graph);
                     break;
                 case -7:
-                    gd = new TreeWidthGreedyFillinDecompose(graph);
-                    break;
-                    //processFiles(getUnbeatFileNames(), (g) -> new TreeWidthGreedyFillinDecompose(g));
-                    //return;
+                    //gd = new TreeWidthGreedyFillinDecompose(graph);
+                    //break;
+                    processFiles(getUnbeatFileNames(), (g) -> new TreeWidthGreedyFillinDecompose(g));
+                    return;
                 case -6:
                     gd = new GreedyMergeDecompose(graph);
                     break;
@@ -411,13 +340,24 @@ public class GreedySearch {
             }
         }
 
+        processGraph(fileName, graph, gd);
+
+        /*if (args.length == 0) {
+            HTTPResultsServer hrServer = new HTTPResultsServer();
+            hrServer.addResult("decomposition", jsonDecomposition);
+            hrServer.addResult("result", result);
+        }*/
+        //hrServer.openBrowser("static/decomposition.html");
+    }
+
+    private static JSONObject processGraph(String fileName, IGraph<Vertex<Integer>, Integer, String> graph, BaseDecompose gd) throws IOException {
         long decomposeStart = System.currentTimeMillis();
         final ImmutableBinaryTree ibt = gd.decompose();
         long decomposeEnd = System.currentTimeMillis();
 
         boolean valid = gd.validateDecomposition(ibt);
 
-        System.out.println("computing boolean width");
+        System.out.println("computing boolean width of LS decomposition");
         long computeWidthStart = System.currentTimeMillis();
         boolean overflow = false;
         long bw = 0;
@@ -428,11 +368,21 @@ public class GreedySearch {
         }
         long computeWidthEnd = System.currentTimeMillis();
 
-        /*System.out.println("improving with local search");
+        System.out.printf("bw: %.2f, improving with local search\n", gd.getLogBooleanWidth(bw));
         LocalSearch ls = new LocalSearch(graph);
-        ImmutableBinaryTree ibt2 = ls.improve(ibt, gd);
+        ImmutableBinaryTree ibt2 = ls.improve(ibt, new GrowNeighbourHoodDecompose(graph));
         valid = ls.validateDecomposition(ibt2);
-*/
+
+        System.out.println("computing boolean width of LS decomposition");
+        computeWidthStart = System.currentTimeMillis();
+        overflow = false;
+        bw = 0;
+        try {
+            bw = gd.getBooleanWidth(ibt2);
+        } catch (ArithmeticException e) {
+            overflow = true;
+        }
+        computeWidthEnd = System.currentTimeMillis();
 
         JSONObject result = new JSONObject();
         result.put("valid", valid);
@@ -469,11 +419,6 @@ public class GreedySearch {
         System.out.printf("result: %s\n", result.toString()); // for parsing
         System.out.println(JsonWriter.formatJson(result.toString()));
 
-        /*if (args.length == 0) {
-            HTTPResultsServer hrServer = new HTTPResultsServer();
-            hrServer.addResult("decomposition", jsonDecomposition);
-            hrServer.addResult("result", result);
-        }*/
-        //hrServer.openBrowser("static/decomposition.html");
+        return result;
     }
 }
