@@ -63,16 +63,23 @@ public class GreedyMergeDecompose extends BaseDecompose {
         while (componentCount > 1) {
             //System.out.printf("cost: %.2f\n", np.cost);
 
-            long mincb = Long.MAX_VALUE;
+            double mincb = Long.MAX_VALUE;
             Vertex<Integer> mina = null, minb = null;
-            for (Vertex<Integer> a : getGraph().vertices()) {
+            ArrayList<Vertex<Integer>> vertices = new ArrayList<>(BasicGraphAlgorithms.getAllVertices(getGraph()));
+            Collections.shuffle(vertices); // randomize so running multiple times can improve
+            for (Vertex<Integer> a : vertices) {
                 for (Vertex<Integer> b : getGraph().incidentVertices(a)) {
                     if (components.get(a.id()) != components.get(b.id())) {
                         //System.out.printf("setting %s component to %s component\n", np.a.id(), np.b.id());
                         ArrayList<Vertex<Integer>> newComponent = new ArrayList<>();
                         newComponent.addAll(components.get(a.id()));
                         newComponent.addAll(components.get(b.id()));
-                        long cb = getCutBool(newComponent, true);
+                        double cb = 0.0;
+                        if (newComponent.size() < 10) {
+                            cb = getCost(a, b) / newComponent.size();
+                        } else {
+                            cb = getCutBool(newComponent, true);
+                        }
                         if (cb < mincb) {
                             mincb = cb;
                             mina = a;
@@ -133,7 +140,7 @@ public class GreedyMergeDecompose extends BaseDecompose {
             }
             SimpleNode nodeParent = ibtMap.get(v);
             //System.out.printf("nodeParent of %s = %s\n", v, nodeParent);
-            ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
+            //ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
             while (!children.isEmpty()) {
                 // add left/right child
                 Vertex<Integer> child = children.pop();

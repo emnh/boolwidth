@@ -113,6 +113,9 @@ public class ImmutableBinaryTree {
         result.neighbours =
                 result.neighbours.assocN(parent.getGraphID(),
                         result.neighbours.nth(parent.getGraphID()).cons(result.reference));
+        if (result.neighbours.nth(parent.getGraphID()).size() > 3) {
+            throw new IndexOutOfBoundsException("can't add node for tree to be binary");
+        }
         return result;
     }
 

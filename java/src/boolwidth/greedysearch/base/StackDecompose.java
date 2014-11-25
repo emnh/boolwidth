@@ -8,10 +8,7 @@ import graph.BasicGraphAlgorithms;
 import graph.Vertex;
 import interfaces.IGraph;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by emh on 11/9/2014.
@@ -20,7 +17,7 @@ import java.util.Stack;
 
 public class StackDecompose extends BaseDecompose {
 
-    public static final int LOCAL_SEARCH_TIME = 60*1000;
+    public static final int LOCAL_SEARCH_TIME = 1*1000;
 
     public StackDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);
@@ -137,12 +134,21 @@ public class StackDecompose extends BaseDecompose {
 
     private void initSplitChildren(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren, Split split) {
         if (splitChildren.get(split).isEmpty()) {
-            if (split.getLefts().size() >= 2) {
+            /*if (split.getLefts().size() >= 2) {
                 Split leftChild = createSplit(split.getDepth() + 1, this, split.getLefts());
                 splitChildren.put(split, leftChild);
                 splits.push(new StackDecomposeSplitStackItem(split, leftChild));
             }
             if (split.getRights().size() >= 2) {
+                Split rightChild = createSplit(split.getDepth() + 1, this, split.getRights());
+                splitChildren.put(split, rightChild);
+                splits.push(new StackDecomposeSplitStackItem(split, rightChild));
+            }*/
+            if (split.size() >= 2) {
+                Split leftChild = createSplit(split.getDepth() + 1, this, split.getLefts());
+                splitChildren.put(split, leftChild);
+                splits.push(new StackDecomposeSplitStackItem(split, leftChild));
+
                 Split rightChild = createSplit(split.getDepth() + 1, this, split.getRights());
                 splitChildren.put(split, rightChild);
                 splits.push(new StackDecomposeSplitStackItem(split, rightChild));
@@ -154,38 +160,39 @@ public class StackDecompose extends BaseDecompose {
         }
     }
 
-    protected static ImmutableBinaryTree getImmutableBinaryTree(Multimap<Split, Split> splitChildren) {
+    public static ImmutableBinaryTree getImmutableBinaryTree(Multimap<Split, Split> splitChildren) {
         Stack<StackDecomposeSplitStackItem> splits = new Stack<>();
         Split rootSplit = splitChildren.get(null).iterator().next();
         splits.push(new StackDecomposeSplitStackItem(null, rootSplit));
 
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
-        SimpleNode last = ibt.getRoot();
         HashMap<Split, SimpleNode> ibtMap = new HashMap<>();
         ibtMap.put(null, ibt.getRoot());
+
+        //HashSet<Vertex<Integer>> total = new HashSet<>();
         while (!splits.isEmpty()) {
             StackDecomposeSplitStackItem splitStackItem = splits.pop();
             Split split = splitStackItem.child;
             Split splitParent = splitStackItem.parent;
             SimpleNode nodeParent = ibtMap.get(splitParent);
-            if (split.getLefts().size() >= 2) {
+            //System.out.printf("split: %s, l/r: %s/%s, nodeParent: %s\n",
+            //        split.getAll(), split.getLefts(), split.getRights(), nodeParent);
+
+            if (split.size() == 1) {
+                ibt = ibt.addChild(nodeParent, Util.getSingle(split.getAll()).id());
+                //total.add(Util.getSingle(split.getAll()));
+            } else {
                 ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
                 ibtMap.put(split, ibt.getReference());
-            } else if (split.getLefts().size() == 1) {
-                ibt = ibt.addChild(nodeParent, Util.getSingle(split.getLefts()).id());
             }
-            if (split.getRights().size() >= 2) {
-                ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
-                ibtMap.put(split, ibt.getReference());
-            } else if (split.getRights().size() == 1) {
-                ibt = ibt.addChild(nodeParent, Util.getSingle(split.getRights()).id());
-            }
+
             for (Split child : splitChildren.get(split)) {
-                // true for isLeft is bogus, but we don't need it in this case
+                //System.out.printf("adding child: %s\n", child.getAll());
                 splits.push(new StackDecomposeSplitStackItem(split, child));
             }
         }
+        //System.out.printf("total size: %d\n", total.size());
         return ibt;
     }
 
@@ -194,6 +201,7 @@ public class StackDecompose extends BaseDecompose {
         ArrayList<Vertex<Integer>> vertices = BasicGraphAlgorithms.BFSAll(getGraph(), getGraph().vertices().iterator().next());
         vertices = BasicGraphAlgorithms.BFSAll(getGraph(), vertices.iterator().next());
         //Collections.shuffle(vertices);
+
         return decompose(vertices);
     }
 }

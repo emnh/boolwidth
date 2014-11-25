@@ -4,6 +4,7 @@ import com.github.krukow.clj_lang.PersistentHashSet;
 import graph.subsets.PosSet;
 import graph.subsets.PosSubSet;
 import interfaces.IGraph;
+import sadiasrc.graph.BasicGraphAlgorithm;
 
 import java.util.*;
 
@@ -41,28 +42,34 @@ public class BasicGraphAlgorithms {
         return result;
     }
 
-    public static <TVertex extends Vertex<V>, V, E> ArrayList<TVertex> BFSAll(IGraph<TVertex, V, E> G, TVertex root)
+    public static <TVertex extends Vertex<V>, V, E> ArrayList<TVertex> BFSAll(IGraph<TVertex, V, E> G, TVertex start)
     {
         boolean[] visited = new boolean[G.numVertices()];
         Queue<TVertex> vertexQueue =  new LinkedList<TVertex>();
-        vertexQueue.add(root);
-        visited[root.id()] = true;
+
+        ArrayList<TVertex> vertices = new ArrayList<>();
+        vertices.add(start);
+        vertices.addAll(BasicGraphAlgorithms.getAllVertices(G));
         ArrayList<TVertex> resultList = new ArrayList<>();
 
-        TVertex current = root;
+        for (TVertex root : vertices) {
+            if (visited[root.id()] == false) {
+                vertexQueue.add(root);
+                visited[root.id()] = true;
 
-        while(!vertexQueue.isEmpty())
-        {
-            current = vertexQueue.remove();
-            resultList.add(current);
+                TVertex current = root;
 
-            for(TVertex child : G.incidentVertices(current))
-            {
-                if(!visited[child.id()])
-                {
-                    vertexQueue.add(child);
-                    visited[child.id()] = true;
+                while (!vertexQueue.isEmpty()) {
+                    current = vertexQueue.remove();
+                    resultList.add(current);
 
+                    for (TVertex child : G.incidentVertices(current)) {
+                        if (!visited[child.id()]) {
+                            vertexQueue.add(child);
+                            visited[child.id()] = true;
+
+                        }
+                    }
                 }
             }
         }

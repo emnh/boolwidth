@@ -51,12 +51,11 @@ public class CaterpillarToFullDecompose extends BaseDecompose {
             OrderedSplit split = splitStackItem.child;
             OrderedSplit parent = splitStackItem.parent;
 
-            if (split.getLefts().size() >= 2) {
+            if (split.size() >= 2) {
                 OrderedSplit leftChild = createSplitGivenOrdering(split.getDepth() + 1, split.getLeftOrder());
                 splitChildren.put(split, leftChild);
                 splits.push(new CaterpillarToFullDecomposeStackItem(split, leftChild));
-            }
-            if (split.getRights().size() >= 2) {
+
                 OrderedSplit rightChild = createSplitGivenOrdering(split.getDepth() + 1, split.getRightOrder());
                 splitChildren.put(split, rightChild);
                 splits.push(new CaterpillarToFullDecomposeStackItem(split, rightChild));

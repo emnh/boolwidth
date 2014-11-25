@@ -17,7 +17,7 @@ public class SpanningTreeCostSymDiffDecompose extends SpanningTreeDecompose {
 
     @Override
     public Collection<Vertex<Integer>> getIncidentVertices(Vertex<Integer> v) {
-        return BasicGraphAlgorithms.getAllVertices(getGraph());
+        return getGraph().incidentVertices(v);
     }
 
     @Override

@@ -75,6 +75,14 @@ public class Split {
         return lefts;
     }
 
+    public PersistentHashSet<Vertex<Integer>> getAll() {
+        PersistentHashSet<Vertex<Integer>> newSet = lefts;
+        for (Vertex<Integer> r : rights) {
+            newSet = newSet.cons(r);
+        }
+        return newSet;
+    }
+
     public Vertex<Integer> getLastMoved() {
         return reference;
     }

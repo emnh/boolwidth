@@ -17,7 +17,7 @@ import java.util.*;
 
 
 
-public class SpanningTreeComponentAverageDecompose extends BaseDecompose {
+public class SpanningTreeComponentAverageDecompose extends SpanningTreeDecompose {
 
     private ArrayList<PosSubSet<Vertex<Integer>>> hoods = BasicGraphAlgorithms.getNeighbourHoods(getGraph());
 
@@ -139,60 +139,8 @@ public class SpanningTreeComponentAverageDecompose extends BaseDecompose {
             }
         }
 
-        // Appoint root as vertex with index 0
-        Vertex<Integer> root = getGraph().getVertex(0);
-
-        // Connect components, just add all to vertex 0, which will be root
-        for (Vertex<Integer> v : getGraph().vertices()) {
-            //System.out.printf("component: %s\n", components.get(v.id()));
-            if (components.get(v.id()) != components.get(root.id())) {
-                //System.out.printf("disconnected component for %d\n", v.id());
-                spanningTreeNeighbours.get(root.id()).add(v);
-                spanningTreeNeighbours.get(v.id()).add(root);
-            }
-        }
-
-        // Convert to binary spanning tree
-        ImmutableBinaryTree ibt = new ImmutableBinaryTree();
-        ibt = ibt.addRoot();
-        HashMap<Vertex<Integer>, SimpleNode> ibtMap = new HashMap<>();
-
-        ibt = ibt.addChild(ibt.getRoot(), root.id()); // root.id() == 0 yes
-        ibtMap.put(root, ibt.getReference());
-
-        Stack<Vertex<Integer>> vertices = new Stack<>();
-        boolean[] seen = new boolean[getGraph().numVertices()];
-        vertices.add(root);
-        seen[root.id()] = true;
-
-        while (!vertices.isEmpty()) {
-            Vertex<Integer> v = vertices.pop();
-            Stack<Vertex<Integer>> children = new Stack<>();
-            for (Vertex<Integer> v2 : spanningTreeNeighbours.get(v.id())) {
-                if (!seen[v2.id()]) {
-                    children.add(v2);
-                    vertices.add(v2);
-                    seen[v2.id()] = true;
-                }
-            }
-            SimpleNode nodeParent = ibtMap.get(v);
-            //System.out.printf("nodeParent of %s = %s\n", v, nodeParent);
-            ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
-            while (!children.isEmpty()) {
-                // add left/right child
-                Vertex<Integer> child = children.pop();
-                ibt = ibt.addChild(nodeParent, child.id());
-                ibtMap.put(child, ibt.getReference());
-
-                // add extra internal right child if more than 2 children
-                if (children.size() > 1) {
-                    // insert extra internal node
-                    ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
-                    nodeParent = ibt.getReference();
-                }
-            }
-        }
-
-        return ibt;
+        Vertex<Integer> root = getGraph().vertices().iterator().next();
+        connectComponents(new ArrayList<>(BasicGraphAlgorithms.getAllVertices(getGraph())), spanningTreeNeighbours, components, root);
+        return getImmutableBinaryTree(spanningTreeNeighbours, root);
     }
 }

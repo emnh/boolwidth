@@ -8,8 +8,8 @@ import interfaces.IGraph;
  * Created by emh on 11/3/2014.
  */
 
-public class GrowNeighbourHoodDecompose extends StackDecomposeTryAllFirstVertexChoice {
-//public class GrowNeighbourHoodDecompose extends StackDecompose {
+//public class GrowNeighbourHoodDecompose extends StackDecomposeTryAllFirstVertexChoice {
+public class GrowNeighbourHoodDecompose extends StackDecompose {
 //public class GrowNeighbourHoodDecompose extends CaterpillarDecompose {
 //public class GrowNeighbourHoodDecompose extends CaterpillarToFullDecompose {
 //public class GrowNeighbourHoodDecompose extends CaterpillarToFullTryAllFirstVertexChoiceDecompose {

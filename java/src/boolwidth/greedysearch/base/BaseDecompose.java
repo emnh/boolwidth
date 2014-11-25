@@ -124,16 +124,17 @@ public class BaseDecompose {
     public long getBooleanWidth(ImmutableBinaryTree ibt, ToLongFunction<HashSet<Integer>> fgetCutBool) {
         final long[] maxCutBool = {0};
 
-        ibt.dfs((parent, node) -> {
+        return getBooleanWidth(ibt, fgetCutBool, Long.MAX_VALUE);
+        /*ibt.dfs((parent, node) -> {
             HashSet<Integer> vertexIDs = new HashSet<>(ibt.getChildren(parent, node));
             long cutbool = fgetCutBool.applyAsLong(vertexIDs);
             //System.out.printf("got cutbool: %d, bw: %d\n", vertexIDs.size(), cutbool);
             if (cutbool > maxCutBool[0]) {
                 maxCutBool[0] = cutbool;
             }
-        });
+        });*/
 
-        return maxCutBool[0];
+        //return maxCutBool[0];
     }
 
     public long getBooleanWidth(ImmutableBinaryTree ibt, ToLongFunction<HashSet<Integer>> fgetCutBool, long UB) {
@@ -143,6 +144,11 @@ public class BaseDecompose {
         ibt.dfs((parent, node) -> {
             HashSet<Integer> vertexIDs = new HashSet<>(ibt.getChildren(parent, node));
             lefts.add(vertexIDs);
+            if (ibt.getExternalID(node) != ImmutableBinaryTree.EMPTY_NODE) {
+                HashSet<Integer> vertexIDsWithoutInternal = new HashSet<>(ibt.getChildren(parent, node));
+                vertexIDsWithoutInternal.remove(ibt.getExternalID(node));
+                lefts.add(vertexIDsWithoutInternal);
+            }
         });
         for (HashSet<Integer> vertexIDs : lefts) {
             long cutbool = fgetCutBool.applyAsLong(vertexIDs);
@@ -257,11 +263,14 @@ public class BaseDecompose {
             HashSet<Integer> dfsparent = new HashSet<>(ibt.getChildren(parent, node));
             dfsparent.remove(ibt.getExternalID(node));
             HashSet<Integer> dfschildren = new HashSet<>();
+            int childCount = 0;
             for (SimpleNode n : ibt.getNeighbours(node)) {
                 if (n != parent) {
+                    childCount += 1;
                     dfschildren.addAll(ibt.getChildren(node, n));
                 }
             }
+            valid[0] = valid[0] && childCount <= 2;
             valid[0] = valid[0] && dfschildren.equals(dfsparent);
             if (!dfschildren.equals(dfsparent)) {
                 System.out.println("dfsparent: " + dfsparent);
@@ -271,6 +280,9 @@ public class BaseDecompose {
                 System.out.println("dfsdifference: " + difference);
                 //dfsparent.removeAll(dfschildren);
                 //System.out.println("diff: " + dfsparent);
+            }
+            if (childCount > 2) {
+                System.out.println("childCount: " + childCount);
             }
         });
 

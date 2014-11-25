@@ -45,10 +45,17 @@ public class SpanningTreeDecompose extends BaseDecompose {
 
     @Override
     public ImmutableBinaryTree decompose() {
+        ArrayList<Vertex<Integer>> vertices = new ArrayList<>(BasicGraphAlgorithms.getAllVertices(getGraph()));
+        return decompose(vertices);
+    }
+
+    public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> allVerticesList) {
         //Multimap<Vertex<Integer>, Vertex<Integer>> spanningTree = ArrayListMultimap.create();
         ArrayList<ArrayList<Vertex<Integer>>> spanningTreeNeighbours = new ArrayList<>();
         ArrayList<ArrayList<Vertex<Integer>>> components = new ArrayList<>();
         PriorityQueue<NodePair> edges = new PriorityQueue<>(getGraph().numEdges(), Comparator.comparingDouble((n) -> n.cost));
+
+        HashSet<Vertex<Integer>> allVertices = new HashSet<>(allVerticesList);
 
         // Initialize edges with costs
         for (Vertex<Integer> a : getGraph().vertices()) {
@@ -58,7 +65,7 @@ public class SpanningTreeDecompose extends BaseDecompose {
             spanningTreeNeighbours.add(new ArrayList<>());
             //for (Vertex<Integer> b : getGraph().incidentVertices(a)) {
             for (Vertex<Integer> b : getIncidentVertices(a)) {
-                if (a.id() < b.id()) {
+                if (a.id() < b.id() && allVertices.contains(a) && allVertices.contains(b)) {
                     NodePair np = new NodePair(a, b, getCost(a, b));
                     edges.add(np);
                     //System.out.printf("adding edge: %s - %s\n", np.a, np.b);
@@ -89,10 +96,14 @@ public class SpanningTreeDecompose extends BaseDecompose {
         }
 
         // Appoint root as vertex with index 0
-        Vertex<Integer> root = getGraph().getVertex(0);
+        Vertex<Integer> root = allVerticesList.iterator().next();
+        connectComponents(allVerticesList, spanningTreeNeighbours, components, root);
+        return getImmutableBinaryTree(spanningTreeNeighbours, root);
+    }
 
+    protected void connectComponents(ArrayList<Vertex<Integer>> allVerticesList, ArrayList<ArrayList<Vertex<Integer>>> spanningTreeNeighbours, ArrayList<ArrayList<Vertex<Integer>>> components, Vertex<Integer> root) {
         // Connect components, just add all to vertex 0, which will be root
-        for (Vertex<Integer> v : getGraph().vertices()) {
+        for (Vertex<Integer> v : allVerticesList) {
             //System.out.printf("component: %s\n", components.get(v.id()));
             if (components.get(v.id()) != components.get(root.id())) {
                 //System.out.printf("disconnected component for %d\n", v.id());
@@ -100,8 +111,9 @@ public class SpanningTreeDecompose extends BaseDecompose {
                 spanningTreeNeighbours.get(v.id()).add(root);
             }
         }
+    }
 
-        // Convert to binary spanning tree
+    protected ImmutableBinaryTree getImmutableBinaryTree(ArrayList<ArrayList<Vertex<Integer>>> spanningTreeNeighbours, Vertex<Integer> root) {
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();
         HashMap<Vertex<Integer>, SimpleNode> ibtMap = new HashMap<>();
@@ -126,7 +138,6 @@ public class SpanningTreeDecompose extends BaseDecompose {
             }
             SimpleNode nodeParent = ibtMap.get(v);
             //System.out.printf("nodeParent of %s = %s\n", v, nodeParent);
-            ibt = ibt.addChild(nodeParent, ImmutableBinaryTree.EMPTY_NODE);
             while (!children.isEmpty()) {
                 // add left/right child
                 Vertex<Integer> child = children.pop();

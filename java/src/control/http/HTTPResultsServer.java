@@ -30,7 +30,8 @@ public class HTTPResultsServer {
         test.put("hello", "world");
         server.createContext("/", new HTTPResultsHandler(test));
         String staticRelative = "/static";
-        File root = new File("..", "explorer");
+        File root = new File((new File(".")).getAbsoluteFile().getParentFile().getParentFile(), "explorer");
+        //System.out.printf("static root: %s\n", root);
         server.createContext(staticRelative, new StaticFilesHandler(staticRelative, root));
         server.setExecutor(null); // creates a default executor
         server.start();

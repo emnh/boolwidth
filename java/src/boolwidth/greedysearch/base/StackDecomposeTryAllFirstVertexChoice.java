@@ -46,10 +46,10 @@ public class StackDecomposeTryAllFirstVertexChoice extends StackDecompose {
             // TODO: don't construct IBT just to getBooleanWidth
             ImmutableBinaryTree ibt = getImmutableBinaryTree(splitChildren);
 
-            long bw = getBooleanWidth(ibt);
+            long bw = getBooleanWidth(ibt, minBW);
             System.out.printf("i: %d/%d, minBW: %.2f, BW: %.2f\n",
                     i, vertices.size(), getLogBooleanWidth(minBW), getLogBooleanWidth(bw));
-            if (bw < minBW) {
+            if (bw != UPPER_BOUND_EXCEEDED && bw < minBW) {
                 minBW = bw;
                 minIBT = ibt;
                 minSplitChildren = splitChildren;

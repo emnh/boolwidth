@@ -104,26 +104,17 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
         convertor.setInput(graphAndMap.twGraph);
         convertor.run();
         NGraph<NTDBag<GraphInput.InputData>> decomposition = convertor.getDecomposition();
-        //decomposition.edges()
+
         //decomposition.printGraph(true, true);
+
         ArrayList<Vertex<Integer>> ordering = new ArrayList<>();
         HashSet<Vertex<Integer>> seen = new HashSet<>();
         BiMap<HashSet<Vertex<Integer>>, NVertex<NTDBag<GraphInput.InputData>>> bagMap = HashBiMap.create();
-        ArrayList<ArrayList<Vertex<Integer>>> spanningTreeNeighbours = new ArrayList<>();
 
         Stack<NVertex<NTDBag<GraphInput.InputData>>> bags = new Stack<>();
         HashSet<NVertex<NTDBag<GraphInput.InputData>>> seenBags = new HashSet<>();
         bags.push(decomposition.getVertex(0));
         seenBags.add(decomposition.getVertex(0));
-
-        /*for (NVertex<NTDBag<GraphInput.InputData>> bag : decomposition) {
-            HashSet<Vertex<Integer>> vertices = new HashSet<>();
-            for (NVertex<GraphInput.InputData> newVertex : bag.data.vertices) {
-                Vertex<Integer> v = graphAndMap.oldToNewVertex.inverse().get(newVertex);
-                vertices.add(v);
-            }
-            System.out.printf("vertices: %s\n", vertices);
-        }*/
 
         ImmutableBinaryTree ibt = new ImmutableBinaryTree();
         ibt = ibt.addRoot();

@@ -184,7 +184,7 @@ public class HeuristicTest<V, E> {
             //String fileName = ControlUtil.GRAPHLIB + "freq/celar06pp.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/mulsol.i.5.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "delauney/pr152.tsp.dgf";
-            String fileName = DiskGraph.getMatchingGraph("**rat575.tsp.dgf");
+            String fileName = DiskGraph.getMatchingGraph("**p654.tsp.dgf");
 
             if (args.length > 0) {
                 fileName = args[0];

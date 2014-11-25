@@ -4,9 +4,11 @@ import boolwidth.greedysearch.*;
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.FixedOrderingDecompose;
 import boolwidth.greedysearch.base.StackDecompose;
+import boolwidth.greedysearch.base.TrickleDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
+import boolwidth.greedysearch.localsearch.LocalSearch;
 import boolwidth.greedysearch.memory.MemoryDecompose;
 import boolwidth.greedysearch.spanning.*;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
@@ -112,7 +114,7 @@ public class GreedySearch {
 
     public static ArrayList<String> getUnbeatFileNames() throws IOException {
         ArrayList<String> fileNames = new ArrayList<>();
-        fileNames.add(DiskGraph.getMatchingGraph("**BN_43.dgf"));
+        /*fileNames.add(DiskGraph.getMatchingGraph("**BN_43.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**BN_45.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**BN_42.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**BN_44.dgf"));
@@ -178,8 +180,42 @@ public class GreedySearch {
         fileNames.add(DiskGraph.getMatchingGraph("**fl417.tsp-pp.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**BN_19.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**munin4-wpp.dgf"));
-        fileNames.add(DiskGraph.getMatchingGraph("**BN_17.dgf"));
         fileNames.add(DiskGraph.getMatchingGraph("**u2152.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_17.dgf"));
+        */
+
+        fileNames.add(DiskGraph.getMatchingGraph("**rl1323.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**d657.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**rd400.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pr1002.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**graph12pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**u574.tsp.dgf"));
+
+        fileNames.add(DiskGraph.getMatchingGraph("**munin2.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin_kgo_complete.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pigs.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_44.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_45.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin3.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**pigs-wpp.dgf"));
+
+
+        fileNames.add(DiskGraph.getMatchingGraph("**pr226.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**link-wpp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**link-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**link.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**p654.tsp-pp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**p654.tsp.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_46.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_42.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_43.dgf"));
+        fileNames.add(DiskGraph.getMatchingGraph("**munin2-wpp.dgf"));
+
+
+
+        fileNames.add(DiskGraph.getMatchingGraph("**fl417.tsp-pp.dgf"));
+
+        fileNames.add(DiskGraph.getMatchingGraph("**BN_42-pp.dgf"));
         return fileNames;
     }
 
@@ -223,7 +259,11 @@ public class GreedySearch {
             result.put("graph", file);
             result.put("v", graph.numVertices());
             result.put("e", graph.numEdges());
-            result.put("heuristic", ibt.creatorName);
+            if (ibt.creatorName != null) {
+                result.put("heuristic", ibt.creatorName);
+            } else {
+                result.put("heuristic", gd.getClass().getName());
+            }
 
             String resultStr = result.toString();
             System.out.printf("result: %s\n", resultStr); // for parsing
@@ -231,7 +271,7 @@ public class GreedySearch {
 
             System.out.println("");
             for (String result2 : results) {
-                System.out.println(result2);
+                System.out.printf("result: %s\n", result2); // for parsing
             }
         }
     }
@@ -275,7 +315,7 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**u574.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**BN_129.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**pigs.dgf");
 
         String cls = "";
         if (args.length > 0) {
@@ -293,7 +333,24 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (-7) {
+            switch (-5) {
+                case -9:
+                    /*long minbw = Long.MAX_VALUE;
+                    for (int i = 0; i < 100; i++ ) {
+                        gd = new GreedyMergeDecompose(graph);
+                        ImmutableBinaryTree ibt = gd.decompose();
+                        long bw = gd.getBooleanWidth(ibt, minbw);
+                        System.out.printf("bw: %.2f\n", gd.getLogBooleanWidth(bw));
+                        if (bw != gd.UPPER_BOUND_EXCEEDED && bw < minbw) {
+                            minbw = bw;
+                            System.out.printf("minbw: %.2f\n", gd.getLogBooleanWidth(minbw));
+                        }
+                    }*/
+                    gd = new GreedyMergeDecompose(graph);
+                    break;
+                case -8:
+                    gd = new TrickleDecompose(graph);
+                    break;
                 case -7:
                     gd = new TreeWidthGreedyFillinDecompose(graph);
                     break;
@@ -371,6 +428,12 @@ public class GreedySearch {
         }
         long computeWidthEnd = System.currentTimeMillis();
 
+        /*System.out.println("improving with local search");
+        LocalSearch ls = new LocalSearch(graph);
+        ImmutableBinaryTree ibt2 = ls.improve(ibt, gd);
+        valid = ls.validateDecomposition(ibt2);
+*/
+
         JSONObject result = new JSONObject();
         result.put("valid", valid);
         result.put("cacheHits", (double) gd.cacheHits / gd.cutboolTotalCalls);
@@ -406,11 +469,11 @@ public class GreedySearch {
         System.out.printf("result: %s\n", result.toString()); // for parsing
         System.out.println(JsonWriter.formatJson(result.toString()));
 
-        if (args.length == 0) {
+        /*if (args.length == 0) {
             HTTPResultsServer hrServer = new HTTPResultsServer();
             hrServer.addResult("decomposition", jsonDecomposition);
             hrServer.addResult("result", result);
-        }
+        }*/
         //hrServer.openBrowser("static/decomposition.html");
     }
 }
