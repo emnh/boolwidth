@@ -84,7 +84,7 @@ public class LocalSearch extends BaseDecompose {
             System.out.println("local search");
             Split split = maxSplit.child;
             Split parent = maxSplit.parent;
-            Split newSplit = split.localSearch();
+            Split newSplit = split.localSearch2();
             long leftCutbool2 = split.measureCutForDecompose(newSplit.getLefts(), null);
             long rightCutbool2 = split.measureCutForDecompose(newSplit.getRights(), null);
             long maxCutBool2 = Math.max(leftCutbool2, rightCutbool2);
@@ -116,7 +116,8 @@ public class LocalSearch extends BaseDecompose {
             initSplitChildren(recalculate, splits, splitChildren, split);
         }
         //decomposeSplits(splits, splitChildren);
-        return better;
+        //return better;
+        return true;
     }
 
     protected static Split initSplit(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren, Split split, Split parent) {

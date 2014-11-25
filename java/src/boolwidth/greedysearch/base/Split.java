@@ -3,7 +3,10 @@ package boolwidth.greedysearch.base;
 import com.github.krukow.clj_lang.PersistentHashSet;
 import graph.Vertex;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
 
 /**
  * Created by emh on 11/2/2014.
@@ -161,6 +164,40 @@ public class Split {
         result.cutbool = 0;
         result.reference = tomove;
         result.logStatement();
+        return result;
+    }
+
+    public Split localSearch2() {
+        Split result = create(this);
+        Random rnd = new Random();
+        int randFromLeft = rnd.nextInt(lefts.size());
+        int randFromRight = rnd.nextInt(rights.size());
+        long oldCutBoolLeft = measureCutForDecompose(lefts, null);
+        long oldCutBoolRight = measureCutForDecompose(rights, null);
+        long minMove = Math.max(oldCutBoolLeft, oldCutBoolRight);
+        ArrayList<Vertex<Integer>> leftList = new ArrayList<>(lefts);
+        Collections.shuffle(leftList, rnd);
+        PersistentHashSet<Vertex<Integer>> newRights = rights;
+        PersistentHashSet<Vertex<Integer>> newLefts = lefts;
+        for (int i = 0; i < randFromLeft; i++) {
+            Vertex<Integer> v = leftList.get(i);
+            newRights = newRights.cons(v);
+            newLefts = newLefts.disjoin(v);
+        }
+        ArrayList<Vertex<Integer>> rightList = new ArrayList<>(rights);
+        Collections.shuffle(rightList, rnd);
+        for (int i = 0; i < randFromRight; i++) {
+            Vertex<Integer> v = rightList.get(i);
+            newRights = newRights.disjoin(v);
+            newLefts = newLefts.cons(v);
+        }
+        long cb1 = measureCutForDecompose(newRights, null);
+        long cb2 = measureCutForDecompose(newLefts, null);
+        long cb = Math.max(cb1, cb2);
+        if (cb < minMove) {
+            result.rights = newRights;
+            result.lefts = newLefts;
+        }
         return result;
     }
 

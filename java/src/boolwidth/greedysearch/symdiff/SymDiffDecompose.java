@@ -7,8 +7,8 @@ import interfaces.IGraph;
 /**
  * Created by emh on 11/3/2014.
  */
-//public class SymDiffDecompose extends StackDecompose {
-public class SymDiffDecompose extends StackDecomposeTryAllFirstVertexChoice {
+public class SymDiffDecompose extends StackDecompose {
+//public class SymDiffDecompose extends StackDecomposeTryAllFirstVertexChoice {
 //public class SymDiffDecompose extends CaterpillarToFullTryAllFirstVertexChoiceDecompose {
 
     public SymDiffDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {

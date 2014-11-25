@@ -20,6 +20,6 @@ public class GrowNeighbourHoodDecompose extends StackDecompose {
 
     @Override
     public Split createSplit(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
-        return new SplitGrowNeighbourhood(depth, decomposition, rights);
+        return new SplitGrowNeighbourhood(depth, decomposition, lefts, rights);
     }
 }
