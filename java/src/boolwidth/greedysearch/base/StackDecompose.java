@@ -43,17 +43,17 @@ public class StackDecompose extends BaseDecompose {
             Split split = splitStackItem.child;
             Split parent = splitStackItem.parent;
             //while (!(2 * split.lefts.size() >= split.rights.size())) {
-            split = initSplit(splits, splitChildren, split, parent);
+            Split newSplit = initSplit(splits, splitChildren, split, parent);
+            splitChildren.remove(parent, split);
+            splitChildren.put(parent, newSplit);
+            split = newSplit;
             initSplitChildren(this, splits, splitChildren, split);
         }
     }
 
-    protected static Split initSplit(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren, Split split, Split parent) {
+    protected Split initSplit(Stack<StackDecomposeSplitStackItem> splits, Multimap<Split, Split> splitChildren, Split split, Split parent) {
         while (!split.isBalanced()) {
-            Split newSplit = split.decomposeAdvance();
-            splitChildren.remove(parent, split);
-            splitChildren.put(parent, newSplit);
-            split = newSplit;
+            split = split.decomposeAdvance();
         }
         return split;
     }

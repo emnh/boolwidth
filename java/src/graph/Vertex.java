@@ -66,12 +66,14 @@ public class Vertex<V> extends Position<V>
 	 */
 	@Override
 	public String toString() {
-		String ret;
+		/*String ret;
 		if (this.elem == null) {
 			ret = Integer.toString(id());
 		} else {
 			ret = this.elem.toString();
 		}
-		return ret;
+		return ret;*/
+		String label = VertexLabel.getLabel(this);
+		return label;
 	}
 }

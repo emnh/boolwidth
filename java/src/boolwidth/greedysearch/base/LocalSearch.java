@@ -84,7 +84,7 @@ public class LocalSearch extends BaseDecompose {
             System.out.println("local search");
             Split split = maxSplit.child;
             Split parent = maxSplit.parent;
-            Split newSplit = split.localSearch2();
+            Split newSplit = split.localSearch();
             long leftCutbool2 = split.measureCutForDecompose(newSplit.getLefts(), null);
             long rightCutbool2 = split.measureCutForDecompose(newSplit.getRights(), null);
             long maxCutBool2 = Math.max(leftCutbool2, rightCutbool2);
@@ -148,7 +148,7 @@ public class LocalSearch extends BaseDecompose {
         }
     }
 
-    private Multimap<Split, Split> convertToSplits(ImmutableBinaryTree ibt, BaseDecompose recalculate) {
+    public static Multimap<Split, Split> convertToSplits(ImmutableBinaryTree ibt, BaseDecompose recalculate) {
         final Multimap<Split, Split> children = ArrayListMultimap.create();
         final HashMap<SimpleNode, Split> ibtToSplits = new HashMap<>();
         //final HashMap<SimpleNode>
@@ -163,13 +163,13 @@ public class LocalSearch extends BaseDecompose {
             if (it.hasNext()) {
                 SimpleNode left = it.next();
                 for (int vid : ibt.getChildren(node, left)) {
-                    leftChildren.add(getGraph().getVertex(vid));
+                    leftChildren.add(recalculate.getGraph().getVertex(vid));
                 }
             }
             if (it.hasNext()) {
                 SimpleNode right = it.next();
                 for (int vid : ibt.getChildren(node, right)) {
-                    rightChildren.add(getGraph().getVertex(vid));
+                    rightChildren.add(recalculate.getGraph().getVertex(vid));
                 }
             }
             allChildren.addAll(leftChildren);
@@ -181,13 +181,13 @@ public class LocalSearch extends BaseDecompose {
                 if (ibt.getExternalID(node) != ibt.EMPTY_NODE) {
                     ArrayList<Vertex<Integer>> singleNode = new ArrayList<>();
 
-                    singleNode.add(getGraph().getVertex(ibt.getExternalID(node)));
+                    singleNode.add(recalculate.getGraph().getVertex(ibt.getExternalID(node)));
 
-                    Split container = recalculate.createSplit(0, this, singleNode, allChildren);
+                    Split container = recalculate.createSplit(0, recalculate, singleNode, allChildren);
                     children.put(splitParent, container);
                     if (allChildren.size() > 0) {
-                        Split singleSplit = recalculate.createSplit(0, this, singleNode);
-                        Split split = recalculate.createSplit(0, this, leftChildren, rightChildren);
+                        Split singleSplit = recalculate.createSplit(0, recalculate, singleNode);
+                        Split split = recalculate.createSplit(0, recalculate, leftChildren, rightChildren);
                         children.put(container, singleSplit);
                         children.put(container, split);
                         ibtToSplits.put(node, split);
@@ -202,7 +202,7 @@ public class LocalSearch extends BaseDecompose {
 
                     //System.out.printf("creating split: %s, %s, %s\n", externalChildren, leftChildren, rightChildren);
 
-                    Split split = recalculate.createSplit(0, this, leftChildren, rightChildren);
+                    Split split = recalculate.createSplit(0, recalculate, leftChildren, rightChildren);
                     children.put(splitParent, split);
                     ibtToSplits.put(node, split);
                 }

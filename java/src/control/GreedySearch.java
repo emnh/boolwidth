@@ -10,10 +10,14 @@ import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import boolwidth.greedysearch.base.LocalSearch;
 import boolwidth.greedysearch.memory.MemoryDecompose;
+import boolwidth.greedysearch.reorder.BFSDecompose;
+import boolwidth.greedysearch.reorder.SimpleBFSDecompose;
 import boolwidth.greedysearch.spanning.*;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
 import boolwidth.greedysearch.treewidth.TreeWidthGreedyFillinDecompose;
+import control.http.HTTPResultsServer;
 import graph.Vertex;
+import graph.VertexLabel;
 import interfaces.IGraph;
 import com.cedarsoftware.util.io.JsonWriter;
 import io.DiskGraph;
@@ -175,7 +179,9 @@ public class GreedySearch {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
         //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**u574.tsp.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**munin_kgo_complete.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**munin_kgo_complete.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**pr1002.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**pr107.tsp.dgf");
 
         String cls = "";
         if (args.length > 0) {
@@ -193,7 +199,13 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (-7) {
+            switch (-10) {
+                case -11:
+                    gd = new SimpleBFSDecompose(graph);
+                    break;
+                case -10:
+                    gd = new BFSDecompose(graph);
+                    break;
                 case -9:
                     long minbw = Long.MAX_VALUE;
                     for (int i = 0; i < 100; i++ ) {
@@ -224,9 +236,9 @@ public class GreedySearch {
                     break;
                 case -5:
                     //gd = new SpanningTreeDecompose(graph);
-                    //gd = new SpanningTreeCostSymDiffDecompose(graph);
+                    gd = new SpanningTreeCostSymDiffDecompose(graph);
                     //gd = new SpanningTreeComponentDecompose(graph);
-                    gd = new SpanningTreeComponentAverageDecompose(graph);
+                    //gd = new SpanningTreeComponentAverageDecompose(graph);
                     //processFiles(getLargeFileNames(), (g) -> new SpanningTreeComponentAverageDecompose(g));
                     //return;
                     break;
@@ -275,12 +287,6 @@ public class GreedySearch {
         }
 
         processGraph(fileName, graph, gd);
-
-        /*if (args.length == 0) {
-            HTTPResultsServer hrServer = new HTTPResultsServer();
-            hrServer.addResult("decomposition", jsonDecomposition);
-            hrServer.addResult("result", result);
-        }*/
         //hrServer.openBrowser("static/decomposition.html");
     }
 
@@ -302,7 +308,7 @@ public class GreedySearch {
         }
         long computeWidthEnd = System.currentTimeMillis();
 
-        ImmutableBinaryTree ibt2 = ibt;
+        /*ImmutableBinaryTree ibt2 = ibt;
         System.out.printf("bw: %.2f, improving with local search\n", gd.getLogBooleanWidth(bw));
         LocalSearch ls = new LocalSearch(graph);
         ibt2 = ls.improve(ibt, gd);
@@ -317,7 +323,7 @@ public class GreedySearch {
         } catch (ArithmeticException e) {
             overflow = true;
         }
-        computeWidthEnd = System.currentTimeMillis();
+        computeWidthEnd = System.currentTimeMillis();*/
 
         JSONObject result = new JSONObject();
         result.put("valid", valid);
@@ -353,6 +359,12 @@ public class GreedySearch {
         //System.out.println(JsonWriter.formatJson(jsonDecomposition.toString()));
         System.out.printf("result: %s\n", result.toString()); // for parsing
         System.out.println(JsonWriter.formatJson(result.toString()));
+
+        //if (args.length == 0) {
+        //    HTTPResultsServer hrServer = new HTTPResultsServer();
+        //    hrServer.addResult("decomposition", jsonDecomposition);
+        //    hrServer.addResult("result", result);
+        //}
 
         return result;
     }

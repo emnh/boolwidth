@@ -1,6 +1,7 @@
 package boolwidth.greedysearch.treewidth;
 
 import boolwidth.greedysearch.base.BaseDecompose;
+import boolwidth.greedysearch.base.CaterpillarDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.spanning.SpanningTreeDecompose;
@@ -105,8 +106,12 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
         convertor.run();
         NGraph<NTDBag<GraphInput.InputData>> decomposition = convertor.getDecomposition();
 
-        //decomposition.printGraph(true, true);
+        ImmutableBinaryTree ibt = treeWidthDecompositionToBooleanDecomposition(graphAndMap, decomposition);
 
+        return ibt;
+    }
+
+    private ImmutableBinaryTree treeWidthDecompositionToBooleanDecomposition(GraphAndMap<Vertex<Integer>, Integer> graphAndMap, NGraph<NTDBag<GraphInput.InputData>> decomposition) {
         ArrayList<Vertex<Integer>> ordering = new ArrayList<>();
         HashSet<Vertex<Integer>> seen = new HashSet<>();
         BiMap<HashSet<Vertex<Integer>>, NVertex<NTDBag<GraphInput.InputData>>> bagMap = HashBiMap.create();
@@ -190,15 +195,6 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
                 }
             }
         }
-
-        //Vertex<Integer> root = graphAndMap.oldToNewVertex.inverse().get(decomposition.getVertex(0).data.vertices.iterator().next());
-
-        /*for (Vertex<Integer> v : ordering) {
-            //System.out.printf("id: %d\n", v.id());
-            split = split.decomposeAdvanceFixed(v);
-            ibt = ibt.addChild(last, split.getLastMoved().id());
-            last = ibt.getReference();
-        }*/
         return ibt;
     }
 }

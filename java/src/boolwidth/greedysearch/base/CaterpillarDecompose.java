@@ -29,8 +29,8 @@ public class CaterpillarDecompose extends BaseDecompose {
     }
 
     @Override
-    public ImmutableBinaryTree decompose() {
-        Split split = createSplit(0, this, getGraph().vertices());
+    public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
+        Split split = createSplit(0, this, vertices);
         ArrayList<Vertex<Integer>> ordering = new ArrayList<>();
 
         while (!split.done()) {
