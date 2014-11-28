@@ -133,15 +133,15 @@ public class SplitGrowNeighbourhood extends Split {
 
                     PosSubSet<Vertex<Integer>> neighbors = new PosSubSet<>(all);
                     int rightNeighboursOfVCount = 0;
-                    int rightNoNeighborInN_LEFTCount = 0;   // external
-                    int external = rightNoNeighborInN_LEFTCount;
+                    int numberOfNewNeighboursAdded = 0;   // external
+                    int external = numberOfNewNeighboursAdded;
                     int internal = rightNeighboursOfVCount - external;
                     for (Vertex<Integer> u : graph.incidentVertices(v)) {
                         if (rights.contains(u)) {
                             neighbors.add(u);
                             rightNeighboursOfVCount++;
                             if (!N_LEFT.contains(u)) {
-                                rightNoNeighborInN_LEFTCount++;
+                                numberOfNewNeighboursAdded++;
                             }
                         }
                     }

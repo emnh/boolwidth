@@ -1,8 +1,7 @@
-package boolwidth.greedysearch.reorder;
+package boolwidth.greedysearch.experimental;
 
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.CaterpillarDecompose;
-import boolwidth.greedysearch.base.Split;
 import boolwidth.greedysearch.base.Util;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import graph.BasicGraphAlgorithms;

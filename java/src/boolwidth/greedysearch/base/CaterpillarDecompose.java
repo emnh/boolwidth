@@ -4,6 +4,7 @@ import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.symdiff.SplitSymDiff;
 import graph.Vertex;
+import graph.VertexLabel;
 import interfaces.IGraph;
 
 import java.util.ArrayList;
@@ -36,6 +37,13 @@ public class CaterpillarDecompose extends BaseDecompose {
         while (!split.done()) {
             split = split.decomposeAdvance();
             ordering.add(split.getLastMoved());
+        }
+
+        //System.out.printf("ordering: %s\n", Util.labels(ordering));
+        int i = 0;
+        for (Vertex<Integer> v : ordering) {
+            VertexLabel.setOrder(v, Integer.toString(i));
+            i += 1;
         }
         return getCaterpillarIBTFromOrdering(ordering);
     }

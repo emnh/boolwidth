@@ -1,15 +1,12 @@
-package boolwidth.greedysearch.reorder;
+package boolwidth.greedysearch.experimental;
 
 import boolwidth.greedysearch.base.*;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
-import boolwidth.greedysearch.growNeighbourHood.SplitGrowNeighbourhood;
 import boolwidth.greedysearch.symdiff.SplitSymDiff;
 import com.github.krukow.clj_lang.PersistentHashSet;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import graph.BasicGraphAlgorithms;
 import graph.Vertex;
-import graph.VertexLabel;
 import interfaces.IGraph;
 
 import java.util.*;
@@ -30,88 +27,6 @@ public class BFSDecompose extends StackDecompose {
         //return new SplitGrowNeighbourhood(depth, decomposition, lefts, rights);
     }
 
-    public static <TVertex extends Vertex<V>, V, E> ArrayList<TVertex> getShortestPath(IGraph<TVertex, V, E> G,
-                                                                                                HashSet<TVertex> subGraph,
-                                                                                                TVertex start,
-                                                                                                TVertex end) {
-        boolean[] visited = new boolean[G.numVertices()];
-        Queue<TVertex> vertexQueue =  new LinkedList<TVertex>();
-        HashMap<TVertex, TVertex> parents = new HashMap<>();
-
-        TVertex root = start;
-        vertexQueue.add(root);
-        visited[root.id()] = true;
-
-        TVertex current;
-        while (!vertexQueue.isEmpty()) {
-            current = vertexQueue.remove();
-
-            for (TVertex child : G.incidentVertices(current)) {
-                if (subGraph.contains(child) && !visited[child.id()]) {
-                    parents.put(child, current);
-                    if (child == end) {
-                        vertexQueue.clear();
-                    } else {
-                        vertexQueue.add(child);
-                        visited[child.id()] = true;
-                    }
-                }
-            }
-        }
-
-        ArrayList<TVertex> path = new ArrayList<>();
-        current = end;
-        path.add(current);
-        while (parents.containsKey(current)) {
-            current = parents.get(current);
-            path.add(current);
-        }
-        return path;
-    }
-
-    public static <TVertex extends Vertex<V>, V, E> ArrayList<ArrayList<TVertex>> getComponents(IGraph<TVertex, V, E> G,
-                                                                                                HashSet<TVertex> subGraph,
-                                                                                                ArrayList<TVertex> removed) {
-        boolean[] visited = new boolean[G.numVertices()];
-        Queue<TVertex> vertexQueue =  new LinkedList<TVertex>();
-
-        ArrayList<TVertex> vertices = new ArrayList<>();
-        vertices.addAll(BasicGraphAlgorithms.getAllVertices(G));
-
-        ArrayList<ArrayList<TVertex>> components = new ArrayList<>();
-        int componentCount = 0;
-
-        for (TVertex v : removed) {
-            visited[v.id()] = true;
-        }
-
-        for (TVertex root : subGraph) {
-            if (visited[root.id()] == false) {
-                componentCount++;
-                ArrayList<TVertex> component = new ArrayList<>();
-                components.add(component);
-                vertexQueue.add(root);
-                visited[root.id()] = true;
-
-                TVertex current = root;
-
-                while (!vertexQueue.isEmpty()) {
-                    current = vertexQueue.remove();
-                    component.add(current);
-
-                    for (TVertex child : G.incidentVertices(current)) {
-                        if (subGraph.contains(child) && !visited[child.id()]) {
-                            vertexQueue.add(child);
-                            visited[child.id()] = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return components;
-    }
-
     public ImmutableBinaryTree decomposeRest(ArrayList<Vertex<Integer>> vertices) {
         CaterpillarDecompose cd = new CaterpillarDecompose(getGraph()) {
             @Override
@@ -128,7 +43,7 @@ public class BFSDecompose extends StackDecompose {
         double bestBalance = Double.MAX_VALUE;
         Vertex<Integer> minU = null, minV = null;
         ImmutableBinaryTree ibtLeft = null, ibtRight = null;
-        ArrayList<ArrayList<Vertex<Integer>>> baseComponents = getComponents(getGraph(), new HashSet<>(split.getAll()), new ArrayList<>());
+        ArrayList<ArrayList<Vertex<Integer>>> baseComponents = BasicGraphAlgorithms.getComponents(getGraph(), new HashSet<>(split.getAll()), new ArrayList<>());
         System.out.printf("entering initSplit: %s, %s\n", split.getLefts(), split.getRights());
         if (baseComponents.size() >= 2) {
             ArrayList<Vertex<Integer>> lefts = baseComponents.get(0);
@@ -151,12 +66,12 @@ public class BFSDecompose extends StackDecompose {
                 while (!separators.isEmpty()) {
                     Vertex<Integer> v = separators.pop();
                     if (u != v) {
-                        ArrayList<Vertex<Integer>> path = getShortestPath(getGraph(), hashSubGraph, u, v);
-                        ArrayList<ArrayList<Vertex<Integer>>> components = getComponents(getGraph(), hashSubGraph, path);
+                        ArrayList<Vertex<Integer>> path = BasicGraphAlgorithms.getShortestPath(getGraph(), hashSubGraph, u, v);
+                        ArrayList<ArrayList<Vertex<Integer>>> components = BasicGraphAlgorithms.getComponents(getGraph(), hashSubGraph, path);
                         //if (components.size() >= 2 &&
                                 //components.get(0).size() + path.size() >= connectedSubGraph.size() / 3 &&
                                 //components.get(1).size() >= connectedSubGraph.size() / 3) {
-                        if (components.size() >= 2) {
+                        if (components.size() == 2) {
                             for (Vertex<Integer> v2 : getGraph().incidentVertices(v)) {
                                 if (!seen.contains(v2)) {
                                     separators.push(v2);

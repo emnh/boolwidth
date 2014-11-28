@@ -9,7 +9,8 @@ import interfaces.IGraph;
  */
 //public class SymDiffDecompose extends StackDecompose {
 //public class SymDiffDecompose extends StackDecomposeTryAllFirstVertexChoice {
-public class SymDiffDecompose extends CaterpillarToFullTryAllFirstVertexChoiceDecompose {
+//public class SymDiffDecompose extends CaterpillarToFullTryAllFirstVertexChoiceDecompose {
+public class SymDiffDecompose extends CaterpillarDecompose {
 
     public SymDiffDecompose(IGraph<Vertex<Integer>, Integer, String> graph) {
         super(graph);

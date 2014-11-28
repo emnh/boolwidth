@@ -89,6 +89,8 @@ public class GraphBuilder<TVertex extends Vertex<V>, V, E> {
 			TVertex v = graph.insertVertex(null);
 			if (!this.revNodeLabelMap.isEmpty()) {
 				VertexLabel.setLabel(v, this.revNodeLabelMap.get(i));
+			} else {
+				VertexLabel.setLabel(v, Integer.toString(i));
 			}
 			nodes.add(v);
 		}

@@ -2,8 +2,12 @@ package boolwidth.greedysearch.base;
 
 import com.github.krukow.clj_lang.PersistentVector;
 import com.github.krukow.clj_lang.PersistentHashSet;
+import graph.Vertex;
+import graph.VertexLabel;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Function;
@@ -13,6 +17,14 @@ import java.util.function.Supplier;
  * Created by emh on 11/2/2014.
  */
 public class Util {
+
+    public static ArrayList<String> labels(Iterable<Vertex<Integer>> vertices) {
+        ArrayList<String> nodes = new ArrayList<>();
+        for (Vertex<Integer> v : vertices) {
+            nodes.add(VertexLabel.getLabel(v));
+        }
+        return nodes;
+    }
 
     public static <T> T timedExecution(Supplier<T> fun, int timeOut) {
         ExecutorService executor = Executors.newFixedThreadPool(1);

@@ -1,9 +1,8 @@
-package boolwidth.greedysearch.symdiff;
+package boolwidth.greedysearch.experimental;
 
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.Split;
 import boolwidth.greedysearch.base.Util;
-import boolwidth.greedysearch.growNeighbourHood.SplitGrowNeighbourhood;
 import graph.BasicGraphAlgorithms;
 import graph.Vertex;
 import graph.subsets.PosSet;
@@ -15,29 +14,29 @@ import java.util.TreeSet;
 /**
  * Created by emh on 11/3/2014.
  */
-public class SplitSymDiff extends Split {
+public class SplitSymDiffEdge extends Split {
 
-    public SplitSymDiff() {
+    public SplitSymDiffEdge() {
     }
 
     @Override
-    public SplitSymDiff create(Split old) {
-        SplitSymDiff result = new SplitSymDiff();
+    public SplitSymDiffEdge create(Split old) {
+        SplitSymDiffEdge result = new SplitSymDiffEdge();
         result.copy(old);
         return result;
     }
 
-    public SplitSymDiff(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
+    public SplitSymDiffEdge(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> rights) {
         super(depth, decomposition, rights);
     }
 
-    public SplitSymDiff(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
+    public SplitSymDiffEdge(int depth, BaseDecompose decomposition, Iterable<Vertex<Integer>> lefts, Iterable<Vertex<Integer>> rights) {
         super(depth, decomposition, lefts, rights);
     }
 
     @Override
-    public SplitSymDiff decomposeAdvance() {
-        SplitSymDiff result = create(this);
+    public SplitSymDiffEdge decomposeAdvance() {
+        SplitSymDiffEdge result = create(this);
         if (done()) {
             return this;
         } else {
@@ -60,15 +59,23 @@ public class SplitSymDiff extends Split {
             }
 
             //long oldcb = this.getDecomposition
-            long minmove = Long.MAX_VALUE;
+            double minmove = Long.MAX_VALUE;
             Vertex<Integer> tomove = null;
 
             //long cb2 = this.getDecomposition().getApproximateCutBool(this.getDecomposition().verticesToInts(lefts)); //measureCut.applyAsLong(lefts, null);
             //System.out.printf("bw: %.2f\n", this.decomposition.getLogBooleanWidth(cb2));
 
             if (lefts.size() == 0) {
-                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
-                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
+                long minDegree = 0;
+                for (Vertex<Integer> v : rights) {
+                    if (graph.incidentVertices(v).size() < minDegree) {
+                        minDegree = graph.incidentVertices(v).size();
+                        tomove = v;
+                    }
+                }
+                System.out.println("was empty, did minDegree");
+                //tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
+                //tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
                 //System.out.println("was empty, did BFS");
             }
 
@@ -96,7 +103,13 @@ public class SplitSymDiff extends Split {
                             }
                         }
                     }
-                    long cb = numberOfNewNeighboursAdded; // neighbors.size();
+                    double cb = numberOfNewNeighboursAdded;
+                    //System.out.printf("cb: %.2f\n", cb);
+
+                    if (cb < minmove) {
+                        minmove = cb;
+                        tomove = v;
+                    }
 
                     // isolated node
                     if (rightCount == 0 && N_LEFT.contains(v)) {
@@ -110,10 +123,6 @@ public class SplitSymDiff extends Split {
                         tomove = v;
                         break;
                     }
-                    if (cb < minmove) {
-                        minmove = cb;
-                        tomove = v;
-                    }
                 }
             }
             if (tomove == null) {
@@ -123,7 +132,7 @@ public class SplitSymDiff extends Split {
             }
             result.lefts = result.lefts.cons(tomove);
             result.rights = result.rights.disjoin(tomove);
-            result.cutbool = minmove;
+            //result.cutbool = minmove;
             result.reference = tomove;
             result.logStatement();
         }

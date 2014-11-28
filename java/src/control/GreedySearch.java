@@ -8,12 +8,12 @@ import boolwidth.greedysearch.base.TrickleDecompose;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
 import boolwidth.greedysearch.ds.SimpleNode;
 import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
-import boolwidth.greedysearch.base.LocalSearch;
 import boolwidth.greedysearch.memory.MemoryDecompose;
-import boolwidth.greedysearch.reorder.BFSDecompose;
-import boolwidth.greedysearch.reorder.SimpleBFSDecompose;
+import boolwidth.greedysearch.experimental.BFSDecompose;
+import boolwidth.greedysearch.experimental.SimpleBFSDecompose;
 import boolwidth.greedysearch.spanning.*;
 import boolwidth.greedysearch.symdiff.SymDiffDecompose;
+import boolwidth.greedysearch.experimental.SymDiffEdgeDecompose;
 import boolwidth.greedysearch.treewidth.TreeWidthGreedyFillinDecompose;
 import control.http.HTTPResultsServer;
 import graph.Vertex;
@@ -177,11 +177,13 @@ public class GreedySearch {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
-        //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**u574.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**munin_kgo_complete.dgf");
-        String fileName = DiskGraph.getMatchingGraph("**pr1002.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**pr1002.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**pr107.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**BN_46.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**d1655.tsp.dgf");
 
         String cls = "";
         if (args.length > 0) {
@@ -199,7 +201,10 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (-10) {
+            switch (-12) {
+                case -12:
+                    gd = new SymDiffEdgeDecompose(graph);
+                    break;
                 case -11:
                     gd = new SimpleBFSDecompose(graph);
                     break;
@@ -349,6 +354,11 @@ public class GreedySearch {
 
         final boolean overflow2 = overflow;
         JSONObject jsonDecomposition = ibt.toJSON(ibt.getRoot(), (obj, parent, node) -> {
+            ArrayList<String> nodes = new ArrayList<>();
+            for (int vid : ibt.getChildren(parent, node)) {
+                nodes.add(Integer.toString(vid));
+            }
+            obj.put("nodes", nodes);
             if (node != ibt.getRoot()) {
                 if (!overflow2) {
                     obj.put("cutBool", gd2.getCutBool(ibt.getChildren(parent, node)));
@@ -356,14 +366,37 @@ public class GreedySearch {
             }
         });
 
+        JSONObject jsonGraph = new JSONObject();
+        jsonGraph.put("name", fileName);
+        ArrayList<String> nodes = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        ArrayList<String> order = new ArrayList<>();
+        ArrayList<ArrayList<String>> edges = new ArrayList<>();
+        for (Vertex<Integer> v : graph.vertices()) {
+            nodes.add(Integer.toString(v.id()));
+            labels.add(VertexLabel.getLabel(v) + "(" + VertexLabel.getOrder(v) + ")");
+            order.add(VertexLabel.getOrder(v));
+            for (Vertex<Integer> u : graph.incidentVertices(v)) {
+                ArrayList<String> edge = new ArrayList<>();
+                edge.add(Integer.toString(v.id()));
+                edge.add(Integer.toString(u.id()));
+                edges.add(edge);
+            }
+        }
+        jsonGraph.put("nodes", nodes);
+        jsonGraph.put("labels", labels);
+        jsonGraph.put("order", order);
+        jsonGraph.put("edges", edges);
+
         //System.out.println(JsonWriter.formatJson(jsonDecomposition.toString()));
         System.out.printf("result: %s\n", result.toString()); // for parsing
         System.out.println(JsonWriter.formatJson(result.toString()));
 
         //if (args.length == 0) {
-        //    HTTPResultsServer hrServer = new HTTPResultsServer();
-        //    hrServer.addResult("decomposition", jsonDecomposition);
-        //    hrServer.addResult("result", result);
+            HTTPResultsServer hrServer = new HTTPResultsServer();
+            hrServer.addResult("decomposition", jsonDecomposition);
+            hrServer.addResult("graph", jsonGraph);
+            hrServer.addResult("result", result);
         //}
 
         return result;

@@ -28,7 +28,7 @@ public class HTTPResultsServer {
         }
         JSONObject test = new JSONObject();
         test.put("hello", "world");
-        server.createContext("/", new HTTPResultsHandler(test));
+        //server.createContext("/", new HTTPResultsHandler(test));
         String staticRelative = "/static";
         File root = new File((new File(".")).getAbsoluteFile().getParentFile().getParentFile(), "explorer");
         //System.out.printf("static root: %s\n", root);
@@ -50,6 +50,6 @@ public class HTTPResultsServer {
     }
 
     public void addResult(String name, JSONObject value) {
-        server.createContext("/" + name, new HTTPResultsHandler(value));
+        server.createContext("/json/" + name, new HTTPResultsHandler(value));
     }
 }

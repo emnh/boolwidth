@@ -78,6 +78,88 @@ public class BasicGraphAlgorithms {
         return resultList;
     }
 
+    public static <TVertex extends Vertex<V>, V, E> ArrayList<TVertex> getShortestPath(IGraph<TVertex, V, E> G,
+                                                                                       HashSet<TVertex> subGraph,
+                                                                                       TVertex start,
+                                                                                       TVertex end) {
+        boolean[] visited = new boolean[G.numVertices()];
+        Queue<TVertex> vertexQueue =  new LinkedList<TVertex>();
+        HashMap<TVertex, TVertex> parents = new HashMap<>();
+
+        TVertex root = start;
+        vertexQueue.add(root);
+        visited[root.id()] = true;
+
+        TVertex current;
+        while (!vertexQueue.isEmpty()) {
+            current = vertexQueue.remove();
+
+            for (TVertex child : G.incidentVertices(current)) {
+                if (subGraph.contains(child) && !visited[child.id()]) {
+                    parents.put(child, current);
+                    if (child == end) {
+                        vertexQueue.clear();
+                    } else {
+                        vertexQueue.add(child);
+                        visited[child.id()] = true;
+                    }
+                }
+            }
+        }
+
+        ArrayList<TVertex> path = new ArrayList<>();
+        current = end;
+        path.add(current);
+        while (parents.containsKey(current)) {
+            current = parents.get(current);
+            path.add(current);
+        }
+        return path;
+    }
+
+    public static <TVertex extends Vertex<V>, V, E> ArrayList<ArrayList<TVertex>> getComponents(IGraph<TVertex, V, E> G,
+                                                                                                HashSet<TVertex> subGraph,
+                                                                                                ArrayList<TVertex> removed) {
+        boolean[] visited = new boolean[G.numVertices()];
+        Queue<TVertex> vertexQueue =  new LinkedList<TVertex>();
+
+        ArrayList<TVertex> vertices = new ArrayList<>();
+        vertices.addAll(BasicGraphAlgorithms.getAllVertices(G));
+
+        ArrayList<ArrayList<TVertex>> components = new ArrayList<>();
+        int componentCount = 0;
+
+        for (TVertex v : removed) {
+            visited[v.id()] = true;
+        }
+
+        for (TVertex root : subGraph) {
+            if (visited[root.id()] == false) {
+                componentCount++;
+                ArrayList<TVertex> component = new ArrayList<>();
+                components.add(component);
+                vertexQueue.add(root);
+                visited[root.id()] = true;
+
+                TVertex current = root;
+
+                while (!vertexQueue.isEmpty()) {
+                    current = vertexQueue.remove();
+                    component.add(current);
+
+                    for (TVertex child : G.incidentVertices(current)) {
+                        if (subGraph.contains(child) && !visited[child.id()]) {
+                            vertexQueue.add(child);
+                            visited[child.id()] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return components;
+    }
+
     protected static <TVertex extends Vertex<V>, V, E> void depthFirstComponent(IGraph<TVertex, V, E> graph, TVertex v, ArrayList<TVertex> component, ArrayList<ArrayList<TVertex>> components) {
         if (components.get(graph.getId(v)) == null) {
             component.add(v);

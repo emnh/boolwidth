@@ -1,16 +1,13 @@
-package boolwidth.greedysearch.reorder;
+package boolwidth.greedysearch.experimental;
 
 import boolwidth.greedysearch.base.BaseDecompose;
 import boolwidth.greedysearch.base.Split;
 import boolwidth.greedysearch.ds.ImmutableBinaryTree;
-import boolwidth.greedysearch.ds.SimpleNode;
-import boolwidth.greedysearch.growNeighbourHood.GrowNeighbourHoodDecompose;
 import boolwidth.greedysearch.growNeighbourHood.SplitGrowNeighbourhood;
 import graph.Vertex;
 import interfaces.IGraph;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * Created by emh on 11/2/2014.
