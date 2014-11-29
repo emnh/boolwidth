@@ -37,6 +37,8 @@ public class TreeWidthGreedyFillinDecompose extends BaseDecompose{
             for (TVertex v2 : graph.incidentVertices(v1)) {
                 NVertex<GraphInput.InputData> newVertex1 = result.oldToNewVertex.get(v1);
                 NVertex<GraphInput.InputData> newVertex2 = result.oldToNewVertex.get(v2);
+                // TODO: adding or removing this influences width of computed tree width.
+                // TODO: sometimes it's worse, sometimes it's better.
                 if (v1.id() < v2.id()) {
                     result.twGraph.addEdge(newVertex1, newVertex2);
                 }

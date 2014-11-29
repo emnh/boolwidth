@@ -30,8 +30,8 @@ public class SymDiffEdgeDecompose extends CaterpillarDecompose {
         return new SplitSymDiffEdge(depth, decomposition, lefts, rights);
     }
 
-    @Override
-    public ImmutableBinaryTree decompose(ArrayList<Vertex<Integer>> vertices) {
+    //@Override
+    public ImmutableBinaryTree decompose2(ArrayList<Vertex<Integer>> vertices) {
 
         ArrayList<Vertex<Integer>> ordering = new ArrayList<>();
 

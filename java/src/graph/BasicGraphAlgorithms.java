@@ -42,6 +42,74 @@ public class BasicGraphAlgorithms {
         return result;
     }
 
+    public static <TVertex extends Vertex<V>, V, E> ArrayList<TVertex> BFSGrid(IGraph<TVertex, V, E> G, TVertex start)
+    {
+        boolean[] visited = new boolean[G.numVertices()];
+        Queue<TVertex> vertexQueue =  new LinkedList<TVertex>();
+
+        ArrayList<TVertex> vertices = new ArrayList<>();
+        vertices.add(start);
+        vertices.addAll(BasicGraphAlgorithms.getAllVertices(G));
+        ArrayList<ArrayList<TVertex>> layers = new ArrayList<>();
+        int layerIndex = 0;
+        ArrayList<TVertex> resultList = new ArrayList<>();
+        HashSet<TVertex> resultHash = new HashSet<>();
+
+        for (TVertex root : vertices) {
+            if (visited[root.id()] == false) {
+                vertexQueue.add(root);
+                visited[root.id()] = true;
+
+                ArrayList<TVertex> layer = new ArrayList<>();
+                layer.add(root);
+                layers.add(layer);
+
+                while (layers.get(layerIndex).size() > 0) {
+                    ArrayList<TVertex> nextLayer = new ArrayList<>();
+                    layers.add(nextLayer);
+                    ArrayList<TVertex> corners = new ArrayList<>();
+                    for (TVertex current : layers.get(layerIndex)) {
+                        resultList.add(current);
+                        resultHash.add(current);
+                    }
+                    // add corners
+                    for (TVertex current : layers.get(layerIndex)) {
+                        for (TVertex child : G.incidentVertices(current)) {
+                            int resultNeighbours = 0;
+                            for (TVertex n : G.incidentVertices(current)) {
+                                if (resultHash.contains(n)) {
+                                    resultNeighbours++;
+                                }
+                            }
+                            if (!visited[child.id()] && resultNeighbours >= 3) {
+                                corners.add(child);
+                                visited[child.id()] = true;
+                            }
+                        }
+                    }
+                    layers.get(layerIndex).addAll(corners);
+                    for (TVertex current : corners) {
+                        resultList.add(current);
+                        resultHash.add(current);
+                    }
+                    // add normal
+                    for (TVertex current : layers.get(layerIndex)) {
+                        for (TVertex child : G.incidentVertices(current)) {
+                            if (!visited[child.id()]) {
+                                nextLayer.add(child);
+                                visited[child.id()] = true;
+                            }
+                        }
+                    }
+                    layerIndex++;
+                }
+            }
+        }
+        Collections.reverse(resultList);
+
+        return resultList;
+    }
+
     public static <TVertex extends Vertex<V>, V, E> ArrayList<TVertex> BFSAll(IGraph<TVertex, V, E> G, TVertex start)
     {
         boolean[] visited = new boolean[G.numVertices()];

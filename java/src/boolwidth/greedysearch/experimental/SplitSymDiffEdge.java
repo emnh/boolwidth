@@ -66,7 +66,7 @@ public class SplitSymDiffEdge extends Split {
             //System.out.printf("bw: %.2f\n", this.decomposition.getLogBooleanWidth(cb2));
 
             if (lefts.size() == 0) {
-                long minDegree = 0;
+                /*long minDegree = 0;
                 for (Vertex<Integer> v : rights) {
                     if (graph.incidentVertices(v).size() < minDegree) {
                         minDegree = graph.incidentVertices(v).size();
@@ -74,9 +74,10 @@ public class SplitSymDiffEdge extends Split {
                     }
                 }
                 System.out.println("was empty, did minDegree");
-                //tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
-                //tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
-                //System.out.println("was empty, did BFS");
+                */
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), Util.getFirst(rights), rights);
+                tomove = BasicGraphAlgorithms.BFS(getDecomposition().getGraph(), tomove, rights);
+                System.out.println("was empty, did BFS");
             }
 
             if (tomove == null) {
@@ -92,8 +93,12 @@ public class SplitSymDiffEdge extends Split {
                     PosSubSet<Vertex<Integer>> neighbors_plus_V = new PosSubSet<>(all);
                     neighbors_plus_V.add(v);
                     int rightCount = 0;
+                    int leftCount = 0;
                     int numberOfNewNeighboursAdded = 0;
                     for (Vertex<Integer> u : graph.incidentVertices(v)) {
+                        if (lefts.contains(u)) {
+                            leftCount++;
+                        }
                         if (rights.contains(u)) {
                             neighbors.add(u);
                             neighbors_plus_V.add(u);
@@ -103,7 +108,10 @@ public class SplitSymDiffEdge extends Split {
                             }
                         }
                     }
-                    double cb = numberOfNewNeighboursAdded;
+                    double cb = -leftCount;
+                    if (leftCount == 1) {
+                        cb = numberOfNewNeighboursAdded;
+                    }
                     //System.out.printf("cb: %.2f\n", cb);
 
                     if (cb < minmove) {

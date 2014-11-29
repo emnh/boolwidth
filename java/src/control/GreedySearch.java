@@ -177,13 +177,19 @@ public class GreedySearch {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "cycle/c5.dimacs";
-        String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**d493.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**u574.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**munin_kgo_complete.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**pr1002.tsp.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**pr107.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**link.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**BN_46.dgf");
         //String fileName = DiskGraph.getMatchingGraph("**d1655.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**rd400.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**pr299.tsp.dgf");
+        //String fileName = DiskGraph.getMatchingGraph("**d1655.tsp.dgf");
+        String fileName = DiskGraph.getMatchingGraph("**rl1323.tsp.dgf");
+
 
         String cls = "";
         if (args.length > 0) {
@@ -201,7 +207,7 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (-12) {
+            switch (0) {
                 case -12:
                     gd = new SymDiffEdgeDecompose(graph);
                     break;
