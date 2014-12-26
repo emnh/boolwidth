@@ -108,39 +108,44 @@ public class GraphFileReader {
 		// read nodes and edges
 		int nodectr = 0;
 		while (this.sc.hasNextLine()) {
-			if (this.sc.hasNext(nodeLabel)) {
-				this.sc.next();
+			String line = this.sc.nextLine();
+			Scanner lineScanner = new Scanner(line);
+
+			if (lineScanner.hasNext(nodeLabel)) {
+				lineScanner.next();
 				if (getNodeLabelMap() == null) {
 					setNodeLabelMap(new HashMap<String, Integer>());
 				}
 
-				String label = this.sc.next();
+				String label = lineScanner.next();
 
 				// read weight. not used
-				this.sc.nextDouble();
+				if (lineScanner.hasNextDouble()) {
+					lineScanner.nextDouble();
+				}
 
 				// map from node label to index
 				getNodeLabelMap().put(label, nodectr);
 				nodectr++;
 			}
-			if (this.sc.hasNext(edgeLabel)) {
-				this.sc.next();
+			if (lineScanner.hasNext(edgeLabel)) {
+				lineScanner.next();
 				int[] tab;
 				if (getNodeLabelMap() == null) {
-					tab = new int[] { this.sc.nextInt(), this.sc.nextInt() };
+					tab = new int[] { lineScanner.nextInt(), lineScanner.nextInt() };
 				} else {
 					// assumes that all nodes have labels if at least one does
-					tab = new int[] { getNodeLabelMap().get(this.sc.next()),
-							getNodeLabelMap().get(this.sc.next()) };
+					String a = lineScanner.next();
+					String b = lineScanner.next();
+					tab = new int[] { getNodeLabelMap().get(a), getNodeLabelMap().get(b) };
 				}
 				this.minNodeNum = Math.min(this.minNodeNum, tab[0]);
 				this.minNodeNum = Math.min(this.minNodeNum, tab[1]);
 				this.maxNodeNum = Math.max(this.maxNodeNum, tab[0]);
 				this.maxNodeNum = Math.max(this.maxNodeNum, tab[1]);
 				this.edgeList.add(tab);
-			} else {
-				this.sc.nextLine();
 			}
+			lineScanner.close();
 		}
 		this.sc.close();
 
