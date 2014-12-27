@@ -89,14 +89,15 @@ public class CCMISDynamicForest {
         boolean isConnected = true;
 
 		boolean isConnectedBasic = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
+		//boolean isConnectedBasic = false;
 		boolean isConnectedDF = dfMap.get(all.first()).componentSize() == all.size();
 		isConnected = isConnectedDF;
 		if (isConnectedBasic != isConnectedDF) {
-			System.out.printf("isConnected: %s, %s, sz: %d/%d\n", isConnectedBasic, isConnectedDF, dfMap.get(all.first()).componentSize(), all.size());
+			//System.out.printf("isConnected: %s, %s, sz: %d/%d\n", isConnectedBasic, isConnectedDF, dfMap.get(all.first()).componentSize(), all.size());
 		}
 
 		//If not connected then call for components and multiply
-		if(!isConnected)
+		if(!isConnectedBasic)
 		{
 			
 			long total=1;

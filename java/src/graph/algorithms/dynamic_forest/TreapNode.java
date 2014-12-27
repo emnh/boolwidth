@@ -141,7 +141,7 @@ public class TreapNode {
     }
 
     public TreapNode insert(EulerObject value) {
-        if(this.right == null) {
+        if (this.right == null) {
             TreapNode nn = this.right = new TreapNode(value, false, false, countOfValue(value), Math.random(), this, null, null, this.next, this);
             if(this.next != null) {
                 this.next.prev = nn;
@@ -151,8 +151,12 @@ public class TreapNode {
             return nn;
         }
         TreapNode v = this.next;
-        TreapNode nn = v.left = new TreapNode(value, false, false, countOfValue(value), Math.random(), v, null, null, v, this);
-        v.prev = nn;
+        TreapNode nn = new TreapNode(value, false, false, countOfValue(value), Math.random(), v, null, null, v, this);
+        // TODO: validate bug fix
+        if (v != null) {
+            v.left = nn;
+            v.prev = nn;
+        }
         this.next = nn;
         nn.bubbleUp();
         return nn;
@@ -269,7 +273,10 @@ public class TreapNode {
         TreapNode node = this;
         if(node.left != null && node.right != null) {
             TreapNode other = node.next;
-            swapNodes(other, node);
+            // TODO: validate bug fix
+            if (other != null) {
+                swapNodes(other, node);
+            }
         }
         if(node.next != null) {
             node.next.prev = node.prev;

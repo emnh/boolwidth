@@ -170,7 +170,7 @@ public class HeuristicTest<V, E> {
 
             //String fileName = ControlUtil.GRAPHLIB + "prob/pigs-pp.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
-            //String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
+            String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/jean.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/zeroin.i.1.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";
@@ -180,7 +180,7 @@ public class HeuristicTest<V, E> {
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen10_10.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/homer.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "prob2/BN_26.dgf";
-            String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
+            //String fileName = ControlUtil.GRAPHLIB + "delauney/a280.tsp.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "freq/celar06pp.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/mulsol.i.5.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "delauney/pr152.tsp.dgf";
@@ -211,8 +211,8 @@ public class HeuristicTest<V, E> {
 
                 MISBackTrackTest.JITWarmUp();
                 //ht.doHeuristic(graph, "APX");
-                //ht.doHeuristic(graph, "CCMIS");
-                ht.doHeuristic(graph, "UNN");
+                ht.doHeuristic(graph, "CCMIS");
+                //ht.doHeuristic(graph, "UNN");
 
                 if (ht.decomposition != null && graph.numVertices() < 100) {
                     GraphViz.saveGraphDecomposition(fileName, graph, ht.bw,

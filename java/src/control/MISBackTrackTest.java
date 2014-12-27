@@ -50,7 +50,7 @@ public class MISBackTrackTest {
         //fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf");
         //fileNames.add(ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs");
 
-        //JITWarmUp();
+        JITWarmUp();
 
         for (String file : fileNames) {
             System.out.println(file);
@@ -63,7 +63,8 @@ public class MISBackTrackTest {
 
     protected static void JITWarmUp() {
         //String fileName = ControlUtil.GRAPHLIB_OURS + "hsugrid/hsu-4x4.dimacs"; //ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
-        String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+        //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
+        String fileName = ControlUtil.GRAPHLIB + "coloring/myciel2.dgf";
         AdjacencyListGraph<Vertex<Integer>, Integer, String> graph = new AdjacencyListGraph.D<Integer, String>();
         DiskGraph.readGraph(fileName, graph);
         ArrayList<Vertex<Integer>> lefts = new ArrayList<Vertex<Integer>>();
@@ -73,10 +74,11 @@ public class MISBackTrackTest {
         BiGraph<Integer, String> bigraph = new BiGraph<>(lefts, graph);
 
         // default JIT compile threshold is 10000 on server, 1500 on client
-        for (int i = 0; i < 10000; i++) {
-            CutBool.countNeighborhoods(bigraph);
+        for (int i = 0; i < 11000; i++) {
+            //CutBool.countNeighborhoods(bigraph);
             CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
-            CCMISRe.BoolDimBranch(new IndexGraph(bigraph));
+            CCMISDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph));
+            //CCMISRe.BoolDimBranch(new IndexGraph(bigraph));
         }
     }
 
@@ -158,7 +160,7 @@ public class MISBackTrackTest {
         final int sampleCount = 1000;
         long bw = 0;
         long est;
-        boolean test = true;
+        boolean test = false;
 
         BenchmarkResult ret;
 
