@@ -119,5 +119,7 @@
     <orderEntry type="library" name="javacl-1.0.0-RC3-shaded" level="project" />
     <orderEntry type="library" name="JOCL-0.1.9" level="project" />
     <orderEntry type="library" name="libtw" level="project" />
+    <orderEntry type="library" name="gs-algo-1.2" level="project" />
+    <orderEntry type="library" name="gs-core-1.2" level="project" />
   </component>
 </module>

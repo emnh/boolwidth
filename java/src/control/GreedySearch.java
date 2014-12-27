@@ -207,7 +207,7 @@ public class GreedySearch {
             Constructor<?> ctor = clazz.getConstructor(IGraph.class);
             gd = (BaseDecompose) ctor.newInstance(new Object[]{graph});
         } else {
-            switch (0) {
+            switch (-7) {
                 case -12:
                     gd = new SymDiffEdgeDecompose(graph);
                     break;

@@ -170,7 +170,7 @@ public class HeuristicTest<V, E> {
 
             //String fileName = ControlUtil.GRAPHLIB + "prob/pigs-pp.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf";
-            String fileName = ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf";
+            String fileName = ControlUtil.GRAPHLIB + "coloring/queen7_7.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/jean.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/zeroin.i.1.dgf";
             //String fileName = ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf";

@@ -11,6 +11,7 @@ import graph.BiGraph;
 import graph.Vertex;
 import interfaces.IGraph;
 import sadiasrc.decomposition.CCMIS;
+import sadiasrc.decomposition.CCMISDynamicForest;
 import sadiasrc.graph.BasicGraphAlgorithm;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -65,8 +66,8 @@ public class BaseDecompose {
             rights.add(graph.getVertex(id));
         }
         BiGraph<Integer, String> bg = new BiGraph<Integer, String>(lefts, rights, graph);
-        //long cb = CCMIS.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(bg));
-        long cb = CutBool.countNeighborhoods(bg);
+        long cb = CCMIS.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(bg));
+        //long cb = CutBool.countNeighborhoods(bg);
         return cb;
     }
 
@@ -103,6 +104,7 @@ public class BaseDecompose {
         BiGraph<Integer, String> bg = new BiGraph<>(lefts, graph);
         //long cb = CutBool.countNeighborhoods(bg);
         long cb = CCMIS.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(bg));
+        //long cb = CCMISDynamicForest.BoolDimBranch(CutBoolComparatorCCMIS.convertSadiaBiGraph(bg));
         cache.put(vids, cb);
         return cb;
     }

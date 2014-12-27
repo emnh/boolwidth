@@ -11,10 +11,7 @@ import graph.BiGraph;
 import graph.Edge;
 import graph.Vertex;
 import io.DiskGraph;
-import sadiasrc.decomposition.CCMIS;
-import sadiasrc.decomposition.CCMISApprox;
-import sadiasrc.decomposition.CCMISDynamicForest;
-import sadiasrc.decomposition.CCMISStack;
+import sadiasrc.decomposition.*;
 
 import java.util.ArrayList;
 import java.util.function.LongSupplier;
@@ -77,7 +74,8 @@ public class MISBackTrackTest {
         for (int i = 0; i < 11000; i++) {
             //CutBool.countNeighborhoods(bigraph);
             CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
-            CCMISDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph));
+            //CCMISDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph));
+            CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph));
             //CCMISRe.BoolDimBranch(new IndexGraph(bigraph));
         }
     }
@@ -181,7 +179,7 @@ public class MISBackTrackTest {
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
-        ret = doBenchMark(() -> CCMISDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
+        ret = doBenchMark(() -> CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("DynamicForest CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         /*
