@@ -58,13 +58,16 @@ public class TreapNode {
         this.priority = priority;
         this.parent = parent;
         this.left = left;
+        if (this.left == this) {
+            System.out.println("10: p.left == p");
+        }
         this.right = right;
         this.next = next;
         this.prev = prev;
     }
 
     public void bubbleUp() {
-        while(true) {
+        while (true) {
             TreapNode p = this.parent;
             if(p == null || p.priority < this.priority) {
                 break;
@@ -72,6 +75,9 @@ public class TreapNode {
             if(this == p.left) {
                 TreapNode b = this.right;
                 p.left = b;
+                if (p.left == p) {
+                    System.out.println("1: p.left == p");
+                }
                 if (b != null) {
                     b.parent = p;
                 }
@@ -83,6 +89,9 @@ public class TreapNode {
                     b.parent = p;
                 }
                 this.left = p;
+                if (this.left == this) {
+                    System.out.println("2: p.left == p");
+                }
             }
             p.update();
             this.update();
@@ -92,13 +101,16 @@ public class TreapNode {
             if(gp != null) {
                 if(gp.left == p) {
                     gp.left = this;
+                    if (gp.left == gp) {
+                        System.out.println("3: p.left == p");
+                    }
                 } else {
                     gp.right = this;
                 }
             }
         }
         TreapNode p = this.parent;
-        while(p != null) {
+        while (p != null) {
             p.update();
             p = p.parent;
         }
@@ -155,6 +167,9 @@ public class TreapNode {
         if(b.parent != null) {
             if(b.parent.left == b) {
                 b.parent.left = a;
+                if (b.parent.left == b.parent) {
+                    System.out.println("6: p.left == p");
+                }
             } else {
                 b.parent.right = a;
             }
@@ -163,16 +178,25 @@ public class TreapNode {
         if (t != null) {
             if(t.left == a) {
                 t.left = b;
+                if (t.left == t) {
+                    System.out.println("7: p.left == p");
+                }
             } else {
                 t.right = b;
             }
         }
         t = a.left;
         a.left = b.left;
+        if (a.left == a) {
+            System.out.println("8: p.left == p");
+        }
         if(b.left != null) {
             b.left.parent = a;
         }
         b.left = t;
+        if (b.left == b) {
+            System.out.println("9: p.left == p");
+        }
         if (t != null) {
             t.parent = b;
         }
@@ -265,6 +289,9 @@ public class TreapNode {
         if(node.parent != null) {
             if(node.parent.left == node) {
                 node.parent.left = r;
+                if (node.parent.left == node.parent) {
+                    System.out.println("5: p.left == p");
+                }
             } else {
                 node.parent.right = r;
             }
@@ -305,15 +332,18 @@ public class TreapNode {
     public TreapNode concatRecurse(TreapNode a, TreapNode b) {
         if(a == null) {
             return b;
-        } else if(b == null) {
+        } else if (b == null) {
             return a;
-        } else if(a.priority < b.priority) {
+        } else if (a.priority < b.priority) {
             a.right = concatRecurse(a.right, b);
             a.right.parent = a;
             a.update();
             return a;
         } else {
             b.left = concatRecurse(a, b.left);
+            if (b.left == b) {
+                System.out.println("4: p.left == p");
+            }
             b.left.parent = b;
             b.update();
             return b;
@@ -336,7 +366,13 @@ public class TreapNode {
         }
         ta.next = sb;
         sb.prev = ta;
-        TreapNode r = concatRecurse(ra, rb);
+        TreapNode r;
+        // TODO: validate bug fix
+        if (ra != rb) {
+            r = concatRecurse(ra, rb);
+        } else {
+            r = ra;
+        }
         r.parent = null;
         return r;
     }

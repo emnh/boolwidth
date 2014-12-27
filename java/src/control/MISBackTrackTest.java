@@ -170,9 +170,11 @@ public class MISBackTrackTest {
         System.out.printf("MIS backtrack persistent (%dms): %d\n", ret.eachDuration(), ret.returnValue);
         */
 
+        /*
         JOCLOpenCLCutBoolComputer.initialize();
         ret = doBenchMark(() -> JOCLOpenCLCutBoolComputer.estimateNeighbourHoods(bigraph, sampleCount), test);
         System.out.printf("OpenCL Approx CB (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+        */
 
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));

@@ -17,9 +17,6 @@ public class CCMISDynamicForest {
 	//groundset for bitset
 	private static IndexedSet<IndexVertex> groundSet;
 
-	private static DynamicForest df = new DynamicForest();
-	private static BiMap<IndexVertex, DynamicForest.DynamicVertex> dfMap = HashBiMap.create();
-
 	public static long BoolDimBranch(BiGraph G)
 	{
 //		System.out.println("Bigraph is");
@@ -41,6 +38,8 @@ public class CCMISDynamicForest {
 		//out =X
 
 		// Create dynamic forest
+		DynamicForest df = new DynamicForest();
+		BiMap<IndexVertex, DynamicForest.DynamicVertex> dfMap = HashBiMap.create();
 		for(int i=0; i < G.numVertices(); i++) {
 			IndexVertex v = G.getVertex(i);
 			DynamicForest.DynamicVertex	dv = df.createVertex(v);
@@ -55,7 +54,7 @@ public class CCMISDynamicForest {
 			}
 		}
 
-		return boolDimBranch(G, all, out, rest);
+		return boolDimBranch(df, dfMap, G, all, out, rest);
 	}
 
 	/**
@@ -67,7 +66,7 @@ public class CCMISDynamicForest {
 	 * @throws java.security.InvalidAlgorithmParameterException
 	 */
 
-	public static long boolDimBranch(BiGraph G, VSubSet all, VSubSet out, VSubSet rest)
+	public static long boolDimBranch(DynamicForest df, BiMap<IndexVertex, DynamicForest.DynamicVertex> dfMap, BiGraph G, VSubSet all, VSubSet out, VSubSet rest)
 	{
 		//checking termination conditions
 
@@ -89,9 +88,12 @@ public class CCMISDynamicForest {
 		//check to see if the graph is disconneced
         boolean isConnected = true;
 
-		isConnected = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
-		//isConnected = dfMap.get(all.first()).componentSize() == all.size();
-		//System.out.printf("isConnected: %s, sz: %d/%d\n", isConnected, dfMap.get(all.first()).componentSize(), all.size());
+		boolean isConnectedBasic = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
+		boolean isConnectedDF = dfMap.get(all.first()).componentSize() == all.size();
+		isConnected = isConnectedDF;
+		if (isConnectedBasic != isConnectedDF) {
+			System.out.printf("isConnected: %s, %s, sz: %d/%d\n", isConnectedBasic, isConnectedDF, dfMap.get(all.first()).componentSize(), all.size());
+		}
 
 		//If not connected then call for components and multiply
 		if(!isConnected)
@@ -108,7 +110,21 @@ public class CCMISDynamicForest {
 				nout.retainAll(out);
 				nrest.retainAll(rest);
 
-				long next = boolDimBranch(G,nall,nout,nrest);
+				// Create dynamic forest
+				DynamicForest newDF = new DynamicForest();
+				BiMap<IndexVertex, DynamicForest.DynamicVertex> newDFMap = HashBiMap.create();
+				for (IndexVertex v : all) {
+					newDFMap.put(v, newDF.createVertex(v));
+				}
+				for (IndexVertex v : all) {
+					for (IndexVertex u : G.neighbours(v)) {
+						if (v.id() < u.id() && all.contains(u)) {
+							newDFMap.get(v).link(newDFMap.get(u), null);
+						}
+					}
+				}
+
+				long next = boolDimBranch(newDF, newDFMap, G, nall, nout, nrest);
                 if (next == 0) return 0;
                 total = Math.multiplyExact(total, next);
 //				System.out.println("total = "+total);
@@ -179,7 +195,7 @@ public class CCMISDynamicForest {
 			{
 				IndexVertex x = toAdd.pop();
 				if(rest.contains(x)) {
-                    putIn(G, all, out, rest, x);
+                    putIn(dfMap, G, all, out, rest, x);
                 } else {
                     outValid = false;
                 }
@@ -190,14 +206,18 @@ public class CCMISDynamicForest {
 		long total = 0;
 		if(outValid)
 		{
-			total = boolDimBranch(G, all, out, rest);
+			total = boolDimBranch(df, dfMap, G, all, out, rest);
 		}
 
 		// move vertices back
         out.cloneInPlace(oldOut);
 		for (IndexVertex x : oldAll.subtract(all)) {
+			dfMap.put(x, df.createVertex(x));
+		}
+		for (IndexVertex x : oldAll.subtract(all)) {
+			//System.out.printf("adding back1: %s\n", x);
 			for (IndexVertex y : G.neighbours(x)) {
-				if (x.id() < y.id()) {
+				if (oldAll.contains(y) && x.id() < y.id()) {
 					dfMap.get(x).link(dfMap.get(y), null);
 				}
 			}
@@ -206,7 +226,7 @@ public class CCMISDynamicForest {
         rest.cloneInPlace(oldRest);
 
 		// try v in
-		putIn(G, all, out, rest, v);
+		putIn(dfMap, G, all, out, rest, v);
 		toAdd = new Stack<IndexVertex>();
 		boolean inValid = true;
 		changed = true;
@@ -248,7 +268,7 @@ public class CCMISDynamicForest {
 			while(inValid && !toAdd.isEmpty())
 			{
 				if(rest.contains(toAdd.peek())) {
-                    putIn(G, all, out, rest, toAdd.pop());
+                    putIn(dfMap, G, all, out, rest, toAdd.pop());
                 } else {
                     inValid = false;
                 }
@@ -258,15 +278,19 @@ public class CCMISDynamicForest {
 		if(inValid)
 		{
 //			System.out.println("branching with "+v+" in");
-			total +=boolDimBranch(G, all, out, rest);
+			total +=boolDimBranch(df, dfMap, G, all, out, rest);
 //			System.out.println("total = "+total);
 		}
 
 		// move vertices back
         out.cloneInPlace(oldOut);
 		for (IndexVertex x : oldAll.subtract(all)) {
+			dfMap.put(x, df.createVertex(x));
+		}
+		for (IndexVertex x : oldAll.subtract(all)) {
+			//System.out.printf("adding back2: %s\n", x);
 			for (IndexVertex y : G.neighbours(x)) {
-				if (x.id() < y.id()) {
+				if (oldAll.contains(y) && x.id() < y.id()) {
 					dfMap.get(x).link(dfMap.get(y), null);
 				}
 			}
@@ -278,21 +302,25 @@ public class CCMISDynamicForest {
 
 	}
 	
-	private static void putIn(IndexGraph g, VSubSet all,VSubSet out,VSubSet rest,IndexVertex v)
+	private static void putIn(BiMap<IndexVertex, DynamicForest.DynamicVertex> dfMap, IndexGraph g, VSubSet all,VSubSet out,VSubSet rest,IndexVertex v)
 	{
 		//System.out.println("Before adding "+v);
 		//System.out.println(all+", "+out+", "+rest);
+		if (all.contains(v)) {
+			//System.out.printf("cutting v: %s, all: %s\n", v, all);
+			dfMap.get(v).cut();
+		}
 		all.remove(v);
-		System.out.printf("cutting v: %s, all: %s\n", v, all);
-		dfMap.get(v).cut();
         out.remove(v);
         rest.remove(v);
 
         VSubSet hood = neighbourhoods.get(v.id());
         all.subtractInPlace(hood);
 		for (IndexVertex u : hood) {
-			System.out.printf("cutting u: %s, all: %s\n", u, all);
-			dfMap.get(u).cut();
+			if (all.contains(u)) {
+				//System.out.printf("cutting u: %s, all: %s\n", u, all);
+				dfMap.get(u).cut();
+			}
 		}
         rest.subtractInPlace(hood);
         out.subtractInPlace(hood);
