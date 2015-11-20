@@ -14,6 +14,8 @@ A git submodule is a subfolder stored in a different repository.
   - Separate repository for easy push to heroku.
 - [java/data](https://github.com/emnh/boolwidth-data)
   - Separate for convenience because of data size.
+- [java/lib](https://github.com/emnh/boolwidth-lib)
+  - Separate because of binary library files.
 
 # Contents
 
