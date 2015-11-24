@@ -68,7 +68,7 @@ public class CCMISApprox {
                 return 1;
             } else {
                 System.out.println("returning 0");
-                return 0;
+                return -1;
             }
         }
 

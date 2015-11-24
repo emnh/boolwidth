@@ -2,10 +2,6 @@ package control;
 
 import boolwidth.CutBool;
 import boolwidth.cutbool.*;
-import boolwidth.cutbool.ccmis_trial.CCMISRe;
-import boolwidth.cutbool.ccmis_trial.IndexGraph;
-import boolwidth.opencl.JOCLOpenCLCutBoolComputer;
-import boolwidth.opencl.OpenCLCutBoolComputer;
 import graph.AdjacencyListGraph;
 import graph.BiGraph;
 import graph.Edge;
@@ -179,8 +175,17 @@ public class MISBackTrackTest {
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
-        ret = doBenchMark(() -> CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
-        System.out.printf("DynamicForest CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+        ret = doBenchMark(() -> CBBacktrackInOutRest.countNeighborhoods(convertSadiaBiGraph(bigraph)), test);
+        System.out.printf("CB bactrack approximation (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+
+        // ret = doBenchMark(() -> CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
+        // System.out.printf("DynamicForest CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+
+        /*ret = doBenchMark(() -> CBBacktrackEstimate.estimateNeighborhoods(bigraph, sampleCount), test);
+        System.out.printf("CB bactrack approximation (%dms): %d\n", ret.eachDuration(), ret.returnValue);
+
+        ret = doBenchMark(() -> CCMISApprox.BoolDimBranch(convertSadiaBiGraph(bigraph), sampleCount), test);
+        System.out.printf("Approx CCMIS backtrack (%dms): %d\n", ret.eachDuration(), ret.returnValue);*/
 
         /*
         ret = doBenchMark(() -> CCMISStack.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);

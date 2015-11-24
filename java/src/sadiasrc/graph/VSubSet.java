@@ -57,6 +57,8 @@ public class VSubSet extends SubSet<IndexVertex> implements IVSet {
 	public VSubSet(IndexedSet<IndexVertex> groundSet) {
 		super(groundSet);
 	}
+
+
 	
 	public int compareTo(IVSet ss) {
 		System.out.println("comparing");
@@ -133,6 +135,12 @@ public class VSubSet extends SubSet<IndexVertex> implements IVSet {
         return ns;
     }
 
+	public VSubSet union(VSubSet s2) {
+		VSubSet s = new VSubSet(groundSet, subset);
+		s.subset.or(s2.subset);
+		return s;
+	}
+
 	public VSubSet intersection(VSubSet s2) {
         VSubSet s = new VSubSet(groundSet, subset);
         s.subset.and(s2.subset);
@@ -157,6 +165,10 @@ public class VSubSet extends SubSet<IndexVertex> implements IVSet {
         VSubSet s = new VSubSet(groundSet, subset);
         s.subset.andNot(s2.subset);
         return s;
+    }
+
+    public boolean isSubSet(VSubSet s2) {
+        return this.subtract(s2).size() == 0;
     }
 
     //O(1)
