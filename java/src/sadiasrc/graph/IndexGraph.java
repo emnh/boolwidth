@@ -184,24 +184,23 @@ public class IndexGraph extends
 		return d;
 	}
 
-	 /* O(vs)*/
+	 /* O(vs) */
 	public IndexVertex maxDegreeVertex(Iterable<IndexVertex> vs)
 	{
-		int maxDeg=-1;
+		int maxDeg = -1;
 		IndexVertex v = null;
-		for(IndexVertex w : vs)
-			
-		{
-			//System.out.println(w+ "has degree "+this.degree(w));
-			int t=this.degree(w);
-			if(t>maxDeg)
+		for(IndexVertex w : vs) {
+			// System.out.println(w+ "has degree "+this.degree(w));
+			int t = this.degree(w);
+			if(t > maxDeg)
 			{
-				v=w;
-				maxDeg=t;
+				v = w;
+				maxDeg = t;
 			}
 		}
 		return v;
 	}
+
 	/*O(n)*/
 	public boolean isPendant(IndexVertex v)
 	{

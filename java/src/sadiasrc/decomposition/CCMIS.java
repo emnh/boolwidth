@@ -16,7 +16,9 @@ public class CCMIS {
 	private static ArrayList<VSubSet> neighbourhoods;
 	//groundset for bitset
 	private static IndexedSet<IndexVertex> groundSet;
-	
+
+	private static VSubSet leftVertices;
+	private static VSubSet rightVertices;
 	
 	public static long BoolDimBranch(BiGraph G)
 	{
@@ -29,6 +31,10 @@ public class CCMIS {
 			neighbourhoods.add(new VSubSet(groundSet, G.neighbours(G.getVertex(i))));
 		}
 
+		leftVertices= new VSubSet(groundSet);
+		leftVertices.addAll(G.leftVertices());
+		rightVertices = new VSubSet(groundSet);
+		rightVertices.addAll(G.rightVertices());
 		
 		VSubSet all = new VSubSet(groundSet);
 		VSubSet out = new VSubSet(groundSet);
@@ -69,33 +75,16 @@ public class CCMIS {
             }
 		}
 
-		//check to see if the graph is disconneced
-        boolean isConnected = true;
-        //if (all.size() >= 10) {
-            isConnected = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
-       //}
-        /* INCORRECT
-        if (rest.size() < 16 && out.size() == 0) {
-            BiGraph bg = new BiGraph(G.numLeftVertices(), G.numRightVertices());
-            for (IndexEdge<IndexVertex> e : G.edges()) {
-                IndexVertex v1 = e.endVertices().get(0);
-                IndexVertex v2 = e.endVertices().get(1);
-                if (rest.contains(v1) && rest.contains(v2)) {
-                    int id1 = v1.id();
-                    int id2 = v2.id();
-                    bg.insertEdge(id1, id2);
-                }
-            }
-            return CutBool.countNeighborhoods(bg);
-        }*/
+		// check to see if the graph is disconnected
+        boolean isConnected = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
 
-		//If not connected then call for components and multiply
+		// if not connected then call for components and multiply
 		if(!isConnected)
 		{
 			
 			long total=1;
-			//returns list of components
-			for(ArrayList<IndexVertex> vs : BasicGraphAlgorithms.connectedComponents(G,all))
+			// returns list of components
+			for(ArrayList<IndexVertex> vs : BasicGraphAlgorithms.connectedComponents(G, all))
 			{
 				VSubSet nall = new VSubSet(groundSet);
 				nall.addAll(vs);
@@ -107,16 +96,35 @@ public class CCMIS {
 				long next = boolDimBranch(G,nall,nout,nrest);
                 if (next == 0) return 0;
                 total = Math.multiplyExact(total, next);
-//				System.out.println("total = "+total);
 			}
 
 			return total;
 		}
 
-		//Find a vertex to branch on
-		
-		IndexVertex v = G.maxDegreeVertex(rest);
-        //System.out.printf("maxvertex: %s, degree: %s, neighbours: %s\n\n", v, G.degree(v), G.neighbours(v));
+		// find a vertex to branch on
+		int maxDeg = -1;
+		IndexVertex v = null;
+		VSubSet selection = rest.intersection(rightVertices);
+		for (IndexVertex w : selection)	{
+			int t = neighbourhoods.get(w.id()).intersection(rest).size();
+			if(t > maxDeg) {
+				v = w;
+				maxDeg = t;
+			}
+		}
+		if (v == null) {
+			selection = rest;
+			for (IndexVertex w : selection)	{
+				int t = neighbourhoods.get(w.id()).intersection(rest).size();
+				if(t > maxDeg) {
+					v = w;
+					maxDeg = t;
+				}
+			}
+		}
+
+		// IndexVertex v = G.maxDegreeVertex(rest);
+        // System.out.printf("maxvertex: %s, degree: %s, neighbours: %s\n\n", v, G.degree(v), G.neighbours(v));
 
 		//if v is out
 		
