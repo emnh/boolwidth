@@ -118,6 +118,7 @@ public class BasicGraphAlgorithms {
 	{
 		return connectedComponents(G, new VSubSet(G.vertices()));
 	}
+
 	public static Collection<ArrayList<IndexVertex>> connectedComponents(IndexGraph G, VSubSet vs)
 	{
 		if(vs.isEmpty())
@@ -158,6 +159,45 @@ public class BasicGraphAlgorithms {
 //			System.out.println(al);
 		return components;
 	}
+
+    public static Collection<VSubSet> connectedComponentsVSubSets(IndexGraph G, VSubSet vs)
+    {
+        if(vs.isEmpty())
+            return null;
+        Collection<VSubSet> components = new ArrayList<>() ;
+        boolean[] used = new boolean[G.numVertices()];
+        for(IndexVertex v : G.vertices())
+            if(!vs.contains(v))
+                used[v.id()]=true;
+
+        for(IndexVertex sv : vs)
+        {
+            if(used[sv.id()]) continue;
+
+            Stack<IndexVertex> s = new Stack<IndexVertex>();
+            s.push(sv);
+            used[sv.id()] = true;
+
+            VSubSet cc = new VSubSet(vs.getGroundSet());
+            while(!s.isEmpty())
+            {
+                IndexVertex v = s.pop();
+                cc.add(v);
+                for(IndexVertex n : G.neighbours(v))
+                {
+                    if(!used[n.id()])
+                    {
+                        s.push(n);
+                        used[n.id()] = true;
+                    }
+                }
+            }
+            components.add(cc);
+        }
+
+        return components;
+    }
+
 	public static Collection<ArrayList<IndexVertex>> connectedComponents(IndexGraph G, Collection<IndexVertex> cvs)
 	{
 		IndexedSet<IndexVertex> groundSet;

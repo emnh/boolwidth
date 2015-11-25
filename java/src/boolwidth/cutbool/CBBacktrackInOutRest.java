@@ -31,19 +31,20 @@ public class CBBacktrackInOutRest {
                              VSubSet inLeft, VSubSet outLeft, VSubSet restLeft,
                              VSubSet inRight, VSubSet outRight, VSubSet restRight) {
 
-        VSubSet in = inLeft.union(inRight);
-        VSubSet out = outLeft.union(outRight);
-        VSubSet rest = restLeft.union(restRight);
-        VSubSet allConnected = in.union(rest);
-
         // disregard some in vertices for connectivity purposes
         for (IndexVertex v : inLeft.union(restLeft)) {
             VSubSet vNeighbourHood = state.neighbourhoods.get(v.id());
             if (vNeighbourHood.isSubSet(inRight)) {
-                allConnected.remove(v);
-                allConnected = allConnected.subtract(vNeighbourHood);
+                inLeft.remove(v);
+                restLeft.remove(v);
+                inRight = inRight.subtract(vNeighbourHood);
             }
         }
+
+        VSubSet in = inLeft.union(inRight);
+        VSubSet out = outLeft.union(outRight);
+        VSubSet rest = restLeft.union(restRight);
+        VSubSet allConnected = in.union(rest);
 
         // termination condition
         if (restRight.size() == 0) {

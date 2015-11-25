@@ -172,11 +172,19 @@ public class MISBackTrackTest {
         System.out.printf("OpenCL Approx CB (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
         */
 
+        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
+        System.out.printf("UNN (bigraph) (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
+        ret = doBenchMark(() -> CCMISHybrid.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
+        System.out.printf("CCMIS hybrid (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+
+        /*
         ret = doBenchMark(() -> CBBacktrackInOutRest.countNeighborhoods(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("CB bactrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+         */
 
         // ret = doBenchMark(() -> CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         // System.out.printf("DynamicForest CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
