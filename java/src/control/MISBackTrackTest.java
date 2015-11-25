@@ -176,7 +176,7 @@ public class MISBackTrackTest {
         System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         ret = doBenchMark(() -> CBBacktrackInOutRest.countNeighborhoods(convertSadiaBiGraph(bigraph)), test);
-        System.out.printf("CB bactrack approximation (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+        System.out.printf("CB bactrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         // ret = doBenchMark(() -> CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         // System.out.printf("DynamicForest CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));

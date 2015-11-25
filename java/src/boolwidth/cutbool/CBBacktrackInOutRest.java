@@ -32,18 +32,40 @@ public class CBBacktrackInOutRest {
                              VSubSet inRight, VSubSet outRight, VSubSet restRight) {
 
         VSubSet in = inLeft.union(inRight);
+        VSubSet out = outLeft.union(outRight);
         VSubSet rest = restLeft.union(restRight);
         VSubSet allConnected = in.union(rest);
 
+        // disregard some in vertices for connectivity purposes
+        for (IndexVertex v : inLeft.union(restLeft)) {
+            VSubSet vNeighbourHood = state.neighbourhoods.get(v.id());
+            if (vNeighbourHood.isSubSet(inRight)) {
+                allConnected.remove(v);
+                allConnected = allConnected.subtract(vNeighbourHood);
+            }
+        }
+
+        // termination condition
         if (restRight.size() == 0) {
             VSubSet total = new VSubSet(state.groundSet);
+            /*if (restLeft.size() > 0) {
+                System.out.println("left not empty");
+            }*/
             for (IndexVertex v : inLeft.union(restLeft)) {
                 VSubSet vNeighbourHood = state.neighbourhoods.get(v.id());
+                if (vNeighbourHood.intersection(outRight).size() > 0) {
+                    System.out.println("intersects out");
+                }
+                vNeighbourHood = vNeighbourHood.intersection(inRight);
+
                 total = total.union(vNeighbourHood);
             }
             if (total.equals(inRight)) {
                 return 1;
             } else {
+                if (!total.isSubSet(inRight)) {
+                    System.out.println("returning 0: " + total.isSubSet(inRight));
+                }
                 return 0;
             }
         }
@@ -58,7 +80,7 @@ public class CBBacktrackInOutRest {
             {
                 VSubSet newAll = new VSubSet(state.groundSet);
                 newAll.addAll(vs);
-                
+
                 VSubSet newInLeft = newAll.intersection(inLeft);
                 VSubSet newOutLeft = newAll.intersection(outLeft);
                 VSubSet newRestLeft = newAll.intersection(restLeft);
@@ -71,15 +93,15 @@ public class CBBacktrackInOutRest {
                         newInLeft, newOutLeft, newRestLeft,
                         newInRight, newOutRight, newRestRight);
                 if (next == 0) return 0;
+                // System.out.println("* " + next);
                 total = Math.multiplyExact(total, next);
             }
 
             return total;
         }
 
-        //IndexVertex v = G.maxDegreeVertex(rest);
+        // choose v
         IndexVertex v = G.maxDegreeVertex(restRight);
-        //IndexVertex v = restRight.first();
 
         // add v and branch
         boolean vinValid = true;
@@ -90,38 +112,51 @@ public class CBBacktrackInOutRest {
         VSubSet vinOutRight = outRight.clone();
         VSubSet vinRestRight = restRight.clone();
 
-        if (G.isRight(v)) {
-            vinInRight.add(v);
-            vinRestRight.remove(v);
 
-            VSubSet vLeftNeighbours = restLeft.intersection(state.neighbourhoods.get(v.id()));
-            if (vLeftNeighbours.size() == 0) {
+        vinInRight.add(v);
+        vinRestRight.remove(v);
+
+        VSubSet vRestLeftNeighbours = restLeft.intersection(state.neighbourhoods.get(v.id()));
+        if (vRestLeftNeighbours.size() == 0) {
+            vinValid = false;
+        }
+        if (vRestLeftNeighbours.size() == 1) {
+            // if it is the only left neighbour it must be in
+            IndexVertex first = vRestLeftNeighbours.first();
+            vinInLeft.add(first);
+            vinRestLeft.remove(first);
+
+            // and then all right neighbours of this one must be in as well
+            VSubSet right = state.neighbourhoods.get(first.id());
+            if (outRight.intersection(right).size() > 0) {
                 vinValid = false;
-            }
-            if (vLeftNeighbours.size() == 1) {
-                // if it is the only left neighbour it must be in
-                IndexVertex first = vLeftNeighbours.first();
-                vinInLeft.add(first);
-                vinRestLeft.remove(first);
+            } else {
+                vinInRight = vinInRight.union(right);
+                vinRestRight = vinRestRight.subtract(right);
 
-                // and then all right neighbours of this one must be in as well
-                VSubSet right = state.neighbourhoods.get(first.id());
-                if (outRight.intersection(right).size() > 0) {
-                    vinValid = false;
-                } else {
-                    vinInRight = vinInRight.union(right);
-                    vinRestRight = vinRestRight.subtract(right);
+                // and then for rest left neighbours of "right" add them if they are subsets of vinInRight
+                VSubSet vLeftTotal = new VSubSet(state.groundSet);
+                for (IndexVertex r : right) {
+                    vLeftTotal = vLeftTotal.union(state.neighbourhoods.get(r.id()));
                 }
-            }
-
-            // for all (neighbours of v) in left, if N(v) subset of inRight, add v to inLeft
-            if (vinValid) {
-                for (IndexVertex u : vLeftNeighbours) {
-                    VSubSet uNeighbourHood = state.neighbourhoods.get(u.id());
-                    if (uNeighbourHood.isSubSet(vinInRight)) {
+                vLeftTotal = vLeftTotal.intersection(restLeft);
+                for (IndexVertex u : vLeftTotal) {
+                    VSubSet uRightNeighbourHood = state.neighbourhoods.get(u.id());
+                    if (uRightNeighbourHood.isSubSet(vinInRight)) {
                         vinInLeft.add(u);
                         vinRestLeft.remove(u);
                     }
+                }
+            }
+        }
+
+        // for all (neighbours of v) in left, if N(v) subset of inRight, add v to inLeft
+        if (vinValid) {
+            for (IndexVertex u : vRestLeftNeighbours) {
+                VSubSet uRightNeighbourHood = state.neighbourhoods.get(u.id());
+                if (uRightNeighbourHood.isSubSet(vinInRight)) {
+                    vinInLeft.add(u);
+                    vinRestLeft.remove(u);
                 }
             }
         }
@@ -143,18 +178,17 @@ public class CBBacktrackInOutRest {
         VSubSet voutOutRight = outRight.clone();
         VSubSet voutRestRight = restRight.clone();
 
-        if (G.isRight(v)) {
-            voutOutRight.add(v);
-            voutRestRight.remove(v);
 
-            // remove all neighbours of v
-            VSubSet vLeftNeighbours = state.neighbourhoods.get(v.id());
-            if (inLeft.intersection(vLeftNeighbours).size() > 0) {
-                voutValid = false;
-            } else {
-                voutOutLeft = voutOutLeft.union(vLeftNeighbours);
-                voutRestLeft = voutRestLeft.subtract(vLeftNeighbours);
-            }
+        voutOutRight.add(v);
+        voutRestRight.remove(v);
+
+        // remove all neighbours of v
+        VSubSet vLeftNeighbours = state.neighbourhoods.get(v.id());
+        if (inLeft.intersection(vLeftNeighbours).size() > 0) {
+            voutValid = false;
+        } else {
+            voutOutLeft = voutOutLeft.union(vLeftNeighbours);
+            voutRestLeft = voutRestLeft.subtract(vLeftNeighbours);
         }
         if (voutValid) {
             total += count(state, G,
