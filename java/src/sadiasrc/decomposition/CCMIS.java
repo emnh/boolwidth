@@ -19,6 +19,7 @@ public class CCMIS {
 
 	private static VSubSet leftVertices;
 	private static VSubSet rightVertices;
+	private static VSubSet minLeftRightVertices;
 	
 	public static long BoolDimBranch(BiGraph G)
 	{
@@ -31,10 +32,12 @@ public class CCMIS {
 			neighbourhoods.add(new VSubSet(groundSet, G.neighbours(G.getVertex(i))));
 		}
 
-		leftVertices= new VSubSet(groundSet);
+		leftVertices = new VSubSet(groundSet);
 		leftVertices.addAll(G.leftVertices());
 		rightVertices = new VSubSet(groundSet);
 		rightVertices.addAll(G.rightVertices());
+
+		minLeftRightVertices = leftVertices.size() >= rightVertices.size() ? rightVertices : leftVertices;
 		
 		VSubSet all = new VSubSet(groundSet);
 		VSubSet out = new VSubSet(groundSet);
@@ -104,7 +107,7 @@ public class CCMIS {
 		// find a vertex to branch on
 		int maxDeg = -1;
 		IndexVertex v = null;
-		VSubSet selection = rest.intersection(rightVertices);
+		VSubSet selection = rest.intersection(minLeftRightVertices);
 		for (IndexVertex w : selection)	{
 			int t = neighbourhoods.get(w.id()).intersection(rest).size();
 			if(t > maxDeg) {
