@@ -290,6 +290,7 @@ public class SubSet<E> extends AbstractSet<E> implements Set<E>, Comparable<SubS
 	public int compareTo(SubSet<E> ss) {
 		if(ss.getGroundSet() != groundSet)
 			throw new InputMismatchException("These subsets are not comparable, since they have different groundsets!");
+		/*
 		if(ss.size()!=size())
 		{
 			return size()-ss.size();
@@ -298,14 +299,42 @@ public class SubSet<E> extends AbstractSet<E> implements Set<E>, Comparable<SubS
 		subset.xor(ss.subset);
 		int c = -1;
 		//compare first difference
-		if(subset.isEmpty())
+		if(subset.isEmpty()) {
 			c = 0;
-		else if(ss.subset.get(subset.nextSetBit(0)))
-			c=1;
+		} else if(ss.subset.get(subset.nextSetBit(0))) {
+			c = 1;
+		}
 		//flip back
 		subset.xor(ss.subset);
+		*/
 
-		return c;
+        // code from http://stackoverflow.com/questions/15330340/how-to-create-sortedset-e-g-treeset-for-elements-of-type-bitset
+		BitSet a = subset;
+		BitSet b = ss.subset;
+		if(a == b){
+			return 0;
+		} else if(a == null) {
+			return -1;
+		} else if(b == null) {
+			return 1;
+		} else if(a.equals(b)) {
+			return 0;
+		} else if(a.length() > b.length()) {
+			return 1;
+		} else if(b.length() > a.length()) {
+			return -1;
+		} else {
+			for(int i = 0; i < a.length(); i++) {
+				if(a.get(i) != b.get(i)) {
+					if(a.get(i)) {
+						return 1;
+					} else {
+						return -1;
+					}
+				}
+			}
+			return 0;
+		}
 	}
 
 	public static void main(String[] args) {

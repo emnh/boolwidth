@@ -4,9 +4,7 @@ import sadiasrc.graph.*;
 import sadiasrc.util.IndexedSet;
 
 import java.security.InvalidAlgorithmParameterException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Stack;
+import java.util.*;
 
 public class CCMISHybrid {
 
@@ -20,14 +18,21 @@ public class CCMISHybrid {
 	private static VSubSet minLeftRightVertices;
 
 	private static long zeroCount;
+
+    public static long[] containingCount;
+
+    private static final boolean LOOK_FOR_TWINS = false;
 	
 	public static long BoolDimBranch(BiGraph G)
 	{
 		neighbourhoods = new ArrayList<VSubSet>(G.numVertices());
 		groundSet = new IndexedSet<IndexVertex>(G.vertices());
-		for(int i=0; i<G.numVertices(); i++)
+        containingCount = new long[G.numVertices()];
+		for(int i = 0; i < G.numVertices(); i++)
 		{
-			neighbourhoods.add(new VSubSet(groundSet, G.neighbours(G.getVertex(i))));
+            IndexVertex v = G.getVertex(i);
+            containingCount[v.id()] = 0;
+			neighbourhoods.add(new VSubSet(groundSet, G.neighbours(v)));
 		}
 
 		leftVertices = new VSubSet(groundSet);
@@ -96,6 +101,35 @@ public class CCMISHybrid {
 			return total;
 		}
 
+        // look for twins and branch after removing one of them
+        if (LOOK_FOR_TWINS) {
+            TreeMap<VSubSet, IndexVertex> closedNeighbourHoods = new TreeMap<>();
+            for (IndexVertex r : rest) {
+                VSubSet rClosedNeighbourHood = neighbourhoods.get(r.id());
+                rClosedNeighbourHood = rClosedNeighbourHood.intersection(all);
+                rClosedNeighbourHood.add(r);
+                if (closedNeighbourHoods.containsKey(rClosedNeighbourHood)) {
+                    IndexVertex s = closedNeighbourHoods.get(rClosedNeighbourHood);
+                    // System.out.println("twin: (" + r.id() + "," + s.id() + ")");
+
+                    VSubSet rAll = all.clone();
+                    VSubSet rRest = rest.clone();
+                    VSubSet rOut = out.clone();
+
+                    rAll.remove(s);
+                    rRest.remove(s);
+
+                    long containingR = containingCount[r.id()];
+                    //System.out.println("containingR: " + containingR);
+                    long total = boolDimBranch(G, rAll, rOut, rRest);
+                    containingR = containingCount[r.id()] - containingR;
+
+                    return total + containingR;
+                }
+                closedNeighbourHoods.put(rClosedNeighbourHood, r);
+            }
+        }
+
 		// find a vertex to branch on
 		int maxDeg = -1;
 		IndexVertex v = null;
@@ -124,28 +158,40 @@ public class CCMISHybrid {
         VSubSet vOutAll = all.clone();
         VSubSet vOutRest = rest.clone();
         VSubSet vOutOut = out.clone();
+        ArrayList<IndexVertex> outNewlyAdded = new ArrayList<>();
 
 		// moving v to out
 		vOutRest.remove(v);
 		vOutOut.add(v);
-		if (isValid(G, vOutAll, vOutOut, vOutRest)) {
+		if (isValid(G, vOutAll, vOutOut, vOutRest, outNewlyAdded)) {
 			total = boolDimBranch(G, vOutAll, vOutOut, vOutRest);
+            for (IndexVertex a : outNewlyAdded) {
+                containingCount[a.id()] += total;
+            }
 		}
 
 		// try v in and branch
         VSubSet vInAll = all.clone();
         VSubSet vInRest = rest.clone();
         VSubSet vInOut = out.clone();
+        ArrayList<IndexVertex> inNewlyAdded = new ArrayList<>();
+        inNewlyAdded.add(v);
+
+        // moving v to in
 		putIn(G, vInAll, vInOut, vInRest, v);
-        if (isValid(G, vInAll, vInOut, vInRest)) {
-			total += boolDimBranch(G, vInAll, vInOut, vInRest);
+        if (isValid(G, vInAll, vInOut, vInRest, inNewlyAdded)) {
+			long vCount = boolDimBranch(G, vInAll, vInOut, vInRest);
+            for (IndexVertex a : inNewlyAdded) {
+                containingCount[a.id()] += vCount;
+            }
+            total += vCount;
 		}
 
 		return total;
 	}
 
     /* look for vertices that can not be dominated and vertices that have to be in */
-    private static boolean isValid(BiGraph G, VSubSet all, VSubSet out, VSubSet rest) {
+    private static boolean isValid(BiGraph G, VSubSet all, VSubSet out, VSubSet rest, ArrayList<IndexVertex> newlyAdded) {
         boolean valid = true;
         boolean changed = true;
         Stack<IndexVertex> toAdd = new Stack<>();
@@ -182,6 +228,7 @@ public class CCMISHybrid {
                 IndexVertex x = toAdd.pop();
                 if(rest.contains(x)) {
                     putIn(G, all, out, rest, x);
+                    newlyAdded.add(x);
                 } else {
                     valid = false;
                 }
@@ -191,7 +238,7 @@ public class CCMISHybrid {
         return valid;
     }
 
-    private static void putIn(IndexGraph g, VSubSet all,VSubSet out,VSubSet rest,IndexVertex v)
+    private static void putIn(IndexGraph g, VSubSet all, VSubSet out, VSubSet rest, IndexVertex v)
 	{
 		all.remove(v);
         out.remove(v);
