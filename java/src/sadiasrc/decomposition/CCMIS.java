@@ -85,18 +85,15 @@ public class CCMIS {
 		if(!isConnected)
 		{
 			
-			long total=1;
+			long total = 1;
 			// returns list of components
-			for(ArrayList<IndexVertex> vs : BasicGraphAlgorithms.connectedComponents(G, all))
+			for(VSubSet vs : BasicGraphAlgorithms.connectedComponentsVSubSets(G, all))
 			{
-				VSubSet nall = new VSubSet(groundSet);
-				nall.addAll(vs);
-				VSubSet nout = nall.clone();
-				VSubSet nrest = nall.clone();
-				nout.retainAll(out);
-				nrest.retainAll(rest);
+				VSubSet nall = vs;
+				VSubSet nout = nall.intersection(out);
+				VSubSet nrest = nall.intersection(rest);
 
-				long next = boolDimBranch(G,nall,nout,nrest);
+				long next = boolDimBranch(G, nall, nout, nrest);
                 if (next == 0) return 0;
                 total = Math.multiplyExact(total, next);
 			}
@@ -125,9 +122,6 @@ public class CCMIS {
 				}
 			}
 		}
-
-		// IndexVertex v = G.maxDegreeVertex(rest);
-        // System.out.printf("maxvertex: %s, degree: %s, neighbours: %s\n\n", v, G.degree(v), G.neighbours(v));
 
 		//if v is out
 		

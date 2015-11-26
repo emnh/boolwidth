@@ -22,6 +22,8 @@ public class CCMISHybrid {
     public static long[] containingCount;
 
     private static final boolean LOOK_FOR_TWINS = false;
+    private static final boolean LOOK_FOR_OUT_TWINS = false;
+    private static final boolean GASPERS_BRANCH = false;
 	
 	public static long BoolDimBranch(BiGraph G)
 	{
@@ -102,6 +104,7 @@ public class CCMISHybrid {
 		}
 
         // look for twins and branch after removing one of them
+        // generally slower
         if (LOOK_FOR_TWINS) {
             TreeMap<VSubSet, IndexVertex> closedNeighbourHoods = new TreeMap<>();
             for (IndexVertex r : rest) {
@@ -130,62 +133,164 @@ public class CCMISHybrid {
             }
         }
 
+        // look for out twins and branch after removing one of them
+        // generally slower
+        if (LOOK_FOR_OUT_TWINS) {
+            TreeMap<VSubSet, IndexVertex> closedNeighbourHoods = new TreeMap<>();
+            for (IndexVertex r : out) {
+                VSubSet rNeighbourHood = neighbourhoods.get(r.id());
+                rNeighbourHood = rNeighbourHood.intersection(all);
+                if (closedNeighbourHoods.containsKey(rNeighbourHood)) {
+                    IndexVertex s = closedNeighbourHoods.get(rNeighbourHood);
+                    // System.out.println("out twin: (" + r.id() + "," + s.id() + ")");
+
+                    VSubSet rAll = all.clone();
+                    VSubSet rRest = rest.clone();
+                    VSubSet rOut = out.clone();
+
+                    rAll.remove(s);
+                    rOut.remove(s);
+
+                    long total = boolDimBranch(G, rAll, rOut, rRest);
+
+                    return total;
+                }
+                closedNeighbourHoods.put(rNeighbourHood, r);
+            }
+        }
+
 		// find a vertex to branch on
-		int maxDeg = -1;
-		IndexVertex v = null;
-		VSubSet selection = rest.intersection(minLeftRightVertices);
-		for (IndexVertex w : selection)	{
-			int t = neighbourhoods.get(w.id()).intersection(rest).size();
-			if(t > maxDeg) {
-				v = w;
-				maxDeg = t;
-			}
-		}
-		if (v == null) {
-			selection = rest;
-			for (IndexVertex w : selection)	{
-				int t = neighbourhoods.get(w.id()).intersection(rest).size();
-				if(t > maxDeg) {
-					v = w;
-					maxDeg = t;
-				}
-			}
-		}
+        IndexVertex v = null;
+        if (GASPERS_BRANCH) {
+            // if there is an out vertex of degree 2 select it
+            for (IndexVertex w : out) {
+                if (neighbourhoods.get(w.id()).intersection(all).size() == 2) {
+                    v = w;
+                    break;
+                }
+            }
+
+            if (v == null) {
+                // select minimum degree
+                int minDeg = Integer.MAX_VALUE;
+                VSubSet selection = all.intersection(minLeftRightVertices);
+                for (IndexVertex w : selection) {
+                    int t = neighbourhoods.get(w.id()).intersection(all).size();
+                    if (t < minDeg) {
+                        v = w;
+                        minDeg = t;
+                    }
+                }
+                if (v == null) {
+                    selection = rest;
+                    for (IndexVertex w : selection) {
+                        int t = neighbourhoods.get(w.id()).intersection(all).size();
+                        if (t < minDeg) {
+                            v = w;
+                            minDeg = t;
+                        }
+                    }
+                }
+            }
+        } else {
+            // select maximum degree
+            int maxDeg = -1;
+            VSubSet selection = rest.intersection(minLeftRightVertices);
+            for (IndexVertex w : selection) {
+                int t = neighbourhoods.get(w.id()).intersection(rest).size();
+                if (t > maxDeg) {
+                    v = w;
+                    maxDeg = t;
+                }
+            }
+            if (v == null) {
+                selection = rest;
+                for (IndexVertex w : selection) {
+                    int t = neighbourhoods.get(w.id()).intersection(rest).size();
+                    if (t > maxDeg) {
+                        v = w;
+                        maxDeg = t;
+                    }
+                }
+            }
+        }
 
         long total = 0;
 
-        // try v out and branch
-        VSubSet vOutAll = all.clone();
-        VSubSet vOutRest = rest.clone();
-        VSubSet vOutOut = out.clone();
-        ArrayList<IndexVertex> outNewlyAdded = new ArrayList<>();
+        if (rest.contains(v)) {
+            // try v in and branch
+            VSubSet vInAll = all.clone();
+            VSubSet vInRest = rest.clone();
+            VSubSet vInOut = out.clone();
+            ArrayList<IndexVertex> inNewlyAdded = new ArrayList<>();
+            inNewlyAdded.add(v);
 
-		// moving v to out
-		vOutRest.remove(v);
-		vOutOut.add(v);
-		if (isValid(G, vOutAll, vOutOut, vOutRest, outNewlyAdded)) {
-			total = boolDimBranch(G, vOutAll, vOutOut, vOutRest);
-            for (IndexVertex a : outNewlyAdded) {
-                containingCount[a.id()] += total;
+            // moving v to in
+            putIn(G, vInAll, vInOut, vInRest, v);
+            if (isValid(G, vInAll, vInOut, vInRest, inNewlyAdded)) {
+                long vCount = boolDimBranch(G, vInAll, vInOut, vInRest);
+                for (IndexVertex a : inNewlyAdded) {
+                    containingCount[a.id()] += vCount;
+                }
+                total += vCount;
             }
-		}
+        }
 
-		// try v in and branch
-        VSubSet vInAll = all.clone();
-        VSubSet vInRest = rest.clone();
-        VSubSet vInOut = out.clone();
-        ArrayList<IndexVertex> inNewlyAdded = new ArrayList<>();
-        inNewlyAdded.add(v);
+        if (GASPERS_BRANCH) {
+            // try all neighbours of v in
+            VSubSet vRestNeighbours = neighbourhoods.get(v.id()).intersection(rest);
 
-        // moving v to in
-		putIn(G, vInAll, vInOut, vInRest, v);
-        if (isValid(G, vInAll, vInOut, vInRest, inNewlyAdded)) {
-			long vCount = boolDimBranch(G, vInAll, vInOut, vInRest);
-            for (IndexVertex a : inNewlyAdded) {
-                containingCount[a.id()] += vCount;
+            ArrayList<IndexVertex> vNList = new ArrayList<>(vRestNeighbours);
+            VSubSet before = new VSubSet(groundSet);
+
+            for (int i = 0; i < vNList.size(); i++) {
+                IndexVertex w = vNList.get(i);
+                VSubSet wNeighbours = neighbourhoods.get(w.id());
+
+                // try w in and branch
+                VSubSet vInAll = all.clone();
+                VSubSet vInRest = rest.clone();
+                VSubSet vInOut = out.clone();
+                ArrayList<IndexVertex> inNewlyAdded = new ArrayList<>();
+
+                VSubSet newOut = before.subtract(wNeighbours);
+                vInRest = vInRest.subtract(newOut);
+                vInOut = vInOut.union(newOut);
+
+                //vInAll.remove(v);
+                //vInRest.remove(v);
+                //vInOut.remove(v);
+                inNewlyAdded.add(w);
+
+                // moving w to in
+                putIn(G, vInAll, vInOut, vInRest, w);
+                if (isValid(G, vInAll, vInOut, vInRest, inNewlyAdded)) {
+                    long vCount = boolDimBranch(G, vInAll, vInOut, vInRest);
+                    for (IndexVertex a : inNewlyAdded) {
+                        containingCount[a.id()] += vCount;
+                    }
+                    total += vCount;
+                }
+                before.add(w);
             }
-            total += vCount;
-		}
+
+        } else {
+            // try v out and branch
+            VSubSet vOutAll = all.clone();
+            VSubSet vOutRest = rest.clone();
+            VSubSet vOutOut = out.clone();
+            ArrayList<IndexVertex> outNewlyAdded = new ArrayList<>();
+
+            // moving v to out
+            vOutRest.remove(v);
+            vOutOut.add(v);
+            if (isValid(G, vOutAll, vOutOut, vOutRest, outNewlyAdded)) {
+                total += boolDimBranch(G, vOutAll, vOutOut, vOutRest);
+                for (IndexVertex a : outNewlyAdded) {
+                    containingCount[a.id()] += total;
+                }
+            }
+        }
 
 		return total;
 	}
@@ -202,19 +307,24 @@ public class CCMISHybrid {
             changed = false;
 
             for(IndexVertex w : all) {
-                VSubSet intersection = rest.intersection(neighbourhoods.get(w.id()));
-                if(intersection.isEmpty()) {
+                VSubSet wRestNeighbourHood = rest.intersection(neighbourhoods.get(w.id()));
+                if(wRestNeighbourHood.isEmpty()) {
+                    // if N(w) in rest is empty no vertex can dominate w, so it must be in
                     if(out.contains(w)){
+                        // H2 of Gaspers
                         valid = false;
                         break;
                     } else {
+                        // R2 of Gaspers
                         if(!toAdd.contains(w)) {
                             toAdd.push(w);
                         }
                     }
                 } else {
-                    if(out.contains(w) && (intersection.size() == 1)) {
-                        IndexVertex u = intersection.first();
+                    // if only one neighbour can dominate w that neighbour must be in
+                    // R1 of Gaspers
+                    if(out.contains(w) && (wRestNeighbourHood.size() == 1)) {
+                        IndexVertex u = wRestNeighbourHood.first();
                         if(u != null) {
                             if(!toAdd.contains(u)) {
                                 toAdd.push(u);

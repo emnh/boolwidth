@@ -21,7 +21,12 @@ public class MISBackTrackTest {
 
         ArrayList<String> fileNames  = new ArrayList<String>();
 
-        fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf");
+        fileNames.add(ControlUtil.GRAPHLIB + "protein/1ail_graph.dimacs");
+        fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
+        fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
+        fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf");
+
+        /*fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "other/risk.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "prob/pigs-pp.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1sem_graph.dimacs");
@@ -33,6 +38,7 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf");
+        */
 
         //fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen16_16.dgf");
         //fileNames.add(ControlUtil.GRAPHLIB + "coloring/homer.dgf");
