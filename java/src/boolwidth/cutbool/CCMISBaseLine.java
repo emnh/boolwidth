@@ -1,16 +1,16 @@
 package boolwidth.cutbool;
 
-import org.bridj.objc.SEL;
 import sadiasrc.graph.*;
 import sadiasrc.heuristic.NDOrdering;
 import sadiasrc.util.IndexedSet;
 
-import java.io.File;
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Stack;
+import java.util.TreeMap;
 
-public class CCMISHybrid {
+public class CCMISBaseLine {
 
 	//stores neighborhood in bitsets for faster intersection and union
 	private static ArrayList<VSubSet> neighbourhoods;
@@ -32,6 +32,9 @@ public class CCMISHybrid {
     private static final boolean SELECT_SEPARATOR = false;
     private static final boolean USE_NDORDERING = false;
     private static final boolean GASPERS_BRANCH = false || SELECT_SEPARATOR;
+
+    // this option leads to incorrect answer, should not be used
+    private static final boolean ENUMERATE_OUT_SEPARATOR = false;
 
     public static class Dissect {
         public static VSubSet findSeparator(BiGraph g, VSubSet all) {
@@ -112,7 +115,7 @@ public class CCMISHybrid {
 
         zeroCount = 0;
 
-		long count = boolDimBranch(G, all, out, rest, separator);
+		long count = boolDimBranch(G, all, out, rest, separator, 0);
 
         // System.out.println("zero count: " + zeroCount);
 
@@ -128,11 +131,9 @@ public class CCMISHybrid {
 	 * @throws InvalidAlgorithmParameterException
 	 */
 
-	public static long boolDimBranch(BiGraph G, VSubSet all, VSubSet out, VSubSet rest, VSubSet separator)
-	{
+	public static long boolDimBranch(BiGraph G, VSubSet all, VSubSet out, VSubSet rest, VSubSet separator, int depth) {
         // check termination conditions
-		if(rest.isEmpty())
-		{
+		if(rest.isEmpty()) {
 			if(out.isEmpty()) {
                 return 1;
             } else {
@@ -145,24 +146,103 @@ public class CCMISHybrid {
         boolean isConnected = BasicGraphAlgorithms.isConnected(G, all, neighbourhoods);
 
 		// if not connected then call for components and multiply
-		if(!isConnected)
-		{
-			
-			long total=1;
-			for(VSubSet vs : BasicGraphAlgorithms.connectedComponentsVSubSets(G, all))
-			{
+		if(!isConnected) {
+			long total = 1;
+			for(VSubSet vs : BasicGraphAlgorithms.connectedComponentsVSubSets(G, all)) {
 				VSubSet newAll = vs;
 				VSubSet newOut = newAll.intersection(out);
 				VSubSet newRest = newAll.intersection(rest);
                 VSubSet newSeparator = new VSubSet(groundSet);
 
-				long next = boolDimBranch(G, newAll, newOut, newRest, newSeparator);
+				long next = boolDimBranch(G, newAll, newOut, newRest, newSeparator, depth);
                 if (next == 0) return 0;
                 total = Math.multiplyExact(total, next);
 			}
 
 			return total;
 		}
+
+        // check to see if out is a separator
+        if (ENUMERATE_OUT_SEPARATOR && out.size() > 0 && out.size() < 5) {
+            boolean outIsSeparator = !BasicGraphAlgorithms.isConnected(G, rest, neighbourhoods);
+            if (outIsSeparator) {
+                ArrayList<VSubSet> connectedComponents =
+                        new ArrayList<>(BasicGraphAlgorithms.connectedComponentsVSubSets(G, rest));
+
+//                if (connectedComponents.size() > 2) {
+//                    ArrayList<VSubSet> connectedComponents2 = new ArrayList<>();
+//                    connectedComponents2.add(connectedComponents.get(0));
+//                    VSubSet restComponents = new VSubSet(groundSet);
+//                    for (int i = 1; i < connectedComponents.size(); i++) {
+//                        restComponents = restComponents.union(connectedComponents.get(i));
+//                    }
+//                    connectedComponents2.add(restComponents);
+//
+//                    System.out.println("out at depth " + depth +
+//                            " separates " + connectedComponents.size() +
+//                            " components and out size is " + out.size());
+//                }
+
+                ArrayList<IndexVertex> outAL = new ArrayList<>(out);
+
+                long allTotal = 0;
+                int outSize = out.size();
+
+                Stack<ArrayList<Integer>> componentPositions = new Stack<>();
+                ArrayList<Integer> currentComponentPositions = new ArrayList<>();
+                componentPositions.push(currentComponentPositions);
+                while (!componentPositions.isEmpty()) {
+                    currentComponentPositions = componentPositions.pop();
+                    for (int componentIndex = 0; componentIndex < connectedComponents.size(); componentIndex++) {
+                        ArrayList<Integer> currentComponentPositions2 = new ArrayList<>(currentComponentPositions);
+                        int currentOutIndex = currentComponentPositions2.size();
+                        IndexVertex currentOut = outAL.get(currentOutIndex);
+                        VSubSet currentOutNeighbourHood = neighbourhoods.get(currentOut.id());
+                        currentComponentPositions2.add(componentIndex);
+                        if (connectedComponents.get(componentIndex).intersection(currentOutNeighbourHood).size() == 0) {
+                            continue;
+                        }
+                        if (currentComponentPositions2.size() < outSize) {
+                            componentPositions.push(currentComponentPositions2);
+                        } else {
+                            // System.out.println("pos: " + currentComponentPositions2);
+
+                            long total = 1;
+                            int currentComponent = 0;
+                            for(VSubSet vs : connectedComponents)
+                            {
+                                VSubSet newAll = vs.clone();
+                                VSubSet newOut = new VSubSet(groundSet); //newAll.intersection(out);
+                                VSubSet newRest = newAll.intersection(rest);
+                                VSubSet newSeparator = new VSubSet(groundSet);
+
+                                int outIndex = 0;
+                                for (int position : currentComponentPositions2) {
+                                    if (position == currentComponent) {
+                                        IndexVertex vOut = outAL.get(outIndex);
+                                        newAll.add(vOut);
+                                        newOut.add(vOut);
+                                    }
+                                    outIndex++;
+                                }
+
+                                long next = boolDimBranch(G, newAll, newOut, newRest, newSeparator, depth);
+                                if (next == 0) {
+                                    // System.out.println("total 0");
+                                    total = 0;
+                                    break;
+                                }
+                                total = Math.multiplyExact(total, next);
+                                currentComponent++;
+                            }
+                            allTotal += total;
+                        }
+                    }
+                }
+
+                return allTotal;
+            }
+        }
 
         // look for twins and branch after removing one of them
         // generally slower
@@ -185,7 +265,7 @@ public class CCMISHybrid {
 
                     long containingR = containingCount[r.id()];
                     //System.out.println("containingR: " + containingR);
-                    long total = boolDimBranch(G, rAll, rOut, rRest, separator);
+                    long total = boolDimBranch(G, rAll, rOut, rRest, separator, depth);
                     containingR = containingCount[r.id()] - containingR;
 
                     return total + containingR;
@@ -212,7 +292,7 @@ public class CCMISHybrid {
                     rAll.remove(s);
                     rOut.remove(s);
 
-                    long total = boolDimBranch(G, rAll, rOut, rRest, separator);
+                    long total = boolDimBranch(G, rAll, rOut, rRest, separator, depth);
 
                     return total;
                 }
@@ -221,6 +301,7 @@ public class CCMISHybrid {
         }
 
 		// find a vertex to branch on
+        boolean force_gaspers_if_out = false;
         IndexVertex v = null;
         if (USE_NDORDERING) {
             // can use all instead of rest, but need to use GASPERS_BRANCH then. it is slower.
@@ -294,11 +375,25 @@ public class CCMISHybrid {
                 }
             }
         } else {
+            VSubSet selection = rest.intersection(minLeftRightVertices);
+            VSubSet degreeSelection = rest;
+
+            /*
+            boolean outIsSeparator = !BasicGraphAlgorithms.isConnected(G, rest, neighbourhoods);
+            if (outIsSeparator) {
+                separator = out;
+            }
+            VSubSet remainingSeparator = separator.intersection(all);
+            if (!remainingSeparator.isEmpty()) {
+                selection = remainingSeparator;
+                degreeSelection = remainingSeparator;
+                force_gaspers_if_out = true;
+            }*/
+
             // select maximum degree
             int maxDeg = -1;
-            VSubSet selection = rest.intersection(minLeftRightVertices);
             for (IndexVertex w : selection) {
-                int t = neighbourhoods.get(w.id()).intersection(rest).size();
+                int t = neighbourhoods.get(w.id()).intersection(degreeSelection).size();
                 if (t > maxDeg) {
                     v = w;
                     maxDeg = t;
@@ -307,7 +402,7 @@ public class CCMISHybrid {
             if (v == null) {
                 selection = rest;
                 for (IndexVertex w : selection) {
-                    int t = neighbourhoods.get(w.id()).intersection(rest).size();
+                    int t = neighbourhoods.get(w.id()).intersection(degreeSelection).size();
                     if (t > maxDeg) {
                         v = w;
                         maxDeg = t;
@@ -329,7 +424,7 @@ public class CCMISHybrid {
             // moving v to in
             putIn(G, vInAll, vInOut, vInRest, v);
             if (isValid(G, vInAll, vInOut, vInRest, inNewlyAdded)) {
-                long vCount = boolDimBranch(G, vInAll, vInOut, vInRest, separator);
+                long vCount = boolDimBranch(G, vInAll, vInOut, vInRest, separator, depth + 1);
                 for (IndexVertex a : inNewlyAdded) {
                     containingCount[a.id()] += vCount;
                 }
@@ -337,7 +432,7 @@ public class CCMISHybrid {
             }
         }
 
-        if (GASPERS_BRANCH) {
+        if (GASPERS_BRANCH || force_gaspers_if_out) {
             // try all neighbours of v in
             VSubSet vRestNeighbours = neighbourhoods.get(v.id()).intersection(rest);
 
@@ -366,7 +461,7 @@ public class CCMISHybrid {
                 // moving w to in
                 putIn(G, vInAll, vInOut, vInRest, w);
                 if (isValid(G, vInAll, vInOut, vInRest, inNewlyAdded)) {
-                    long vCount = boolDimBranch(G, vInAll, vInOut, vInRest, separator);
+                    long vCount = boolDimBranch(G, vInAll, vInOut, vInRest, separator, depth + 1);
                     for (IndexVertex a : inNewlyAdded) {
                         containingCount[a.id()] += vCount;
                     }
@@ -386,7 +481,7 @@ public class CCMISHybrid {
             vOutRest.remove(v);
             vOutOut.add(v);
             if (isValid(G, vOutAll, vOutOut, vOutRest, outNewlyAdded)) {
-                total += boolDimBranch(G, vOutAll, vOutOut, vOutRest, separator);
+                total += boolDimBranch(G, vOutAll, vOutOut, vOutRest, separator, depth + 1);
                 for (IndexVertex a : outNewlyAdded) {
                     containingCount[a.id()] += total;
                 }

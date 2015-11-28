@@ -77,8 +77,10 @@ public class MISBackTrackTest {
         for (int i = 0; i < 11000; i++) {
             //CutBool.countNeighborhoods(bigraph);
             CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph));
+            //CCMISBaseLine.BoolDimBranch(convertSadiaBiGraph(bigraph));
+            //CCMISExperimental.BoolDimBranch(convertSadiaBiGraph(bigraph));
             //CCMISDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph));
-            CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph));
+            //CCMISGSDynamicForest.BoolDimBranch(convertSadiaBiGraph(bigraph));
             //CCMISRe.BoolDimBranch(new IndexGraph(bigraph));
         }
     }
@@ -182,11 +184,11 @@ public class MISBackTrackTest {
         // ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
         // System.out.printf("UNN (bigraph) (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
-        ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
-        System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+        ret = doBenchMark(() -> CCMISBaseLine.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
+        System.out.printf("CCMIS baseline (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
-        ret = doBenchMark(() -> CCMISHybrid.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
-        System.out.printf("CCMIS hybrid (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+        ret = doBenchMark(() -> CCMISExperimental.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
+        System.out.printf("CCMIS XP       (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         /*
         ret = doBenchMark(() -> CBBacktrackInOutRest.countNeighborhoods(convertSadiaBiGraph(bigraph)), test);

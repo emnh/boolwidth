@@ -57,7 +57,7 @@ public class CutBoolComparatorCCMIS<V, E>  extends CutBoolComparator<V, E> imple
             }*/
 
             long before, after;
-            cb = CCMISHybrid.BoolDimBranch(convertSadiaBiGraph(cut));
+            cb = CCMISExperimental.BoolDimBranch(convertSadiaBiGraph(cut));
 			//cb = CCMISDynamicForest.BoolDimBranch(convertSadiaBiGraph(cut));
             /*
             long UPPER_BOUND = 1000000; // should be a runtime (ms) perhaps
