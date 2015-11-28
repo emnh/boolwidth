@@ -25,6 +25,7 @@ public class MISBackTrackTest {
         fileNames.add(ControlUtil.GRAPHLIB + "protein/1aba_graph.dimacs");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/david.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen8_8.dgf");
+        fileNames.add(ControlUtil.GRAPHLIB + "prob2/BN_93.dgf");
 
         /*fileNames.add(ControlUtil.GRAPHLIB + "coloring/queen5_5.dgf");
         fileNames.add(ControlUtil.GRAPHLIB + "other/risk.dgf");
@@ -178,8 +179,8 @@ public class MISBackTrackTest {
         System.out.printf("OpenCL Approx CB (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
         */
 
-        ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
-        System.out.printf("UNN (bigraph) (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
+        // ret = doBenchMark(() -> CutBool.countNeighborhoods(bigraph), test);
+        // System.out.printf("UNN (bigraph) (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
 
         ret = doBenchMark(() -> CCMIS.BoolDimBranch(convertSadiaBiGraph(bigraph)), test);
         System.out.printf("Sadia CCMIS backtrack (%dms): log2(%d)=%.2f\n", ret.eachDuration(), ret.returnValue, CutBool.getLogBW(ret.returnValue));
