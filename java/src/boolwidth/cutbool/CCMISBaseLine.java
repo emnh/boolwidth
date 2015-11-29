@@ -83,13 +83,11 @@ public class CCMISBaseLine {
         }
     }
 	
-	public static long BoolDimBranch(BiGraph G)
-	{
+	public static long BoolDimBranch(BiGraph G)	{
 		neighbourhoods = new ArrayList<VSubSet>(G.numVertices());
 		groundSet = new IndexedSet<IndexVertex>(G.vertices());
         containingCount = new long[G.numVertices()];
-		for(int i = 0; i < G.numVertices(); i++)
-		{
+		for(int i = 0; i < G.numVertices(); i++) {
             IndexVertex v = G.getVertex(i);
             containingCount[v.id()] = 0;
 			neighbourhoods.add(new VSubSet(groundSet, G.neighbours(v)));

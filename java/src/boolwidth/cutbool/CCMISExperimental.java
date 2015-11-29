@@ -1,12 +1,9 @@
 package boolwidth.cutbool;
 
-import org.bridj.objc.SEL;
 import sadiasrc.graph.*;
 import sadiasrc.heuristic.NDOrdering;
 import sadiasrc.util.IndexedSet;
 
-import java.io.File;
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.util.*;
 

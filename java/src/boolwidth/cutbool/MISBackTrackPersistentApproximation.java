@@ -10,6 +10,7 @@ import java.util.HashSet;
 /**
  * Created by emh on 5/14/2014.
  */
+@Deprecated
 class PersistentMISStateApproximation<V, E> {
     public AdjacencyListGraph<Vertex<V>, V, E> graph;
     //public HashSet<Vertex<V>> R_in;
@@ -36,6 +37,7 @@ class PersistentMISStateApproximation<V, E> {
     }
 }
 
+@Deprecated
 public class MISBackTrackPersistentApproximation {
 
     /*public String fmtVList(Collection<Vertex<V>> vertices) {

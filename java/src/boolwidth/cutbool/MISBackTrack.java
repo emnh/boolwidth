@@ -10,6 +10,7 @@ import java.util.HashSet;
 /**
  * Created by emh on 5/14/2014.
  */
+@Deprecated
 class MISState<V, E> {
     public AdjacencyListGraph<Vertex<V>, V, E> graph;
     //public HashSet<Vertex<V>> R_in;
@@ -32,6 +33,7 @@ class MISState<V, E> {
     }
 }
 
+@Deprecated
 public class MISBackTrack {
 
 
